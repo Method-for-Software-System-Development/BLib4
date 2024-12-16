@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.Pane?>
+
+<Pane prefHeight="432.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.ServerMonitorFrameController">
+   <children>
+      <TableView fx:id="monitorTable" layoutX="65.0" layoutY="84.0" prefHeight="334.0" prefWidth="471.0" style="-fx-background-color: #000000;">
+        <columns>
+          <TableColumn prefWidth="66.0" text="#" />
+          <TableColumn prefWidth="167.0" text="IP" />
+            <TableColumn prefWidth="112.0" text="Host" />
+            <TableColumn prefWidth="125.0" text="Status" />
+        </columns>
+      </TableView>
+      <Button id="btnExit" fx:id="btnExit" layoutX="484.0" layoutY="40.0" mnemonicParsing="false" onAction="#getExitBtn" text="Exit" />
+   </children>
+</Pane>
