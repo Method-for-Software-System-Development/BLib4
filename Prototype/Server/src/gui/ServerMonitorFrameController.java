@@ -61,8 +61,8 @@ public class ServerMonitorFrameController {
     private void addRow(String host, String ip) {
         List<String> list = new ArrayList<>();
         list.add(String.valueOf(index++));
-        list.add(host);
         list.add(ip);
+        list.add(host);
         list.add("Connected");
 
         this.monitorList.add(list);
