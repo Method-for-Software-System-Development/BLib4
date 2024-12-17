@@ -44,25 +44,10 @@ public class ServerPortFrameController  {
 		}
 		else
 		{
-			((Node)event.getSource()).getScene().getWindow().hide(); //hiding primary window
-			Stage primaryStage = new Stage();
-			FXMLLoader loader = new FXMLLoader();
 			ServerUI.runServer(p);
 
-			//ToDo: open the monitor window
-			Pane root = loader.load(getClass().getResource("/gui/ServerMonitor.fxml").openStream());
-			ServerMonitorFrameController serverMonitorFrameController = loader.getController();
-
-			Scene scene = new Scene(root);
-			//?scene.getStylesheets().add(getClass().getResource("/gui/ServerMonitor.css").toExternalForm());
-			primaryStage.setTitle("Server Monitor");
-
-			primaryStage.setScene(scene);
-			primaryStage.show();
-
-			serverMonitorFrameController.addRow("localhost", "test", "test");
-			serverMonitorFrameController.addRow("localhost", "test1", "test");
-			serverMonitorFrameController.addRow("localhost", "test2", "test");
+			// hide port window
+			((Node)event.getSource()).getScene().getWindow().hide();
 		}
 	}
 

@@ -7,12 +7,12 @@
 
 <Pane prefHeight="432.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.ServerMonitorFrameController">
    <children>
-      <TableView fx:id="monitorTable" layoutX="65.0" layoutY="84.0" prefHeight="334.0" prefWidth="471.0" style="-fx-background-color: #000000;">
+      <TableView fx:id="monitorTable" layoutX="65.0" layoutY="84.0" prefHeight="334.0" prefWidth="471.0">
         <columns>
-          <TableColumn prefWidth="66.0" text="#" />
-          <TableColumn prefWidth="167.0" text="IP" />
-            <TableColumn prefWidth="112.0" text="Host" />
-            <TableColumn prefWidth="125.0" text="Status" />
+          <TableColumn fx:id="column1" prefWidth="66.0" text="#" />
+          <TableColumn fx:id="column2" prefWidth="167.0" text="IP" />
+            <TableColumn fx:id="column3" prefWidth="112.0" text="Host" />
+            <TableColumn fx:id="column4" prefWidth="125.0" text="Status" />
         </columns>
       </TableView>
       <Button id="btnExit" fx:id="btnExit" layoutX="484.0" layoutY="40.0" mnemonicParsing="false" onAction="#getExitBtn" text="Exit" />

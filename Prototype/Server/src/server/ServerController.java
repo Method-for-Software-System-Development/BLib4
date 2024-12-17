@@ -8,6 +8,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 
+import gui.ServerMonitorFrameController;
+import logic.MessageType;
 import ocsf.server.*;
 
 /**
@@ -23,6 +25,8 @@ import ocsf.server.*;
 
 public class ServerController extends AbstractServer
 {
+    private ServerMonitorFrameController monitorController;
+
     //Class variables *************************************************
 
     /**
@@ -40,9 +44,10 @@ public class ServerController extends AbstractServer
      */
     private Connection conn;
 
-    public ServerController(int port)
+    public ServerController(int port, ServerMonitorFrameController monitorController)
     {
         super(port);
+        this.monitorController = monitorController;
     }
 
     //Instance methods ************************************************
@@ -57,8 +62,31 @@ public class ServerController extends AbstractServer
     public void handleMessageFromClient  (Object msg, ConnectionToClient client)
     {
 
-        //ToDo: handle the message from the client
+        MessageType reciveMsg = (MessageType) msg;
 
+        switch (reciveMsg.getId())
+        {
+            case "100":
+                // request to send all the subscribers in db, no data in the message
+                break;
+
+            case "101":
+                // request to send subscriber with specific id, in format String (the id)
+                break;
+
+            case "102":
+                // request to update subscriber in db, in format Subscriber
+                break;
+
+            default:
+                System.out.println("Invalid message type");
+                break;
+        }
+
+
+
+        //ToDo: handle the message from the client
+        // Type of messages: Request all students, update student in DB, get student by ID
         /*
         if (msg instanceof Student)
         {
@@ -104,6 +132,22 @@ public class ServerController extends AbstractServer
      */
     protected void serverStopped()  {
         System.out.println ("Server has stopped listening for connections.");
+    }
+
+
+    @Override
+    protected void clientConnected(ConnectionToClient client) {
+        System.out.println("Client connected");
+
+        monitorController.clientConnected(client);
+    }
+
+
+    @Override
+    protected synchronized void clientDisconnected(ConnectionToClient client) {
+        System.out.println("Client disconnected");
+
+        monitorController.clientDisconnected(client);
     }
 
     private void connectToDb()
