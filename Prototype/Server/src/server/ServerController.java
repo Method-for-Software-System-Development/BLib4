@@ -10,6 +10,8 @@ import java.sql.SQLException;
 
 import gui.ServerMonitorFrameController;
 import logic.MessageType;
+import logic.Subscriber;
+import logic.dbController;
 import ocsf.server.*;
 
 /**
@@ -28,22 +30,14 @@ public class ServerController extends AbstractServer
     private ServerMonitorFrameController monitorController;
 
     //Class variables *************************************************
-
-    /**
-     * The default port to listen on.
-     */
-    //final public static int DEFAULT_PORT = 5555;
-
+    private dbController dbController;
     //Constructors ****************************************************
 
     /**
      * Constructs an instance of the echo server.
      *
      * @param port The port number to connect on.
-     *
      */
-    private Connection conn;
-
     public ServerController(int port, ServerMonitorFrameController monitorController)
     {
         super(port);
@@ -55,64 +49,56 @@ public class ServerController extends AbstractServer
     /**
      * This method handles any messages received from the client.
      *
-     * @param msg The message received from the client.
+     * @param msg    The message received from the client.
      * @param client The connection from which the message originated.
-     * @param
      */
-    public void handleMessageFromClient  (Object msg, ConnectionToClient client)
+    public void handleMessageFromClient(Object msg, ConnectionToClient client)
     {
 
-        MessageType reciveMsg = (MessageType) msg;
-
-        switch (reciveMsg.getId())
+        MessageType receiveMsg = (MessageType) msg;
+        MessageType sendMsg = null;
+        switch (receiveMsg.getId())
         {
             case "100":
                 // request to send all the subscribers in db, no data in the message
+                sendMsg = new MessageType("200", dbController.getAllSubscribers());
                 break;
 
             case "101":
                 // request to send subscriber with specific id, in format String (the id)
+                sendMsg = new MessageType("201", dbController.getSubscriberById((String) receiveMsg.getData()));
                 break;
 
             case "102":
                 // request to update subscriber in db, in format Subscriber
+                sendMsg = new MessageType("202", dbController.updateSubscriber((Subscriber) receiveMsg.getData()));
                 break;
 
             default:
                 System.out.println("Invalid message type");
-                break;
+                return;
         }
 
+        // sent the message to the client
+        sendMessageToClient(client, sendMsg);
+    }
 
-
-        //ToDo: handle the message from the client
-        // Type of messages: Request all students, update student in DB, get student by ID
-        /*
-        if (msg instanceof Student)
+    /**
+     * The method send message to specific client
+     *
+     * @param client - the client to send the message
+     * @param msg    - the message to send
+     */
+    private void sendMessageToClient(ConnectionToClient client, Object msg)
+    {
+        try
         {
-            // Update the student in the DB
-            Student s = (Student) msg;
-            // update db
-            updateStudentInDB(s);
-
-            this.sendToAllClients("valid");
+            client.sendToClient(msg);
         }
-        else if(msg instanceof String )  {
-            // Send the student to the client
-            int flag = 0;
-            for (int i = 0; i < 4; i++) {
-                if (students[i].getId().equals(msg)) {
-                    System.out.println("Server Found");
-                    this.sendToAllClients(students[i].toString());
-                    flag = 1;
-                }
-
-            }
-            if (flag != 1) {
-                System.out.println("Not Found");
-                this.sendToAllClients("Error");
-            }
-        }*/
+        catch (Exception e)
+        {
+            System.out.println("Error sending message to client");
+        }
     }
 
     /**
@@ -121,67 +107,48 @@ public class ServerController extends AbstractServer
      */
     protected void serverStarted()
     {
-        System.out.println ("Server listening for connections on port " + getPort());
+        System.out.println("Server listening for connections on port " + getPort());
 
-        connectToDb();
-
+        // get connection to the db
+        this.dbController = logic.dbController.getInstance();
     }
+
     /**
      * This method overrides the one in the superclass.  Called
      * when the server stops listening for connections.
      */
-    protected void serverStopped()  {
-        System.out.println ("Server has stopped listening for connections.");
+    protected void serverStopped()
+    {
+        System.out.println("Server has stopped listening for connections.");
     }
 
 
+    /**
+     * This method is called when the server is connected to a client.
+     *
+     * @param client the connection connected to the client.
+     */
     @Override
-    protected void clientConnected(ConnectionToClient client) {
+    protected void clientConnected(ConnectionToClient client)
+    {
         System.out.println("Client connected");
 
         monitorController.clientConnected(client);
     }
 
-
+    // ToDo: not working, check why
+    /**
+     * This method is called when the server is disconnected from a client.
+     *
+     * @param client the connection with the client.
+     */
     @Override
-    protected synchronized void clientDisconnected(ConnectionToClient client) {
+    protected synchronized void clientDisconnected(ConnectionToClient client)
+    {
         System.out.println("Client disconnected");
 
         monitorController.clientDisconnected(client);
     }
-
-    private void connectToDb()
-    {
-        try
-        {
-            Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
-            System.out.println("Driver definition succeed");
-        } catch (Exception ex) {
-            /* handle the error*/
-            System.out.println("Driver definition failed");
-        }
-
-        try
-        {
-            this.conn = DriverManager.getConnection("jdbc:mysql://localhost/blib4?serverTimezone=IST","root","Aa123456");
-            System.out.println("SQL connection succeed");
-
-            //getFacilityFromDB(conn);
-            //getStudentsFromDB(conn);
-
-        } catch (SQLException ex)
-        {/* handle any errors*/
-            System.out.println("SQLException: " + ex.getMessage());
-            System.out.println("SQLState: " + ex.getSQLState());
-            System.out.println("VendorError: " + ex.getErrorCode());
-        }
-    }
-
-    //ToDo: read data from DB
-
-
-    //ToDo: update data in DB
 }
-
 
 //End of EchoServer class
