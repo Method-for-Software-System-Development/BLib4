@@ -3,6 +3,7 @@
 // license found at www.lloseng.com
 package server;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -73,6 +74,15 @@ public class ServerController extends AbstractServer
                 // request to update subscriber in db, in format Subscriber
                 sendMsg = new MessageType("202", dbController.updateSubscriber((Subscriber) receiveMsg.getData()));
                 break;
+
+            case "DISCONNECT":
+                try {
+                    monitorController.clientDisconnected(client);
+                    client.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return;
 
             default:
                 System.out.println("Invalid message type");
@@ -145,9 +155,7 @@ public class ServerController extends AbstractServer
     @Override
     protected synchronized void clientDisconnected(ConnectionToClient client)
     {
-        System.out.println("Client disconnected");
-
-        monitorController.clientDisconnected(client);
+        System.out.println("Client disconnected!");
     }
 }
 

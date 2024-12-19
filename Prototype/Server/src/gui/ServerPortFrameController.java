@@ -56,7 +56,7 @@ public class ServerPortFrameController  {
 				
 		Scene scene = new Scene(root);
 		scene.getStylesheets().add(getClass().getResource("/gui/ServerPort.css").toExternalForm());
-		primaryStage.setTitle("Client");
+		primaryStage.setTitle("Server");
 		primaryStage.setScene(scene);
 		
 		primaryStage.show();		

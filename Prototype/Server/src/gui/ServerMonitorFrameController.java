@@ -14,7 +14,8 @@ import ocsf.server.ConnectionToClient;
 
 import java.util.*;
 
-public class ServerMonitorFrameController {
+public class ServerMonitorFrameController
+{
     private static int index = 1;
     private ObservableList<List<String>> monitorList = FXCollections.observableArrayList();
     private Property<ObservableList<List<String>>> monitorListProperty = new SimpleObjectProperty<>(monitorList);
@@ -39,7 +40,8 @@ public class ServerMonitorFrameController {
     private Button monitorButton;
 
     @FXML
-    private void initialize() {
+    private void initialize()
+    {
         // Initialize your components here if needed
         monitorTable.itemsProperty().bind(monitorListProperty);
 
@@ -51,14 +53,14 @@ public class ServerMonitorFrameController {
     }
 
 
-    public void getExitBtn(ActionEvent event) throws Exception {
+    public void getExitBtn(ActionEvent event) throws Exception
+    {
         System.out.println("exit Academic Tool");
         System.exit(0);
     }
 
-    //ToDo: add handle for update the table
-
-    private void addRow(String host, String ip) {
+    private void addRow(String host, String ip)
+    {
         List<String> list = new ArrayList<>();
         list.add(String.valueOf(index++));
         list.add(ip);
@@ -66,22 +68,30 @@ public class ServerMonitorFrameController {
         list.add("Connected");
 
         this.monitorList.add(list);
-
-        System.out.println(this.monitorList);
     }
 
-
-    public void clientConnected(ConnectionToClient client) {
+    public void clientConnected(ConnectionToClient client)
+    {
         clientMap.put(client, index);
         addRow(Objects.requireNonNull(client.getInetAddress()).getHostName(), client.getInetAddress().getHostAddress());
     }
 
-    public void clientDisconnected(ConnectionToClient client) {
-        //System.out.println("Client Disconnected");
+    public void clientDisconnected(ConnectionToClient client)
+    {
         int index = clientMap.get(client);
-        this.monitorList.remove(index);
-        clientMap.remove(client);
-    }
 
+        // remove the client from the table
+        for (List<String> list : monitorList)
+        {
+            if (list.get(0).equals(String.valueOf(index)))
+            {
+                monitorList.remove(list);
+                break;
+            }
+        }
+
+        clientMap.remove(client);
+        System.out.println(this.monitorList);
+    }
 
 }
