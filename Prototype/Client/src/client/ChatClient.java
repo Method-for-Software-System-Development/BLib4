@@ -12,6 +12,7 @@ import logic.Subscriber;
 import ocsf.client.AbstractClient;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,7 +34,7 @@ public class ChatClient extends AbstractClient {
     ChatIF clientUI;
     private ShowAllSubscribersFrameController showAllSubscribersController;
     private EditSubscriberFrameController editSubscriberFrameController;
-    public static List<Subscriber> subscribers = null;
+    public static List<Subscriber> subscribers = new ArrayList<Subscriber>();
     public static boolean awaitResponse = false;
 
     //Constructors ****************************************************
@@ -67,14 +68,14 @@ public class ChatClient extends AbstractClient {
             case "200":
                 // list of all the subscribers in db, in format List<Subscriber>
                 subscribers = (List<Subscriber>) receiveMsg.getData();
-                System.out.println(subscribers);
                 break;
 
             case "201":
                 // subscriber details, in format Subscriber
                 Subscriber subscriber=(Subscriber)receiveMsg.getData();
                 subscribers.clear();
-                subscribers.add(subscriber);
+                if(subscriber!=null)
+                	subscribers.add(subscriber);
                 break;
 
             case "202":

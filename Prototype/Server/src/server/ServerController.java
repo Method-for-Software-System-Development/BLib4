@@ -105,7 +105,6 @@ public class ServerController extends AbstractServer
     {
         try
         {
-        	System.out.println("?????????");
             client.sendToClient(msg);
         }
         catch (Exception e)

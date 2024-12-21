@@ -62,8 +62,9 @@ public class EditSubscriberFrameController {
         String history = txtHistory.getText();
         String phone = txtPhone.getText();
         String email = txtEmail.getText();
-
-        // ToDo: Add logic to save the subscriber details
+        
+        // Update the subscriber details in db
+    	ClientUI.chat.accept(new MessageType("102",new Subscriber(Integer.parseInt(id),name,Integer.parseInt(history),phone,email)));
     }
 
     @FXML
