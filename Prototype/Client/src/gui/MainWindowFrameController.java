@@ -6,10 +6,12 @@ import client.ClientUI;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import ocsf.client.AbstractClient;
 
@@ -36,15 +38,38 @@ public class MainWindowFrameController {
     private TextField txtStudentId;
 
     @FXML
-    private void handleShowAll(ActionEvent event) {
+    private void handleShowAll(ActionEvent event) throws IOException {
         // Handle the Show All button action
+    	((Node) event.getSource()).getScene().getWindow().hide(); //hiding primary window
+    	FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/ShowAllSubscribers.fxml"));
+    	Parent root = loader.load();
+    	Scene scene = new Scene(root);
+        Stage primaryStage = new Stage();
+    	primaryStage.setScene(scene);
+    	primaryStage.show();
+        primaryStage.setTitle("All Subscribers");
+
         //ToDo: open new window with all students (table)
     }
 
     @FXML
-    private void handleSearch(ActionEvent event) {
+    private void handleSearch(ActionEvent event) throws IOException {
         // Handle the Search button action
         //ToDo: open new window with student details
+    	String id=txtStudentId.getText();
+    	if (id.trim().isEmpty()) {
+            System.out.println("You must enter an id number");
+
+        } else {
+        	((Node) event.getSource()).getScene().getWindow().hide(); //hiding primary window
+        	FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/SubscriberDetails.fxml"));
+        	Parent root = loader.load();
+        	Scene scene = new Scene(root);
+        	Stage primaryStage = new Stage();
+        	primaryStage.setScene(scene);
+        	primaryStage.show();
+        	primaryStage.setTitle("Subscriber Details");        	
+        }
     }
 
     @FXML

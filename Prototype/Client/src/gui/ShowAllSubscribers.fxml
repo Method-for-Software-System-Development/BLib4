@@ -5,17 +5,17 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.ShowAllSubscribersFrameController">
+<AnchorPane prefHeight="658.0" prefWidth="976.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.ShowAllSubscribersFrameController">
    <children>
-      <TableView layoutX="34.0" layoutY="25.0" prefHeight="291.0" prefWidth="533.0">
+      <TableView fx:id="tableSubscribers" layoutX="22.0" layoutY="24.0" prefHeight="566.0" prefWidth="939.0">
         <columns>
-          <TableColumn fx:id="column1" prefWidth="96.0" text="ID" />
-          <TableColumn fx:id="column2" prefWidth="99.0" text="Name" />
-            <TableColumn fx:id="column3" prefWidth="97.0" text="History No." />
-            <TableColumn fx:id="column4" prefWidth="113.0" text="Phone" />
-            <TableColumn fx:id="column5" prefWidth="127.0" text="Email" />
+          <TableColumn fx:id="colID" prefWidth="126.66665649414062" text="ID" />
+          <TableColumn fx:id="colName" prefWidth="157.66668701171875" text="Name" />
+            <TableColumn fx:id="colHistory" prefWidth="254.0" text="History No." />
+            <TableColumn fx:id="colPhone" prefWidth="176.0" text="Phone" />
+            <TableColumn fx:id="colEmail" prefWidth="227.0" text="Email" />
         </columns>
       </TableView>
-      <Button fx:id="btnClose" layoutX="515.0" layoutY="341.0" mnemonicParsing="false" onAction="#handleClose" text="Close" />
+      <Button fx:id="btnClose" layoutX="466.0" layoutY="606.0" mnemonicParsing="false" onAction="#handleClose" text="Close" />
    </children>
 </AnchorPane>
