@@ -114,6 +114,8 @@ public class MainWindowFrameController
         primaryStage.setScene(scene);
 
         primaryStage.show();    // Start the main window
+
+        mainWindow = primaryStage;
     }
 
 
