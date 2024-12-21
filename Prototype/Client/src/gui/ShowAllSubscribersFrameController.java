@@ -65,6 +65,8 @@ public class ShowAllSubscribersFrameController
         // ToDo: Load data into the table (maybe create method that will be called after receive the message)
     }
 
+
+
     /**
      * This method is used to update the subscribers list when new data arrives.
      *
