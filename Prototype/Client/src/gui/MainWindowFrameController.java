@@ -18,8 +18,9 @@ import ocsf.client.AbstractClient;
 
 import java.io.IOException;
 
-public class MainWindowFrameController {
-	
+public class MainWindowFrameController
+{
+    private static Stage mainWindow;
 
     @FXML
     private Button btnShowAll;
@@ -34,47 +35,53 @@ public class MainWindowFrameController {
     private TextField txtStudentId;
 
     @FXML
-    private void handleShowAll(ActionEvent event) throws IOException {
+    private void handleShowAll(ActionEvent event) throws IOException
+    {
         // Handle the Show All button action
-		FXMLLoader loader = new FXMLLoader();
-		
-		ClientUI.chat.accept(new MessageType("100",null));
+        FXMLLoader loader = new FXMLLoader();
 
-    	((Node) event.getSource()).getScene().getWindow().hide(); //hiding primary window
-		Pane root = loader.load(getClass().getResource("/gui/ShowAllSubscribers.fxml").openStream());    	
-    	ShowAllSubscribersFrameController showAllSubscribersFrameController = loader.getController();		
-    	showAllSubscribersFrameController.updateSubscribersInTableView(ChatClient.subscribers);
-    	
-    	Scene scene = new Scene(root);
+        ClientUI.chat.accept(new MessageType("100", null));
+
+        ((Node) event.getSource()).getScene().getWindow().hide(); //hiding primary window
+        Pane root = loader.load(getClass().getResource("/gui/ShowAllSubscribers.fxml").openStream());
+        ShowAllSubscribersFrameController showAllSubscribersFrameController = loader.getController();
+        showAllSubscribersFrameController.updateSubscribersInTableView(ChatClient.subscribers);
+
+        Scene scene = new Scene(root);
         Stage primaryStage = new Stage();
-    	primaryStage.setScene(scene);
-    	primaryStage.show();		
-		primaryStage.setTitle("All Subscribers");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+        primaryStage.setTitle("All Subscribers");
     }
 
     @FXML
-    private void handleSearch(ActionEvent event) throws IOException {
+    private void handleSearch(ActionEvent event) throws IOException
+    {
         // Handle the Search button action
         //ToDo: open new window with student details
-    	String id=txtStudentId.getText();
-    	if (id.trim().isEmpty()) {
+        String id = txtStudentId.getText();
+        if (id.trim().isEmpty())
+        {
             System.out.println("You must enter an id number");
 
-        } else {
-        	ClientUI.chat.accept(new MessageType("101",id));
-        	((Node) event.getSource()).getScene().getWindow().hide(); //hiding primary window
-        	FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/EditSubscriber.fxml"));
-        	Parent root = loader.load();
-        	Scene scene = new Scene(root);
-        	Stage primaryStage = new Stage();
-        	primaryStage.setScene(scene);
-        	primaryStage.show();
-        	primaryStage.setTitle("Subscriber Details");   
+        }
+        else
+        {
+            ClientUI.chat.accept(new MessageType("101", id));
+            ((Node) event.getSource()).getScene().getWindow().hide(); //hiding primary window
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/EditSubscriber.fxml"));
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+            Stage primaryStage = new Stage();
+            primaryStage.setScene(scene);
+            primaryStage.show();
+            primaryStage.setTitle("Subscriber Details");
         }
     }
 
     @FXML
-    private void handleExit(ActionEvent event) {
+    private void handleExit(ActionEvent event)
+    {
         // Handle the Exit button action
         System.out.println("exit Main Windows");
 
@@ -84,7 +91,8 @@ public class MainWindowFrameController {
         System.exit(0);
     }
 
-    public void start(Stage primaryStage) throws IOException {
+    public void start(Stage primaryStage) throws IOException
+    {
 
         Parent root = FXMLLoader.load(getClass().getResource("/gui/MainWindow.fxml"));
 
@@ -93,6 +101,17 @@ public class MainWindowFrameController {
         primaryStage.setTitle("Academic Managment Tool");
         primaryStage.setScene(scene);
 
-        primaryStage.show();	// Start the main window
+        primaryStage.show();    // Start the main window
+
+        // Save the main window
+        mainWindow = primaryStage;
+    }
+
+    public static void showMainWindow()
+    {
+        if (mainWindow != null)
+        {
+            mainWindow.show();
+        }
     }
 }
