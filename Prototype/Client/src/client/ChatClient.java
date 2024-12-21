@@ -35,6 +35,7 @@ public class ChatClient extends AbstractClient {
     private ShowAllSubscribersFrameController showAllSubscribersController;
     private EditSubscriberFrameController editSubscriberFrameController;
     public static List<Subscriber> subscribers = new ArrayList<Subscriber>();
+    public static boolean serverResponse = false;
     public static boolean awaitResponse = false;
 
     //Constructors ****************************************************
@@ -80,6 +81,7 @@ public class ChatClient extends AbstractClient {
 
             case "202":
                 // status of update in the db, in format boolean
+                serverResponse = (boolean) receiveMsg.getData();
                 break;
 
             default:
@@ -127,7 +129,6 @@ public class ChatClient extends AbstractClient {
             quit();
         }
     }
-
 
     /**
      * This method terminates the client.

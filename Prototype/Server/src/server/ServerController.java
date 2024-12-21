@@ -57,7 +57,6 @@ public class ServerController extends AbstractServer
      */
     public void handleMessageFromClient(Object msg, ConnectionToClient client)
     {
-
         MessageType receiveMsg = (MessageType) msg;
         MessageType sendMsg = null;
         switch (receiveMsg.getId())
@@ -78,10 +77,13 @@ public class ServerController extends AbstractServer
                 break;
 
             case "DISCONNECT":
-                try {
+                try
+                {
                     monitorController.clientDisconnected(client);
                     client.close();
-                } catch (IOException e) {
+                }
+                catch (IOException e)
+                {
                     e.printStackTrace();
                 }
                 return;
@@ -148,7 +150,6 @@ public class ServerController extends AbstractServer
         monitorController.clientConnected(client);
     }
 
-    // ToDo: not working, check why
     /**
      * This method is called when the server is disconnected from a client.
      *

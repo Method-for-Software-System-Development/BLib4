@@ -9,6 +9,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
@@ -52,6 +53,14 @@ public class MainWindowFrameController
         primaryStage.setScene(scene);
         primaryStage.show();
         primaryStage.setTitle("All Subscribers");
+
+        // Set the action to be performed when the user tries to close the window
+        primaryStage.setOnCloseRequest(e ->
+        {
+            e.consume();
+            primaryStage.close();
+            showMainWindow();
+        });
     }
 
     @FXML
@@ -63,7 +72,6 @@ public class MainWindowFrameController
         if (id.trim().isEmpty())
         {
             System.out.println("You must enter an id number");
-
         }
         else
         {
@@ -72,6 +80,8 @@ public class MainWindowFrameController
             {
                 System.out.println("Student ID Not Found");
 
+                Alert alert = new Alert(Alert.AlertType.ERROR, "Subscriber ID Not Found");
+                alert.showAndWait();
             }
             else
             {
@@ -86,6 +96,14 @@ public class MainWindowFrameController
                 primaryStage.setScene(scene);
                 primaryStage.show();
                 primaryStage.setTitle("Subscriber Details");
+
+                // Set the action to be performed when the user tries to close the window
+                primaryStage.setOnCloseRequest(e ->
+                {
+                    e.consume();
+                    primaryStage.close();
+                    showMainWindow();
+                });
             }
         }
     }
@@ -105,7 +123,6 @@ public class MainWindowFrameController
 
     public void start(Stage primaryStage) throws IOException
     {
-
         Parent root = FXMLLoader.load(getClass().getResource("/gui/MainWindow.fxml"));
 
         Scene scene = new Scene(root);
@@ -116,6 +133,13 @@ public class MainWindowFrameController
         primaryStage.show();    // Start the main window
 
         mainWindow = primaryStage;
+
+        // Set the action to be performed when the user tries to close the window
+        primaryStage.setOnCloseRequest(e ->
+        {
+            e.consume();
+            handleExit(new ActionEvent());
+        });
     }
 
 

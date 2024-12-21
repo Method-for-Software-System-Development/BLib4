@@ -19,6 +19,7 @@ public class dbController
 
     /**
      * get the instance of the dbController
+     *
      * @return the instance of the dbController
      */
     public static dbController getInstance()
@@ -62,6 +63,7 @@ public class dbController
 
     /**
      * get all the subscribers from the db
+     *
      * @return list of all the subscribers
      */
     public List<Subscriber> getAllSubscribers()
@@ -96,6 +98,7 @@ public class dbController
 
     /**
      * get subscriber from db by id
+     *
      * @param id - the id of the subscriber
      * @return the subscriber with the id
      */
@@ -131,6 +134,7 @@ public class dbController
 
     /**
      * update the subscriber in the db with the new data
+     *
      * @param newSubscriber - the new subscriber data
      */
     public boolean updateSubscriber(Subscriber newSubscriber)
@@ -141,9 +145,9 @@ public class dbController
         {
             stmt = connection.prepareStatement("UPDATE subscriber SET subscriber_email = ?, subscriber_phone_number = ? where subscriber_id = ?");
 
-            stmt.setString(1,newSubscriber.getEmail());
-            stmt.setString(2,newSubscriber.getPhoneNumber());
-            stmt.setInt(3,newSubscriber.getId());
+            stmt.setString(1, newSubscriber.getEmail());
+            stmt.setString(2, newSubscriber.getPhoneNumber());
+            stmt.setInt(3, newSubscriber.getId());
 
             stmt.executeUpdate();
         }

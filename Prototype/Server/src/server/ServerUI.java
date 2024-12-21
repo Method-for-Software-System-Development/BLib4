@@ -11,27 +11,44 @@ import logic.Subscriber;
 
 import java.io.IOException;
 import java.util.Vector;
+
 import gui.ServerPortFrameController;
 
-public class ServerUI extends Application {
+public class ServerUI extends Application
+{
     final public static int DEFAULT_PORT = 5555;
-    public static Vector<Subscriber> subscribers =new Vector<Subscriber>();
+    public static Vector<Subscriber> subscribers = new Vector<Subscriber>();
 
 
-    public static void main( String args[] ) throws Exception
+    public static void main(String args[]) throws Exception
     {
         launch(args);
     } // end main
 
+    /**
+     * This method starts the application
+     * @param primaryStage the primary stage for this application, onto which
+     * the application scene can be set.
+     * Applications may create other stages, if needed, but they will not be
+     * primary stages.
+     * @throws Exception
+     */
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) throws Exception
+    {
         // TODO Auto-generated method stub
         ServerPortFrameController aFrame = new ServerPortFrameController(); // create StudentFrame
 
         aFrame.start(primaryStage);
     }
 
-    public static void runServer(String p) throws IOException {
+    /**
+     * This method runs the server
+     * @param p the port number
+     * @throws IOException
+     */
+    public static void runServer(String p) throws IOException
+    {
         int port = 0; //Port to listen on
 
         try
@@ -39,7 +56,7 @@ public class ServerUI extends Application {
             port = Integer.parseInt(p); //Set port to 5555
 
         }
-        catch(Throwable t)
+        catch (Throwable t)
         {
             System.out.println("ERROR - Could not connect!");
         }
@@ -51,13 +68,19 @@ public class ServerUI extends Application {
         ServerMonitorFrameController serverMonitorFrameController = loader.getController();
 
         Scene scene = new Scene(root);
-        //?scene.getStylesheets().add(getClass().getResource("/gui/ServerMonitor.css").toExternalForm());
         primaryStage.setTitle("Server Monitor");
 
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        ServerController sv = new ServerController(port,serverMonitorFrameController);
+        // Set the action to be performed when the user tries to close the window
+        primaryStage.setOnCloseRequest(e ->
+        {
+            e.consume();
+            System.exit(0);
+        });
+
+        ServerController sv = new ServerController(port, serverMonitorFrameController);
 
         try
         {
@@ -68,6 +91,4 @@ public class ServerUI extends Application {
             System.out.println("ERROR - Could not listen for clients!");
         }
     }
-
-
 }

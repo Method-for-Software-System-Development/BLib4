@@ -21,7 +21,6 @@ public class ServerMonitorFrameController
     private Property<ObservableList<List<String>>> monitorListProperty = new SimpleObjectProperty<>(monitorList);
     private Map<ConnectionToClient, Integer> clientMap = new HashMap<>();
 
-
     @FXML
     private TableView<List<String>> monitorTable;
 
@@ -39,6 +38,9 @@ public class ServerMonitorFrameController
     @FXML
     private Button monitorButton;
 
+    /**
+     * This method is called when the user clicks the "Exit" button
+     */
     @FXML
     private void initialize()
     {
@@ -52,13 +54,22 @@ public class ServerMonitorFrameController
         column4.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().get(3)));
     }
 
-
+    /**
+     * This method is called when the user clicks the "Exit" button
+     * @param event
+     * @throws Exception
+     */
     public void getExitBtn(ActionEvent event) throws Exception
     {
         System.out.println("exit Academic Tool");
         System.exit(0);
     }
 
+    /**
+     * The method is called when there are new clients connected to the server
+     * @param host
+     * @param ip
+     */
     private void addRow(String host, String ip)
     {
         List<String> list = new ArrayList<>();
@@ -70,12 +81,20 @@ public class ServerMonitorFrameController
         this.monitorList.add(list);
     }
 
+    /**
+     * The method is called when there are clients connecting from the server
+     * @param client
+     */
     public void clientConnected(ConnectionToClient client)
     {
         clientMap.put(client, index);
         addRow(Objects.requireNonNull(client.getInetAddress()).getHostName(), client.getInetAddress().getHostAddress());
     }
 
+    /**
+     * The method is called when there are clients disconnected from the server
+     * @param client
+     */
     public void clientDisconnected(ConnectionToClient client)
     {
         int index = clientMap.get(client);
@@ -91,7 +110,6 @@ public class ServerMonitorFrameController
         }
 
         clientMap.remove(client);
-        System.out.println(this.monitorList);
     }
 
 }

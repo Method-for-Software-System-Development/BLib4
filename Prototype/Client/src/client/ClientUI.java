@@ -15,9 +15,6 @@ public class ClientUI extends Application {
 	 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		 ///chat= new ClientController("localhost", 5555);
-		// TODO Auto-generated method stub
-						  		
 		ClientPortFrameController aFrame = new ClientPortFrameController(); // create StudentFrame
 		 
 		aFrame.start(primaryStage);
@@ -35,7 +32,6 @@ public class ClientUI extends Application {
 			System.out.println("ERROR - Could not connect!");
 		}
 
-
 		try {
 			chat= new ClientController(ip, port);
 
@@ -46,7 +42,6 @@ public class ClientUI extends Application {
 		}
 
 		MainWindowFrameController aFrame = new MainWindowFrameController(); // create StudentFrame
-
 
 		Stage primaryStage = new Stage();
 		aFrame.start(primaryStage);
