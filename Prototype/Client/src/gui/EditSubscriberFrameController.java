@@ -69,18 +69,11 @@ public class EditSubscriberFrameController {
 
     @FXML
     private void handleClose(ActionEvent event) throws IOException {
-        // Close the window
+    	 // Close the window
         Stage stage = (Stage) btnClose.getScene().getWindow();
         stage.close();
 
-        //ToDo: open the previous window
-        ((Node) event.getSource()).getScene().getWindow().hide(); //hiding primary window
-    	FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/SubscriberDetails.fxml"));
-    	Parent root = loader.load();
-    	Scene scene = new Scene(root);
-    	Stage primaryStage = new Stage();
-    	primaryStage.setScene(scene);
-    	primaryStage.show();
-    	primaryStage.setTitle("Subscriber Details");    
+        // open the main menu
+        MainWindowFrameController.showMainWindow();   
     }
 }
