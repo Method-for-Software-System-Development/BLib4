@@ -122,10 +122,22 @@ public class ChatClient extends AbstractClient {
      */
     public void quit() {
         try {
+            sendDisconnectRequest();
             closeConnection();
         } catch (IOException e) {
         }
         System.exit(0);
+    }
+
+    public void sendDisconnectRequest() {
+        try {
+            openConnection();
+            MessageType disconnectMessage = new MessageType("DISCONNECT", null);
+            sendToServer(disconnectMessage);
+        } catch (IOException e) {
+            e.printStackTrace();
+            clientUI.display("Could not send disconnect request to server: " + e);
+        }
     }
 }
 //End of ChatClient class
