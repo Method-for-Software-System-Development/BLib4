@@ -13,17 +13,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import logic.MessageType;
 import ocsf.client.AbstractClient;
 
 import java.io.IOException;
 
 public class MainWindowFrameController {
-
-    private ChatClient chatClient;
-
-    public void setChatClient(ChatClient chatClient) {
-        this.chatClient = chatClient;
-    }
+	
 
     @FXML
     private Button btnShowAll;
@@ -40,16 +36,20 @@ public class MainWindowFrameController {
     @FXML
     private void handleShowAll(ActionEvent event) throws IOException {
         // Handle the Show All button action
+		FXMLLoader loader = new FXMLLoader();
+		
+		ClientUI.chat.accept(new MessageType("100",null));
+
     	((Node) event.getSource()).getScene().getWindow().hide(); //hiding primary window
-    	FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/ShowAllSubscribers.fxml"));
-    	Parent root = loader.load();
+		Pane root = loader.load(getClass().getResource("/gui/ShowAllSubscribers.fxml").openStream());    	
+    	ShowAllSubscribersFrameController showAllSubscribersFrameController = loader.getController();		
+    	showAllSubscribersFrameController.updateSubscribersInTableView(ChatClient.subscribers);
+    	
     	Scene scene = new Scene(root);
         Stage primaryStage = new Stage();
     	primaryStage.setScene(scene);
-    	primaryStage.show();
-        primaryStage.setTitle("All Subscribers");
-
-        //ToDo: open new window with all students (table)
+    	primaryStage.show();		
+		primaryStage.setTitle("All Subscribers");
     }
 
     @FXML
@@ -61,14 +61,15 @@ public class MainWindowFrameController {
             System.out.println("You must enter an id number");
 
         } else {
+        	ClientUI.chat.accept(new MessageType("101",id));
         	((Node) event.getSource()).getScene().getWindow().hide(); //hiding primary window
-        	FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/SubscriberDetails.fxml"));
+        	FXMLLoader loader = new FXMLLoader(getClass().getResource("/gui/EditSubscriber.fxml"));
         	Parent root = loader.load();
         	Scene scene = new Scene(root);
         	Stage primaryStage = new Stage();
         	primaryStage.setScene(scene);
         	primaryStage.show();
-        	primaryStage.setTitle("Subscriber Details");        	
+        	primaryStage.setTitle("Subscriber Details");   
         }
     }
 

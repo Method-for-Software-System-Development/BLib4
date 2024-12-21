@@ -5,11 +5,14 @@
 package client;
 
 import client.ChatIF;
+import gui.EditSubscriberFrameController;
+import gui.ShowAllSubscribersFrameController;
 import logic.MessageType;
 import logic.Subscriber;
 import ocsf.client.AbstractClient;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * This class overrides some of the methods defined in the abstract
@@ -28,7 +31,9 @@ public class ChatClient extends AbstractClient {
      * the display method in the client.
      */
     ChatIF clientUI;
-    public static Subscriber s1 = new Subscriber(1, null, 2, null, null);
+    private ShowAllSubscribersFrameController showAllSubscribersController;
+    private EditSubscriberFrameController editSubscriberFrameController;
+    public static List<Subscriber> subscribers = null;
     public static boolean awaitResponse = false;
 
     //Constructors ****************************************************
@@ -57,14 +62,19 @@ public class ChatClient extends AbstractClient {
      */
     public void handleMessageFromServer(Object msg) {
         MessageType receiveMsg = (MessageType) msg;
-
+        awaitResponse=false;
         switch (receiveMsg.getId()) {
             case "200":
                 // list of all the subscribers in db, in format List<Subscriber>
+                subscribers = (List<Subscriber>) receiveMsg.getData();
+                System.out.println(subscribers);
                 break;
 
             case "201":
-                // subscriber detailes, in format Subscriber
+                // subscriber details, in format Subscriber
+                Subscriber subscriber=(Subscriber)receiveMsg.getData();
+                subscribers.clear();
+                subscribers.add(subscriber);
                 break;
 
             case "202":
@@ -77,6 +87,7 @@ public class ChatClient extends AbstractClient {
         }
 
     }
+    
 
 
     //ToDo: under that command I didnt touch (need to check if we need to change something)
@@ -139,5 +150,21 @@ public class ChatClient extends AbstractClient {
             clientUI.display("Could not send disconnect request to server: " + e);
         }
     }
+
+	public EditSubscriberFrameController getEditSubscriberFrameController() {
+		return editSubscriberFrameController;
+	}
+
+	public void setEditSubscriberFrameController(EditSubscriberFrameController editSubscriberFrameController) {
+		this.editSubscriberFrameController = editSubscriberFrameController;
+	}
+
+	public ShowAllSubscribersFrameController getShowAllSubscribersController() {
+		return showAllSubscribersController;
+	}
+
+	public void setShowAllSubscribersController(ShowAllSubscribersFrameController showAllSubscribersController) {
+		this.showAllSubscribersController = showAllSubscribersController;
+	}
 }
 //End of ChatClient class

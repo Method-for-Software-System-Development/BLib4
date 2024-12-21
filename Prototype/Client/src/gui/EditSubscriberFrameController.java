@@ -2,6 +2,8 @@ package gui;
 
 import java.io.IOException;
 
+import client.ChatClient;
+import client.ClientUI;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -11,6 +13,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import logic.MessageType;
+import logic.Subscriber;
 
 public class EditSubscriberFrameController {
 
@@ -38,6 +42,16 @@ public class EditSubscriberFrameController {
     @FXML
     private void initialize() {
         // Initialize any required logic here
+    }
+    
+
+    public void showSubscriberDetails(Subscriber subscriber) {
+    // Populate the UI with the subscriber details
+    	txtID.setText(""+subscriber.getId());
+    	txtName.setText(subscriber.getName());
+    	txtHistory.setText(""+subscriber.getSubscriptionHistory());
+    	txtPhone.setText(subscriber.getPhoneNumber());
+    	txtEmail.setText(subscriber.getEmail());
     }
 
     @FXML
