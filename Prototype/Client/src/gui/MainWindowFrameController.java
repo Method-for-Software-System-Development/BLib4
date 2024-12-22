@@ -89,6 +89,7 @@ public class MainWindowFrameController
         {
             // send message to server to get subscriber details
             ClientUI.chat.accept(new MessageType("101", id));
+
             if (ChatClient.subscribers.isEmpty())
             {
                 System.out.println("Student ID Not Found");
@@ -149,7 +150,7 @@ public class MainWindowFrameController
         Parent root = FXMLLoader.load(getClass().getResource("/gui/MainWindow.fxml"));
 
         Scene scene = new Scene(root);
-        primaryStage.setTitle("Academic Managment Tool");
+        primaryStage.setTitle("Main Window");
         primaryStage.setScene(scene);
 
         primaryStage.show();    // Start the main window

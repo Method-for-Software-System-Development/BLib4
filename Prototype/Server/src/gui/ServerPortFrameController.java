@@ -91,7 +91,7 @@ public class ServerPortFrameController
      */
     public void getExitBtn(ActionEvent event)
     {
-        System.out.println("exit Academic Tool");
+        System.out.println("exit Server port");
         System.exit(0);
     }
 

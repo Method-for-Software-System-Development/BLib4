@@ -72,6 +72,7 @@ public class ChatClient extends AbstractClient
         {
             case "200":
                 // list of all the subscribers in db, in format List<Subscriber>
+                subscribers.clear();
                 subscribers = (List<Subscriber>) receiveMsg.getData();
                 break;
 
@@ -80,7 +81,9 @@ public class ChatClient extends AbstractClient
                 Subscriber subscriber = (Subscriber) receiveMsg.getData();
                 subscribers.clear();
                 if (subscriber != null)
+                {
                     subscribers.add(subscriber);
+                }
                 break;
 
             case "202":
@@ -94,9 +97,6 @@ public class ChatClient extends AbstractClient
         }
 
     }
-
-
-    //ToDo: under that command I didnt touch (need to check if we need to change something)
 
     /**
      * This method handles all data coming from the UI

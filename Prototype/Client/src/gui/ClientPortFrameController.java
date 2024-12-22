@@ -52,7 +52,12 @@ public class ClientPortFrameController
         p = getport();
         ip = getip();
 
-        if (p.trim().isEmpty())
+        // check if the user entered the IP address and port number
+        if (ip.trim().isEmpty())
+        {
+            System.out.println("You must enter an IP address");
+        }
+        else if (p.trim().isEmpty())
         {
             System.out.println("You must enter a port number");
         }

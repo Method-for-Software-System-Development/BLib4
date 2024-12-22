@@ -62,7 +62,7 @@ public class ServerMonitorFrameController
      */
     public void getExitBtn(ActionEvent event) throws Exception
     {
-        System.out.println("exit Academic Tool");
+        System.out.println("exit Server Monitor Tool");
         System.exit(0);
     }
 
