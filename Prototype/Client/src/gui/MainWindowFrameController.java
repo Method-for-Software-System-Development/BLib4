@@ -1,7 +1,6 @@
 package gui;
 
 import client.ChatClient;
-import client.ClientController;
 import client.ClientUI;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -15,7 +14,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import logic.MessageType;
-import ocsf.client.AbstractClient;
 
 import java.io.IOException;
 
@@ -35,14 +33,22 @@ public class MainWindowFrameController
     @FXML
     private TextField txtStudentId;
 
+    /**
+     * This method is used to handle the Show All button action and open the ShowAllSubscribers window.
+     *
+     * @param event
+     * @throws IOException
+     */
     @FXML
     private void handleShowAll(ActionEvent event) throws IOException
     {
         // Handle the Show All button action
         FXMLLoader loader = new FXMLLoader();
 
+        // send message to server to get all subscribers
         ClientUI.chat.accept(new MessageType("100", null));
 
+        // open the ShowAllSubscribers window
         ((Node) event.getSource()).getScene().getWindow().hide(); //hiding primary window
         Pane root = loader.load(getClass().getResource("/gui/ShowAllSubscribers.fxml").openStream());
         ShowAllSubscribersFrameController showAllSubscribersFrameController = loader.getController();
@@ -63,6 +69,12 @@ public class MainWindowFrameController
         });
     }
 
+    /**
+     * This method is used to handle the Search button action and open the EditSubscriber window.
+     *
+     * @param event
+     * @throws IOException
+     */
     @FXML
     private void handleSearch(ActionEvent event) throws IOException
     {
@@ -75,6 +87,7 @@ public class MainWindowFrameController
         }
         else
         {
+            // send message to server to get subscriber details
             ClientUI.chat.accept(new MessageType("101", id));
             if (ChatClient.subscribers.isEmpty())
             {
@@ -108,6 +121,11 @@ public class MainWindowFrameController
         }
     }
 
+    /**
+     * This method is used to handle the Exit button action and disconnect the client from the server.
+     *
+     * @param event
+     */
     @FXML
     private void handleExit(ActionEvent event)
     {
@@ -120,13 +138,17 @@ public class MainWindowFrameController
         System.exit(0);
     }
 
-
+    /**
+     * This method is used to start the main window.
+     *
+     * @param primaryStage
+     * @throws IOException
+     */
     public void start(Stage primaryStage) throws IOException
     {
         Parent root = FXMLLoader.load(getClass().getResource("/gui/MainWindow.fxml"));
 
         Scene scene = new Scene(root);
-        //scene.getStylesheets().add(getClass().getResource("/gui/AcademicFrame.css").toExternalForm());
         primaryStage.setTitle("Academic Managment Tool");
         primaryStage.setScene(scene);
 

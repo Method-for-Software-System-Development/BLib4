@@ -3,7 +3,6 @@ package server;
 import gui.ServerMonitorFrameController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
@@ -16,7 +15,6 @@ import gui.ServerPortFrameController;
 
 public class ServerUI extends Application
 {
-    final public static int DEFAULT_PORT = 5555;
     public static Vector<Subscriber> subscribers = new Vector<Subscriber>();
 
 
@@ -27,10 +25,11 @@ public class ServerUI extends Application
 
     /**
      * This method starts the application
+     *
      * @param primaryStage the primary stage for this application, onto which
-     * the application scene can be set.
-     * Applications may create other stages, if needed, but they will not be
-     * primary stages.
+     *                     the application scene can be set.
+     *                     Applications may create other stages, if needed, but they will not be
+     *                     primary stages.
      * @throws Exception
      */
     @Override
@@ -43,7 +42,8 @@ public class ServerUI extends Application
     }
 
     /**
-     * This method runs the server
+     * The method open the server monitor window and start the server
+     *
      * @param p the port number
      * @throws IOException
      */
@@ -61,6 +61,7 @@ public class ServerUI extends Application
             System.out.println("ERROR - Could not connect!");
         }
 
+        // Open the server monitor window
         Stage primaryStage = new Stage();
         FXMLLoader loader = new FXMLLoader();
 
@@ -80,6 +81,7 @@ public class ServerUI extends Application
             System.exit(0);
         });
 
+        // Create a new ServerController to start the server
         ServerController sv = new ServerController(port, serverMonitorFrameController);
 
         try

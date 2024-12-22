@@ -18,7 +18,7 @@ public class dbController
     }
 
     /**
-     * get the instance of the dbController
+     * get the instance of the dbController for singleton
      *
      * @return the instance of the dbController
      */
@@ -32,7 +32,7 @@ public class dbController
     }
 
     /**
-     * connect to the db
+     * The method create connection to the db
      */
     public void connect()
     {
@@ -62,7 +62,7 @@ public class dbController
     }
 
     /**
-     * get all the subscribers from the db
+     * The method run SQL query to get all the subscribers from the db
      *
      * @return list of all the subscribers
      */
@@ -97,7 +97,7 @@ public class dbController
     }
 
     /**
-     * get subscriber from db by id
+     * The method run SQL query to get subscriber from db by id
      *
      * @param id - the id of the subscriber
      * @return the subscriber with the id
@@ -133,7 +133,7 @@ public class dbController
 
 
     /**
-     * update the subscriber in the db with the new data
+     * The method run SQL query to update the subscriber in the db with the new data
      *
      * @param newSubscriber - the new subscriber data
      */

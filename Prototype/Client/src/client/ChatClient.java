@@ -24,7 +24,8 @@ import java.util.List;
  * @author Fran&ccedil;ois B&eacute;langer
  * @version July 2000
  */
-public class ChatClient extends AbstractClient {
+public class ChatClient extends AbstractClient
+{
     //Instance variables **********************************************
 
     /**
@@ -49,7 +50,8 @@ public class ChatClient extends AbstractClient {
      */
 
     public ChatClient(String host, int port, ChatIF clientUI)
-            throws IOException {
+            throws IOException
+    {
         super(host, port); //Call the superclass constructor
         this.clientUI = clientUI;
         openConnection();
@@ -62,10 +64,12 @@ public class ChatClient extends AbstractClient {
      *
      * @param msg The message from the server.
      */
-    public void handleMessageFromServer(Object msg) {
+    public void handleMessageFromServer(Object msg)
+    {
         MessageType receiveMsg = (MessageType) msg;
-        awaitResponse=false;
-        switch (receiveMsg.getId()) {
+        awaitResponse = false;
+        switch (receiveMsg.getId())
+        {
             case "200":
                 // list of all the subscribers in db, in format List<Subscriber>
                 subscribers = (List<Subscriber>) receiveMsg.getData();
@@ -73,10 +77,10 @@ public class ChatClient extends AbstractClient {
 
             case "201":
                 // subscriber details, in format Subscriber
-                Subscriber subscriber=(Subscriber)receiveMsg.getData();
+                Subscriber subscriber = (Subscriber) receiveMsg.getData();
                 subscribers.clear();
-                if(subscriber!=null)
-                	subscribers.add(subscriber);
+                if (subscriber != null)
+                    subscribers.add(subscriber);
                 break;
 
             case "202":
@@ -90,40 +94,37 @@ public class ChatClient extends AbstractClient {
         }
 
     }
-    
 
 
     //ToDo: under that command I didnt touch (need to check if we need to change something)
+
     /**
      * This method handles all data coming from the UI
      *
      * @param message The message from the UI.
      */
-    public void handleMessageFromClientUI(Object message) {
-        try {
+    public void handleMessageFromClientUI(Object message)
+    {
+        try
+        {
             openConnection();//in order to send more than one message
             awaitResponse = true;
             sendToServer(message);
             // wait for response
-            while (awaitResponse) {
-                try {
+            while (awaitResponse)
+            {
+                try
+                {
                     Thread.sleep(100);
-                } catch (InterruptedException e) {
+                }
+                catch (InterruptedException e)
+                {
                     e.printStackTrace();
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-            clientUI.display("Could not send message to server: Terminating client." + e);
-            quit();
         }
-    }
-
-    public void handleUpdateMessageFromClientUI(Object message) {
-        try {
-            openConnection();//in order to send more than one message
-            sendToServer(message);
-        } catch (IOException e) {
+        catch (IOException e)
+        {
             e.printStackTrace();
             clientUI.display("Could not send message to server: Terminating client." + e);
             quit();
@@ -133,40 +134,52 @@ public class ChatClient extends AbstractClient {
     /**
      * This method terminates the client.
      */
-    public void quit() {
-        try {
+    public void quit()
+    {
+        try
+        {
             sendDisconnectRequest();
             closeConnection();
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
         }
         System.exit(0);
     }
 
-    public void sendDisconnectRequest() {
-        try {
+    public void sendDisconnectRequest()
+    {
+        try
+        {
             openConnection();
             MessageType disconnectMessage = new MessageType("DISCONNECT", null);
             sendToServer(disconnectMessage);
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             e.printStackTrace();
             clientUI.display("Could not send disconnect request to server: " + e);
         }
     }
 
-	public EditSubscriberFrameController getEditSubscriberFrameController() {
-		return editSubscriberFrameController;
-	}
+    public EditSubscriberFrameController getEditSubscriberFrameController()
+    {
+        return editSubscriberFrameController;
+    }
 
-	public void setEditSubscriberFrameController(EditSubscriberFrameController editSubscriberFrameController) {
-		this.editSubscriberFrameController = editSubscriberFrameController;
-	}
+    public void setEditSubscriberFrameController(EditSubscriberFrameController editSubscriberFrameController)
+    {
+        this.editSubscriberFrameController = editSubscriberFrameController;
+    }
 
-	public ShowAllSubscribersFrameController getShowAllSubscribersController() {
-		return showAllSubscribersController;
-	}
+    public ShowAllSubscribersFrameController getShowAllSubscribersController()
+    {
+        return showAllSubscribersController;
+    }
 
-	public void setShowAllSubscribersController(ShowAllSubscribersFrameController showAllSubscribersController) {
-		this.showAllSubscribersController = showAllSubscribersController;
-	}
+    public void setShowAllSubscribersController(ShowAllSubscribersFrameController showAllSubscribersController)
+    {
+        this.showAllSubscribersController = showAllSubscribersController;
+    }
 }
 //End of ChatClient class

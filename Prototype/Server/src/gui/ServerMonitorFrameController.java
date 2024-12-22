@@ -39,7 +39,7 @@ public class ServerMonitorFrameController
     private Button monitorButton;
 
     /**
-     * This method is called when the user clicks the "Exit" button
+     * This method is called to initialize the table of active clients
      */
     @FXML
     private void initialize()
@@ -56,6 +56,7 @@ public class ServerMonitorFrameController
 
     /**
      * This method is called when the user clicks the "Exit" button
+     *
      * @param event
      * @throws Exception
      */
@@ -67,6 +68,8 @@ public class ServerMonitorFrameController
 
     /**
      * The method is called when there are new clients connected to the server
+     * to add him to the table
+     *
      * @param host
      * @param ip
      */
@@ -82,7 +85,8 @@ public class ServerMonitorFrameController
     }
 
     /**
-     * The method is called when there are clients connecting from the server
+     * The method is called when there are clients connecting from the server to handle the table
+     *
      * @param client
      */
     public void clientConnected(ConnectionToClient client)
@@ -92,7 +96,8 @@ public class ServerMonitorFrameController
     }
 
     /**
-     * The method is called when there are clients disconnected from the server
+     * The method is called when there are clients disconnected from the server to habdle the table
+     *
      * @param client
      */
     public void clientDisconnected(ConnectionToClient client)
@@ -111,5 +116,4 @@ public class ServerMonitorFrameController
 
         clientMap.remove(client);
     }
-
 }

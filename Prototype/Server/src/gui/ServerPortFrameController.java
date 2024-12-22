@@ -1,6 +1,5 @@
 package gui;
 
-import javafx.scene.layout.Pane;
 import server.ServerUI;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -37,7 +36,8 @@ public class ServerPortFrameController
     }
 
     /**
-     * This method is called when the user clicks the "Exit" button
+     * This method is called when the user clicks the "Done" button and create connection to the server
+     *
      * @param event
      * @throws Exception
      */
@@ -60,7 +60,8 @@ public class ServerPortFrameController
     }
 
     /**
-     * This method is called when the user clicks the "Exit" button
+     * This method is called to start the port window
+     *
      * @param primaryStage
      * @throws Exception
      */
@@ -85,6 +86,7 @@ public class ServerPortFrameController
 
     /**
      * This method is called when the user clicks the "Exit" button
+     *
      * @param event
      */
     public void getExitBtn(ActionEvent event)

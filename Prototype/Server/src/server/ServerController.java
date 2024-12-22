@@ -4,13 +4,6 @@
 package server;
 
 import java.io.IOException;
-import java.sql.Connection;
-
-import java.sql.DriverManager;
-import java.sql.SQLException;
-
-import java.io.*;
-
 import gui.ServerMonitorFrameController;
 import logic.MessageType;
 import logic.Subscriber;
@@ -40,6 +33,7 @@ public class ServerController extends AbstractServer
      * Constructs an instance of the echo server.
      *
      * @param port The port number to connect on.
+     * @param monitorController the monitor controller
      */
     public ServerController(int port, ServerMonitorFrameController monitorController)
     {

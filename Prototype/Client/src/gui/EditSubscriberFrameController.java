@@ -6,10 +6,6 @@ import client.ChatClient;
 import client.ClientUI;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -46,7 +42,11 @@ public class EditSubscriberFrameController
         // Initialize any required logic here
     }
 
-
+    /**
+     * This method is used to show the subscriber details in the UI.
+     *
+     * @param subscriber
+     */
     public void showSubscriberDetails(Subscriber subscriber)
     {
         // Populate the UI with the subscriber details
@@ -57,6 +57,11 @@ public class EditSubscriberFrameController
         txtEmail.setText(subscriber.getEmail());
     }
 
+    /**
+     * This method is used to handle the save button action and send an update request to the server.
+     *
+     * @param event
+     */
     @FXML
     private void handleSave(ActionEvent event)
     {
@@ -70,7 +75,7 @@ public class EditSubscriberFrameController
         // Update the subscriber details in db
         ClientUI.chat.accept(new MessageType("102", new Subscriber(Integer.parseInt(id), name, Integer.parseInt(history), phone, email)));
 
-        // check server response
+        // check server response and show alert
         if (ChatClient.serverResponse)
         {
             Alert alert = new Alert(Alert.AlertType.INFORMATION, "Subscriber details updated successfully");
@@ -85,6 +90,12 @@ public class EditSubscriberFrameController
         }
     }
 
+    /**
+     * This method is used to handle the close button action and close the window.
+     *
+     * @param event
+     * @throws IOException
+     */
     @FXML
     private void handleClose(ActionEvent event) throws IOException
     {

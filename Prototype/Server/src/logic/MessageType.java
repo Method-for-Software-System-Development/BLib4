@@ -9,7 +9,8 @@ public class MessageType implements Serializable
     public Object data;
 
     /**
-     *  Default constructor
+     * Default constructor
+     *
      * @param id
      * @param data
      */

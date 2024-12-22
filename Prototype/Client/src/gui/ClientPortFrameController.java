@@ -1,7 +1,6 @@
 package gui;
 
 import client.ClientUI;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -13,10 +12,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
-
-public class ClientPortFrameController {
-
-    String temp = "";
+public class ClientPortFrameController
+{
 
     @FXML
     private Button btnExit = null;
@@ -31,35 +28,49 @@ public class ClientPortFrameController {
     @FXML
     private TextField iptxt;
 
-    ObservableList<String> list;
-
-    private String getport() {
+    private String getport()
+    {
         return portxt.getText();
     }
 
-    private String getip() {
+    private String getip()
+    {
         return iptxt.getText();
     }
 
-    public void DoneClient(ActionEvent event) throws Exception {
+    /**
+     * This method is used to handle the Done button action and open the Client main window.
+     *
+     * @param event
+     * @throws Exception
+     */
+    public void DoneClient(ActionEvent event) throws Exception
+    {
         String p;
         String ip;
 
         p = getport();
         ip = getip();
 
-        if (p.trim().isEmpty()) {
+        if (p.trim().isEmpty())
+        {
             System.out.println("You must enter a port number");
-
-        } else {
+        }
+        else
+        {
             ((Node) event.getSource()).getScene().getWindow().hide(); //hiding primary window
-            Stage primaryStage = new Stage();
-            FXMLLoader loader = new FXMLLoader();
             ClientUI.runClient(ip, p);
         }
     }
 
-    public void start(Stage primaryStage) throws Exception {
+    /**
+     * The method is used to start the ClientPort window.
+     *
+     * @param primaryStage
+     * @throws Exception
+     */
+    public void start(Stage primaryStage) throws Exception
+    {
         Parent root = FXMLLoader.load(getClass().getResource("/gui/ClientPort.fxml"));
 
         Scene scene = new Scene(root);
@@ -70,7 +81,14 @@ public class ClientPortFrameController {
         primaryStage.show();
     }
 
-    public void getExitBtn(ActionEvent event) throws Exception {
+    /**
+     * This method is used to handle the Exit button action.
+     *
+     * @param event
+     * @throws Exception
+     */
+    public void getExitBtn(ActionEvent event) throws Exception
+    {
         System.out.println("exit Academic Tool");
         System.exit(0);
     }

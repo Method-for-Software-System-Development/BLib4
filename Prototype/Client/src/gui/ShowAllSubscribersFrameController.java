@@ -1,14 +1,10 @@
 package gui;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import client.ChatClient;
-import client.ClientUI;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -17,9 +13,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
-import logic.MessageType;
 import logic.Subscriber;
-import ocsf.server.ConnectionToClient;
+
 
 public class ShowAllSubscribersFrameController
 {
@@ -53,7 +48,6 @@ public class ShowAllSubscribersFrameController
     @FXML
     private void initialize()
     {
-        //ToDo: check if ok, if not copy from the server monitor (the table work there)
         tableSubscribers.itemsProperty().bind(SubscribersListProperty);
 
         colID.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -61,8 +55,6 @@ public class ShowAllSubscribersFrameController
         colHistory.setCellValueFactory(new PropertyValueFactory<>("subscriptionHistory"));
         colPhone.setCellValueFactory(new PropertyValueFactory<>("phoneNumber"));
         colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
-
-        // ToDo: Load data into the table (maybe create method that will be called after receive the message)
     }
 
     /**

@@ -5,46 +5,69 @@ import gui.ClientPortFrameController;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
-public class ClientUI extends Application {
-	public static ClientController chat; //only one instance
+public class ClientUI extends Application
+{
+    public static ClientController chat; //only one instance
 
-	public static void main( String args[] ) throws Exception
-	   { 
-		    launch(args);  
-	   } // end main
-	 
-	@Override
-	public void start(Stage primaryStage) throws Exception {
-		ClientPortFrameController aFrame = new ClientPortFrameController(); // create StudentFrame
-		 
-		aFrame.start(primaryStage);
-	}
+    /**
+     * This method is the entry point when the program is run as an application.
+     *
+     * @param args
+     * @throws Exception
+     */
+    public static void main(String args[]) throws Exception
+    {
+        launch(args);
+    } // end main
 
-	public static void runClient(String ip, String p) throws Exception {
-		int port = 0; //Port to listen on
-		try
-		{
-			port = Integer.parseInt(p);
+    /**
+     * This method is called when the program is run as an application.
+     *
+     * @param primaryStage
+     * @throws Exception
+     */
+    @Override
+    public void start(Stage primaryStage) throws Exception
+    {
+        ClientPortFrameController aFrame = new ClientPortFrameController(); // create StudentFrame
 
-		}
-		catch(Throwable t)
-		{
-			System.out.println("ERROR - Could not connect!");
-		}
+        aFrame.start(primaryStage);
+    }
 
-		try {
-			chat= new ClientController(ip, port);
+    /**
+     * This method is called to start the connection with the server.
+     *
+     * @param serverIp
+     * @param portStr
+     * @throws Exception
+     */
+    public static void runClient(String serverIp, String portStr) throws Exception
+    {
+        int port = 0; //Port to listen on
+        try
+        {
+            port = Integer.parseInt(portStr);
 
-		}
-		catch (Exception ex)
-		{
-			System.out.println("ERROR - Could not connect to server!");
-		}
+        }
+        catch (Throwable t)
+        {
+            System.out.println("ERROR - Could not connect!");
+        }
 
-		MainWindowFrameController aFrame = new MainWindowFrameController(); // create StudentFrame
+        try
+        {
+            chat = new ClientController(serverIp, port);
 
-		Stage primaryStage = new Stage();
-		aFrame.start(primaryStage);
-	}
-	
+        }
+        catch (Exception ex)
+        {
+            System.out.println("ERROR - Could not connect to server!");
+        }
+
+        MainWindowFrameController aFrame = new MainWindowFrameController(); // create StudentFrame
+
+        Stage primaryStage = new Stage();
+        aFrame.start(primaryStage);
+    }
+
 }
