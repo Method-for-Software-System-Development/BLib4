@@ -146,10 +146,11 @@ fabric.properties
 ### Intellij Patch ###
 # Comment Reason: https://github.com/joeblau/gitignore.io/issues/186#issuecomment-215987721
 
-# *.iml
-# modules.xml
-# .idea/misc.xml
-# *.ipr
+*.iml
+modules.xml
+.idea/misc.xml
+*.ipr
+.idea/
 
 # Sonarlint plugin
 # https://plugins.jetbrains.com/plugin/7973-sonarlint
@@ -202,3 +203,12 @@ fabric.properties
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+
+# Remote temp files
+RemoteSystemsTempFiles/
+
+# remove manifest.mf files
+*.MF
+
+# include mysql lib files
+!mysql-connector-java-8.0.13.jar
