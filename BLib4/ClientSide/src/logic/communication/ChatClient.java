@@ -69,13 +69,90 @@ public class ChatClient extends AbstractClient
         awaitResponse = false;
         switch (receiveMsg.getId())
         {
-            case "200":
+            case "201":
+                //ToDo: implement
+                break;
+
+            case "202":
+                //ToDo: implement
+                break;
+
+            case "203":
+                //ToDo: implement
+                break;
+
+            case "204":
+                //ToDo: implement
+                break;
+
+            case "205":
+                //ToDo: implement
+                break;
+
+            case "206":
+                //ToDo: implement
+                break;
+
+            case "207":
+                //ToDo: implement
+                break;
+
+            case "208":
+                //ToDo: implement
+                break;
+
+            case "209":
+                //ToDo: implement
+                break;
+
+            case "210":
+                //ToDo: implement
+                break;
+
+            case "211":
+                //ToDo: implement
+                break;
+
+            case "212":
+                //ToDo: implement
+                break;
+
+            case "213":
+                //ToDo: implement
+                break;
+
+            case "214":
+                //ToDo: implement
+                break;
+
+            case "215":
+                //ToDo: implement
+                break;
+
+            case "216":
+                //ToDo: implement
+                break;
+
+            case "217":
+                //ToDo: implement
+                break;
+
+            case "218":
+                //ToDo: implement
+                break;
+
+            case "219":
+                //ToDo: implement
+                break;
+
+            //!/ remove this /////////////////////////////////
+            case "0200":
                 // list of all the subscribers in db, in format List<Subscriber>
                 subscribers.clear();
                 subscribers = (List<Subscriber>) receiveMsg.getData();
                 break;
 
-            case "201":
+            case "0201":
                 // subscriber details, in format Subscriber
                 Subscriber subscriber = (Subscriber) receiveMsg.getData();
                 subscribers.clear();
@@ -85,10 +162,11 @@ public class ChatClient extends AbstractClient
                 }
                 break;
 
-            case "202":
+            case "0202":
                 // status of update in the db, in format boolean
                 serverResponse = (boolean) receiveMsg.getData();
                 break;
+            //!/ end of remove this //////////////////////////////////
 
             default:
                 System.out.println("Invalid message received from server");
@@ -151,7 +229,7 @@ public class ChatClient extends AbstractClient
         try
         {
             openConnection();
-            MessageType disconnectMessage = new MessageType("DISCONNECT", null);
+            MessageType disconnectMessage = new MessageType("99", null);
             sendToServer(disconnectMessage);
         }
         catch (IOException e)

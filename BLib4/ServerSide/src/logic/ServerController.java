@@ -55,22 +55,8 @@ public class ServerController extends AbstractServer
         MessageType sendMsg = null;
         switch (receiveMsg.getId())
         {
-            case "100":
-                // request to send all the subscribers in db, no data in the message
-                sendMsg = new MessageType("200", dbController.getAllSubscribers());
-                break;
-
-            case "101":
-                // request to send subscriber with specific id, in format String (the id)
-                sendMsg = new MessageType("201", dbController.getSubscriberById((String) receiveMsg.getData()));
-                break;
-
-            case "102":
-                // request to update subscriber in db, in format Subscriber
-                sendMsg = new MessageType("202", dbController.updateSubscriber((Subscriber) receiveMsg.getData()));
-                break;
-
-            case "DISCONNECT":
+            //ToDo: handle the mew message types
+            case "99":
                 try
                 {
                     monitorController.clientDisconnected(client);
@@ -81,6 +67,93 @@ public class ServerController extends AbstractServer
                     e.printStackTrace();
                 }
                 return;
+
+            case "100":
+                //ToDo: implement
+                break;
+
+            case "104":
+                //ToDo: implement
+                break;
+
+            case "105":
+                //ToDo: implement
+                break;
+
+            case "106":
+                //ToDo: implement
+                break;
+
+            case "107":
+                //ToDo: implement
+                break;
+
+            case "108":
+                //ToDo: implement
+                break;
+
+            case "109":
+                //ToDo: implement
+                break;
+
+            case "110":
+                //ToDo: implement
+                break;
+
+            case "111":
+                //ToDo: implement
+                break;
+
+            case "112":
+                //ToDo: implement
+                break;
+
+            case "113":
+                //ToDo: implement
+                break;
+
+            case "114":
+                //ToDo: implement
+                break;
+
+            case "115":
+                //ToDo: implement
+                break;
+
+            case "116":
+                //ToDo: implement
+                break;
+
+            case "117":
+                //ToDo: implement
+                break;
+
+            case "118":
+                //ToDo: implement
+                break;
+
+            case "119":
+                //ToDo: implement
+                break;
+
+
+            //!/ Remove this///////////////////////////
+            case "0103":
+                // request to send all the subscribers in db, no data in the message
+                sendMsg = new MessageType("0200", dbController.getAllSubscribers());
+                break;
+
+            case "0101":
+                // request to send subscriber with specific id, in format String (the id)
+                sendMsg = new MessageType("0201", dbController.getSubscriberById((String) receiveMsg.getData()));
+                break;
+
+            case "0102":
+                // request to update subscriber in db, in format Subscriber
+                sendMsg = new MessageType("0202", dbController.updateSubscriber((Subscriber) receiveMsg.getData()));
+                break;
+            //!/ end remove this///////////////////////////
+
 
             default:
                 System.out.println("Invalid message type");

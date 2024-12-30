@@ -72,7 +72,7 @@ public class EditSubscriberFrameController
         String email = txtEmail.getText();
 
         // Update the subscriber details in db
-        ClientUI.chat.accept(new MessageType("102", new Subscriber(Integer.parseInt(id), name, Integer.parseInt(history), phone, email)));
+        ClientUI.chat.accept(new MessageType("0102", new Subscriber(Integer.parseInt(id), name, Integer.parseInt(history), phone, email)));
 
         // check server response and show alert
         if (ChatClient.serverResponse)

@@ -46,7 +46,7 @@ public class MainWindowFrameController
         FXMLLoader loader = new FXMLLoader();
 
         // send message to server to get all subscribers
-        ClientUI.chat.accept(new MessageType("100", null));
+        ClientUI.chat.accept(new MessageType("0103", null));
 
         // open the ShowAllSubscribers window
         ((Node) event.getSource()).getScene().getWindow().hide(); //hiding primary window
@@ -88,7 +88,7 @@ public class MainWindowFrameController
         else
         {
             // send message to server to get subscriber details
-            ClientUI.chat.accept(new MessageType("101", id));
+            ClientUI.chat.accept(new MessageType("0101", id));
 
             if (ChatClient.subscribers.isEmpty())
             {
