@@ -49,8 +49,8 @@ public class EditSubscriberFrameController
     public void showSubscriberDetails(Subscriber subscriber)
     {
         // Populate the UI with the subscriber details
-        txtID.setText("" + subscriber.getId());
-        txtName.setText(subscriber.getName());
+        txtID.setText("" + subscriber.getID());
+        txtName.setText(subscriber.getFull_name());
         txtHistory.setText("" + subscriber.getSubscriptionHistory());
         txtPhone.setText(subscriber.getPhoneNumber());
         txtEmail.setText(subscriber.getEmail());
