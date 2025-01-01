@@ -2,12 +2,12 @@ package entities.book;
 
 import java.util.Date;
 
-public class CoptOfTheBook {
+public class CopyOfTheBook {
 	private final String copyID;
 	private String locationOnShelf;
 	private final Date purchaseDate;
 	
-	public CoptOfTheBook(String copyID, String locationOnShelf, Date purchaseDate) {
+	public CopyOfTheBook(String copyID, String locationOnShelf, Date purchaseDate) {
 		this.copyID = copyID;
 		this.locationOnShelf = locationOnShelf;
 		this.purchaseDate = purchaseDate;
@@ -29,5 +29,4 @@ public class CoptOfTheBook {
 	public Date getPurchaseDate() {
 		return purchaseDate;
 	}
-	
 }

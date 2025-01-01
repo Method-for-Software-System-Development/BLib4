@@ -7,7 +7,7 @@ public abstract class User {
 	private String full_name;
 	private String userName;
 	private String password;
-	private String phoneNumber;
+	private String phoneNumber = null;
 	public String email = null;
 	private boolean EmailChanged;
 	private boolean PhoneChanged;
@@ -24,12 +24,15 @@ public abstract class User {
      * @param EmailChanged
      */
 	
-	public User(String ID, String full_name, String userName, String password, String phoneNumber, String Email) {
+	public User(String ID, String full_name, String userName, String password, String newPhoneNumber, String Email) {
 		this.ID = ID;
 		this.full_name = full_name;
 		this.userName = userName;
 		this.password = password;
-		this.phoneNumber = phoneNumber;
+
+		if(newPhoneNumber!=null) {
+			phoneNumber = newPhoneNumber;
+		}
 		
 		if (Email != null && validateEmail(Email)) {
             this.email = Email;
@@ -39,7 +42,7 @@ public abstract class User {
         }
 	}
 	
-	public boolean validateEmail(String Email) {
+	private boolean validateEmail(String Email) {
 		//Pattern for correct email
 		 Pattern validEmailPattern = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
 		 
@@ -65,7 +68,7 @@ public abstract class User {
 
 	// Setting a new phone number is available
 	public void setPhoneNumber(String newPhoneNumber) {
-		if(phoneNumber!=null && phoneNumber!= newPhoneNumber) {
+		if(newPhoneNumber!=null && phoneNumber!= newPhoneNumber) {
 			this.phoneNumber = newPhoneNumber;
 			PhoneChanged = true;
 		}

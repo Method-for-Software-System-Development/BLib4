@@ -12,18 +12,16 @@ public class Book {
 	private final String description;
 	private HashMap<String,String> waitlist = new HashMap<>();
 	
-	
-	//Constructor without a subject
-	public Book(int book_id, String title, int edition_number, Date printDate, String description) {
-		this.book_id = book_id;
-		this.title = title;
-		this.edition_number = edition_number;
-		this.printDate = printDate;
-		this.subject = null;
-		this.description = description;
-	}
-	
-	//Constructor with all fields
+	/**
+	 * Constructor to initialize the Book
+	 *
+	 * @param book_id       	The unique identifier for the book
+	 * @param title         	The title of the book
+	 * @param edition_number    The edition number of the book
+	 * @param printDate     	The date the book was printed
+	 * @param subject       	The subject or genre of the book
+	 * @param description   	A brief description of the book
+	 */
 	public Book(int book_id, String title, int edition_number, Date printDate, String subject, String description) {
 		this.book_id = book_id;
 		this.title = title;

@@ -12,6 +12,9 @@ public class Librarian extends User implements Serializable{
 		super(ID, full_name, userName, password, phoneNumber, Email);
 		this.employmentDate = employmentDate;
 	}
-	
+
+	public Date getEmploymentDate() {
+		return employmentDate;
+	}
 	
 }
