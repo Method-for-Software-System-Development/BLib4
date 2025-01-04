@@ -3,7 +3,11 @@
 // license found at www.lloseng.com
 package logic;
 
+import java.io.Console;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import gui.ServerMonitorFrameController;
 import entities.logic.MessageType;
 import entities.user.Subscriber;
@@ -32,7 +36,7 @@ public class ServerController extends AbstractServer
     /**
      * Constructs an instance of the echo server.
      *
-     * @param port The port number to connect on.
+     * @param port              The port number to connect on.
      * @param monitorController the monitor controller
      */
     public ServerController(int port, ServerMonitorFrameController monitorController)
@@ -52,11 +56,11 @@ public class ServerController extends AbstractServer
     public void handleMessageFromClient(Object msg, ConnectionToClient client)
     {
         MessageType receiveMsg = (MessageType) msg;
-        MessageType sendMsg = null;
+        MessageType responseMsg = null;
         switch (receiveMsg.getId())
         {
-            //ToDo: handle the mew message types
             case "99":
+                // Client wants to disconnect
                 try
                 {
                     monitorController.clientDisconnected(client);
@@ -69,91 +73,92 @@ public class ServerController extends AbstractServer
                 return;
 
             case "100":
-                //ToDo: implement
+                // Client wants to log in (subscriber/librarian)
+                responseMsg = handleLoginRequest(receiveMsg);
                 break;
 
             case "104":
-                //ToDo: implement
+                // Sign up request to add new subscriber
+                responseMsg = new MessageType("204", dbController.handleSubscriberSignUp((List<String>) receiveMsg.data));
                 break;
 
             case "105":
+                // Request to search book by name or category or free text
                 //ToDo: implement
                 break;
 
             case "106":
+                //? Borrow book request - find copy of the book
                 //ToDo: implement
                 break;
 
             case "107":
+                //? Borrow book request - create new borrow in the system
                 //ToDo: implement
                 break;
 
             case "108":
+                // Client request to order a book
                 //ToDo: implement
                 break;
 
             case "109":
+                // Request to return a borrowed book
                 //ToDo: implement
                 break;
 
             case "110":
+                // Request to return all the active subscriber borrowed books
                 //ToDo: implement
                 break;
 
             case "111":
+                // Request by the subscriber to extend book borrow
                 //ToDo: implement
                 break;
 
             case "112":
+                // Request to get all the subscriber history
+                //? return json, how to do it?
                 //ToDo: implement
                 break;
 
             case "113":
+                // Request to update subscriber email and phone number
                 //ToDo: implement
                 break;
 
             case "114":
+                // Request to update subscriber password
                 //ToDo: implement
                 break;
 
             case "115":
+                // Request to get all the subscribers in the DB
                 //ToDo: implement
                 break;
 
             case "116":
+                // Request by the librarian to get subscriber membership card
                 //ToDo: implement
                 break;
 
             case "117":
+                // Request by the librarian to manually extend book borrow
                 //ToDo: implement
                 break;
 
             case "118":
+                // Request by the librarian to get book borrow time report
+                //? what data need to return
                 //ToDo: implement
                 break;
 
             case "119":
+                // Request by the librarian to get subscriber status report
+                //? what data need to return
                 //ToDo: implement
                 break;
-
-
-            //!/ Remove this///////////////////////////
-            case "0103":
-                // request to send all the subscribers in db, no data in the message
-                sendMsg = new MessageType("0200", dbController.getAllSubscribers());
-                break;
-
-            case "0101":
-                // request to send subscriber with specific id, in format String (the id)
-                sendMsg = new MessageType("0201", dbController.getSubscriberById((String) receiveMsg.getData()));
-                break;
-
-            case "0102":
-                // request to update subscriber in db, in format Subscriber
-                sendMsg = new MessageType("0202", dbController.updateSubscriber((Subscriber) receiveMsg.getData()));
-                break;
-            //!/ end remove this///////////////////////////
-
 
             default:
                 System.out.println("Invalid message type");
@@ -161,7 +166,7 @@ public class ServerController extends AbstractServer
         }
 
         // sent the message to the client
-        sendMessageToClient(client, sendMsg);
+        sendMessageToClient(client, responseMsg);
     }
 
     /**
@@ -226,6 +231,41 @@ public class ServerController extends AbstractServer
     protected synchronized void clientDisconnected(ConnectionToClient client)
     {
         System.out.println("Client disconnected!");
+    }
+
+    /**
+     * This method handles the received "100" message and return response message to send to the client
+     *
+     * @param receiveMsg - received message from the client
+     * @return response message to send the client
+     */
+    private MessageType handleLoginRequest(MessageType receiveMsg)
+    {
+        MessageType responseMsg = null;
+        List<String> data = (List<String>) receiveMsg.data;
+
+        switch (data.get(2))
+        {
+            case "subscriber":
+                responseMsg = new MessageType("201", dbController.handleSubscriberLogin(data.get(0), data.get(1)));
+                break;
+
+            case "librarian":
+                responseMsg = new MessageType("202", dbController.handleLibrarianLogin(data.get(0), data.get(1)));
+                break;
+
+            default:
+                System.out.println("Error! invalid login type");
+                break;
+        }
+
+        // check if the login failed
+        if (responseMsg == null || responseMsg.data == null)
+        {
+            responseMsg = new MessageType("203", null);
+        }
+
+        return responseMsg;
     }
 }
 

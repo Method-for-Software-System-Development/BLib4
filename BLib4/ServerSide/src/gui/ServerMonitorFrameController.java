@@ -8,10 +8,13 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import ocsf.server.ConnectionToClient;
 
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.util.*;
 
 public class ServerMonitorFrameController
@@ -37,6 +40,8 @@ public class ServerMonitorFrameController
     private TableColumn<List<String>, String> column4;
     @FXML
     private Button monitorButton;
+    @FXML
+    private Label ipLbl;
 
     /**
      * This method is called to initialize the table of active clients
@@ -52,6 +57,16 @@ public class ServerMonitorFrameController
         column2.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().get(1)));
         column3.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().get(2)));
         column4.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().get(3)));
+
+        // get the local ip and present on the window
+        try (final DatagramSocket socket = new DatagramSocket())
+        {
+            socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
+            ipLbl.setText("Server ip: " + socket.getLocalAddress().getHostAddress());
+        }
+        catch (Exception ignored)
+        {
+        }
     }
 
     /**

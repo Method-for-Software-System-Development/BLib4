@@ -9,6 +9,8 @@ import javafx.stage.Stage;
 import entities.user.Subscriber;
 
 import java.io.IOException;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.util.Vector;
 
 import gui.ServerPortFrameController;
