@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mysql.cj.protocol.Message;
 import gui.ServerMonitorFrameController;
 import entities.logic.MessageType;
 import entities.user.Subscriber;
@@ -15,8 +16,8 @@ import logic.dbController;
 import ocsf.server.*;
 
 /**
- * This class overrides some of the methods in the abstract
- * superclass in order to give more functionality to the server.
+ * This class overrides some methods in the abstract
+ * superclass to give more functionality to the server.
  *
  * @author Dr Timothy C. Lethbridge
  * @author Dr Robert Lagani&egrave;re
@@ -83,8 +84,8 @@ public class ServerController extends AbstractServer
                 break;
 
             case "105":
-                // Request to search book by name or category or free text
-                //ToDo: implement
+                // Request to a search book by name or category or free text
+                responseMsg = handleBookSearchRequest(receiveMsg);
                 break;
 
             case "106":
@@ -157,6 +158,16 @@ public class ServerController extends AbstractServer
             case "119":
                 // Request by the librarian to get subscriber status report
                 //? what data need to return
+                //ToDo: implement
+                break;
+
+            case "120":
+                // Request from the client to get 5 neweset books in the library
+                //ToDo: implement
+                break;
+
+            case "121":
+                // Request from the client to get 5 most borrowed books in the library
                 //ToDo: implement
                 break;
 
@@ -263,6 +274,33 @@ public class ServerController extends AbstractServer
         if (responseMsg == null || responseMsg.data == null)
         {
             responseMsg = new MessageType("203", null);
+        }
+
+        return responseMsg;
+    }
+
+    public MessageType handleBookSearchRequest(MessageType receiveMsg)
+    {
+        MessageType responseMsg = null;
+        List<String> data = (List<String>) receiveMsg.data;
+
+        switch(data.get(0))
+        {
+            case "name":
+                responseMsg = new MessageType("205", dbController.handleBookSearchByName(data.get(1)));
+                break;
+
+            case "category":
+                responseMsg = new MessageType("205", dbController.handleBookSearchByCategory(data.get(1)));
+                break;
+
+            case "freeText":
+                responseMsg = new MessageType("205", dbController.handleBookSearchByFreeText(data.get(1)));
+                break;
+
+            default:
+                System.out.println("Error! invalid search type");
+                break;
         }
 
         return responseMsg;

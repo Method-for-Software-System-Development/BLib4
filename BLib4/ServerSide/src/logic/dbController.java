@@ -4,8 +4,10 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import entities.book.Book;
 import entities.user.Librarian;
 import entities.user.Subscriber;
+import javafx.scene.image.Image;
 
 public class dbController
 {
@@ -35,7 +37,7 @@ public class dbController
     }
 
     /**
-     * The method create connection to the db
+     * The method creates a connection to the db
      */
     public void connect()
     {
@@ -67,19 +69,19 @@ public class dbController
     /**
      * The method run SQL query to get the subscriber from the db by id and password
      *
-     * @param subsriberId - the id of the subscriber
-     * @param password    - the password of the subscriber
+     * @param subscriberId - the id of the subscriber
+     * @param password     - the password of the subscriber
      * @return - the subscriber if found, else null
      */
-    public Subscriber handleSubscriberLogin(String subsriberId, String password)
+    public Subscriber handleSubscriberLogin(String subscriberId, String password)
     {
         Subscriber subscriber = null;
         PreparedStatement stmt;
 
         try
         {
-            stmt = connection.prepareStatement("select * from subscriber where subscriber_id = ? and subscriber_password = ?");
-            stmt.setString(1, subsriberId);
+            stmt = connection.prepareStatement("select * from subscriber where subscriber_id = ? and subscriber_password = ?;");
+            stmt.setString(1, subscriberId);
             stmt.setString(2, password);
 
             ResultSet rs = stmt.executeQuery();
@@ -113,7 +115,7 @@ public class dbController
 
         try
         {
-            stmt = connection.prepareStatement("select * from librarian where librarian_id = ? and librarian_password = ?");
+            stmt = connection.prepareStatement("select * from librarian where librarian_id = ? and librarian_password = ?;");
             stmt.setString(1, librarianId);
             stmt.setString(2, password);
 
@@ -133,7 +135,12 @@ public class dbController
         return librarian;
     }
 
-
+    /**
+     * The method run SQL query to create a new subscriber in the db
+     *
+     * @param data - the data of the new subscriber
+     * @return - true if the subscriber created, else false
+     */
     public boolean handleSubscriberSignUp(List<String> data)
     {
         PreparedStatement stmt;
@@ -141,7 +148,7 @@ public class dbController
         try
         {
             //check that the subscriber id is not already in use
-            stmt = connection.prepareStatement("select * from subscriber where subscriber_id = ?");
+            stmt = connection.prepareStatement("select * from subscriber where subscriber_id = ?;");
             stmt.setString(1, data.get(0));
 
             ResultSet rs = stmt.executeQuery();
@@ -185,8 +192,123 @@ public class dbController
 
         return true;
     }
-}
 
+    /**
+     * The method run SQL query to search for a book by name
+     *
+     * @param name - the name of the book to search
+     * @return - list of books with the name
+     */
+    public List<Book> handleBookSearchByName(String name)
+    {
+        List<Book> books = new ArrayList<>();
+        PreparedStatement stmt;
+
+        try
+        {
+            // Prepare the SQL query with the MATCH and AGAINST functions
+            stmt = connection.prepareStatement("SELECT * FROM book WHERE book_title = ?;");
+            stmt.setString(1, name);
+
+            ResultSet rs = stmt.executeQuery();
+
+            books = getBooksFromResultSet(rs);
+
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+
+        return books;
+    }
+
+    /**
+     * The method run SQL query to search for a book by category
+     *
+     * @param category - the category of the book to search
+     * @return - list of books with the category
+     */
+    public List<Book> handleBookSearchByCategory(String category)
+    {
+        List<Book> books = new ArrayList<>();
+        PreparedStatement stmt;
+
+        try
+        {
+            // Prepare the SQL query with the MATCH and AGAINST functions
+            stmt = connection.prepareStatement("SELECT * FROM book WHERE book_subject = ?;");
+            stmt.setString(1, category);
+
+            ResultSet rs = stmt.executeQuery();
+
+            books = getBooksFromResultSet(rs);
+
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+
+        return books;
+    }
+
+    /**
+     * The method run SQL query to search for a book by free text
+     *
+     * @param text - the text to search
+     * @return - list of books that related to the text
+     */
+    public List<Book> handleBookSearchByFreeText(String text)
+    {
+        List<Book> books = new ArrayList<>();
+        PreparedStatement stmt;
+
+        try
+        {
+            // Prepare the SQL query with the MATCH and AGAINST functions
+            stmt = connection.prepareStatement("SELECT * FROM book WHERE MATCH(description) AGAINST(? IN NATURAL LANGUAGE MODE);");
+            stmt.setString(1, text);
+
+            ResultSet rs = stmt.executeQuery();
+
+            books = getBooksFromResultSet(rs);
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+
+        return books;
+    }
+
+    private List<Book> getBooksFromResultSet(ResultSet rs) throws SQLException
+    {
+        List<Book> books = new ArrayList<>();
+
+        // Iterate through the result set and create Book objects
+        while (rs.next())
+        {
+            Book book = new Book(
+                    rs.getInt("book_id"),
+                    rs.getString("title"),
+                    rs.getInt("edition_number"),
+                    rs.getDate("printDate"),
+                    rs.getString("subject"),
+                    rs.getString("description")
+            );
+
+            // get the image of the book
+            book.setImage(ImageUtil.convertBlobToImage(rs.getBlob("image")));
+
+            // add the book to the list
+            books.add(book);
+        }
+
+        return books;
+    }
+
+}
 
 //    /**
 //     * The method run SQL query to get all the subscribers from the db
