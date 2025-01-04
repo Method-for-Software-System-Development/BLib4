@@ -80,7 +80,7 @@ public class dbController
 
         try
         {
-            stmt = connection.prepareStatement("select * from subscriber where subscriber_id = ? and subscriber_password = ?;");
+            stmt = connection.prepareStatement("SELECT * from subscriber where subscriber_id = ? and subscriber_password = ?;");
             stmt.setString(1, subscriberId);
             stmt.setString(2, password);
 
@@ -115,7 +115,7 @@ public class dbController
 
         try
         {
-            stmt = connection.prepareStatement("select * from librarian where librarian_id = ? and librarian_password = ?;");
+            stmt = connection.prepareStatement("SELECT * from librarian where librarian_id = ? and librarian_password = ?;");
             stmt.setString(1, librarianId);
             stmt.setString(2, password);
 
@@ -148,7 +148,7 @@ public class dbController
         try
         {
             //check that the subscriber id is not already in use
-            stmt = connection.prepareStatement("select * from subscriber where subscriber_id = ?;");
+            stmt = connection.prepareStatement("SELECT * from subscriber where subscriber_id = ?;");
             stmt.setString(1, data.get(0));
 
             ResultSet rs = stmt.executeQuery();
@@ -282,6 +282,12 @@ public class dbController
         return books;
     }
 
+    /**
+     * The method run SQL query to get the books from the result set
+     * @param rs - the result set
+     * @return - list of books
+     * @throws SQLException
+     */
     private List<Book> getBooksFromResultSet(ResultSet rs) throws SQLException
     {
         List<Book> books = new ArrayList<>();
@@ -308,104 +314,93 @@ public class dbController
         return books;
     }
 
-}
 
-//    /**
-//     * The method run SQL query to get all the subscribers from the db
-//     *
-//     * @return list of all the subscribers
-//     */
-//    public List<Subscriber> getAllSubscribers()
-//    {
-//        List<Subscriber> subscribers = new ArrayList<>();
-//        Statement stmt;
-//
-//        try
-//        {
-//            stmt = connection.createStatement();
-//            ResultSet rs = stmt.executeQuery("select * from subscriber");
-//
-//            // save the data to the list
-//            while (rs.next())
-//            {
-//                // create new subscriber
-//                Subscriber subscriber = new Subscriber(Integer.parseInt(rs.getString(1)),
-//                        rs.getString(2), Integer.parseInt(rs.getString(3)),
-//                        rs.getString(4), rs.getString(5));
-//
-//                // add the subscriber to the list
-//                subscribers.add(subscriber);
-//            }
-//        }
-//        catch (SQLException e)
-//        {
-//            e.printStackTrace();
-//        }
-//
-//        return subscribers;
-//    }
-//
-//    /**
-//     * The method run SQL query to get subscriber from db by id
-//     *
-//     * @param id - the id of the subscriber
-//     * @return the subscriber with the id
-//     */
-//    public Subscriber getSubscriberById(String id)
-//    {
-//        Subscriber subscriber = null;
-//
-//        PreparedStatement stmt;
-//
-//        try
-//        {
-//            stmt = connection.prepareStatement("select * from subscriber where subscriber_id = ?");
-//            stmt.setString(1, id);
-//
-//            ResultSet rs = stmt.executeQuery();
-//
-//            // we have only on result if existed, else zero.
-//            if (rs.next())
-//            {
-//                subscriber = new Subscriber(Integer.parseInt(rs.getString(1)),
-//                        rs.getString(2), Integer.parseInt(rs.getString(3)),
-//                        rs.getString(4), rs.getString(5));
-//            }
-//        }
-//        catch (SQLException e)
-//        {
-//            e.printStackTrace();
-//        }
-//
-//        return subscriber;
-//    }
-//
-//
-//    /**
-//     * The method run SQL query to update the subscriber in the db with the new data
-//     *
-//     * @param newSubscriber - the new subscriber data
-//     */
-//    public boolean updateSubscriber(Subscriber newSubscriber)
-//    {
-//        PreparedStatement stmt;
-//
-//        try
-//        {
-//            stmt = connection.prepareStatement("UPDATE subscriber SET subscriber_email = ?, subscriber_phone_number = ? where subscriber_id = ?");
-//
-//            stmt.setString(1, newSubscriber.getEmail());
-//            stmt.setString(2, newSubscriber.getPhoneNumber());
-//            stmt.setInt(3, newSubscriber.getId());
-//
-//            stmt.executeUpdate();
-//        }
-//        catch (SQLException e)
-//        {
-//            e.printStackTrace();
-//            return false;
-//        }
-//
-//        return true;
-//    }
-//}
+
+    /**
+     * The method run SQL query to update the subscriber details
+     * @param subscriber - the new details of the subscriber
+     * @return - true if the update succeeds, else false
+     */
+    public boolean handleUpdateSubscriberDetails(Subscriber subscriber)
+    {
+        PreparedStatement stmt;
+
+        try
+        {
+            stmt = connection.prepareStatement("UPDATE subscriber SET subscriber_phone_number = ?, subscriber_email = ? WHERE subscriber_id = ?;");
+
+            stmt.setString(1, subscriber.getPhone());
+            stmt.setString(2, subscriber.getEmail());
+            stmt.setString(3, subscriber.getId());
+
+            stmt.executeUpdate();
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * The method run SQL query to update the subscriber password
+     * @param data - the subscriber id and new password
+     * @return - true if the update succeeds, else false
+     */
+    public boolean handleUpdateSubscriberPassword(List<String> data)
+    {
+        PreparedStatement stmt;
+
+        try
+        {
+            stmt = connection.prepareStatement("UPDATE subscriber SET subscriber_password = ? WHERE subscriber_id = ?;");
+
+            stmt.setString(1, data.get(1));
+            stmt.setString(2, data.get(0));
+
+            stmt.executeUpdate();
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
+    }
+
+    public List<Subscriber> handleGetAllSubscribers()
+    {
+        List<Subscriber> subscribers = new ArrayList<>();
+        PreparedStatement stmt;
+
+        try
+        {
+            // Prepare the SQL query with the MATCH and AGAINST functions
+            stmt = connection.prepareStatement("SELECT * from subscriber;");
+
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next())
+            {
+                //create new subscriber
+                Subscriber subscriber = new Subscriber(rs.getString("subscriber_id"),
+                        rs.getString("subscriber_name"), rs.getString("subscriber_phone_number"),
+                        rs.getString("subscriber_email"), rs.getBoolean("subscriber_status"));
+
+                //add the subscriber to the list
+                subscribers.add(subscriber);
+            }
+
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+
+        return subscribers;
+    }
+
+}

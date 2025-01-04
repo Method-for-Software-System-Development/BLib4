@@ -126,17 +126,17 @@ public class ServerController extends AbstractServer
 
             case "113":
                 // Request to update subscriber email and phone number
-                //ToDo: implement
+                responseMsg = new MessageType("213", dbController.handleUpdateSubscriberDetails((Subscriber) receiveMsg.data));
                 break;
 
             case "114":
                 // Request to update subscriber password
-                //ToDo: implement
+                responseMsg = new MessageType("214", dbController.handleUpdateSubscriberPassword((List<String>) receiveMsg.data));
                 break;
 
             case "115":
                 // Request to get all the subscribers in the DB
-                //ToDo: implement
+                responseMsg = new MessageType("215", dbController.handleGetAllSubscribers());
                 break;
 
             case "116":
