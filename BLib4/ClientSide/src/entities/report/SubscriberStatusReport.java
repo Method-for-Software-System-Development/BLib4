@@ -1,12 +1,12 @@
 package entities.report;
 
-import java.io.IOException;
-import java.util.Date;
-
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+
+import java.io.IOException;
+import java.util.Date;
 
 public class SubscriberStatusReport extends Report {
 	private int[] dailyActive;
@@ -75,7 +75,7 @@ public class SubscriberStatusReport extends Report {
 	public void generateContent() {
 		try {
 			//loading FXML file
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("Implement"));
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("Implement"));  	//ToDo: implement the FXML file
 			Parent root = loader.load();
 			
 			// Create a new stage for the new screen

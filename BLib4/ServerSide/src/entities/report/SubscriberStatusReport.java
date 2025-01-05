@@ -75,7 +75,7 @@ public class SubscriberStatusReport extends Report {
 	public void generateContent() {
 		try {
 			//loading FXML file
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("Implement"));
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("Implement"));  	//ToDo: implement the FXML file
 			Parent root = loader.load();
 			
 			// Create a new stage for the new screen

@@ -12,14 +12,14 @@ public class Notification {
 	 *
 	 * @param noteNum   The unique number identifying the notification
 	 * @param sender    The sender of the notification
-	 * @param reciver   The receiver of the notification
+	 * @param receiver   The receiver of the notification
 	 * @param mean      The medium or means of the notification (e.g., email, SMS)
 	 * @param content   The content or message of the notification
 	 */
-	public Notification(int noteNum, String sender, String reciver, String mean, String content) {
+	public Notification(int noteNum, String sender, String receiver, String mean, String content) {
 		this.noteNum = noteNum;
 		this.sender = sender;
-		this.reciver = reciver;
+		this.reciver = receiver;
 		this.mean = mean;
 		this.content = content;
 	}
@@ -35,7 +35,7 @@ public class Notification {
 	}
 
 
-	public String getReciver() {
+	public String getReceiver() {
 		return reciver;
 	}
 

@@ -99,7 +99,7 @@ public class Subscriber implements Serializable
      */
     public void setEmail(String email)
     {
-        if (validateEmail(email))
+        if (validateEmail(email) && !this.email.equals(email))
         {
             this.email = email;
             this.EmailChanged = true;
@@ -135,6 +135,15 @@ public class Subscriber implements Serializable
     public boolean isChanged()
     {
         return EmailChanged || PhoneChanged;
+    }
+
+    /**
+     * The method resets the changed flags
+     */
+    public void resetChanged()
+    {
+        EmailChanged = false;
+        PhoneChanged = false;
     }
 
     /**
