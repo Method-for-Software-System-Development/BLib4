@@ -12,6 +12,7 @@ import ocsf.client.AbstractClient;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -37,6 +38,7 @@ public class ChatClient extends AbstractClient
     public static List<Subscriber> subscribers = new ArrayList<Subscriber>();
     public static boolean serverResponse = false;
     public static boolean awaitResponse = false;
+    public static Date todayDate;
 
     //Constructors ****************************************************
 
@@ -95,6 +97,7 @@ public class ChatClient extends AbstractClient
 
             case "207":
                 //ToDo: implement
+            	serverResponse = (boolean) receiveMsg.getData(); // true means success
                 break;
 
             case "208":
@@ -144,7 +147,15 @@ public class ChatClient extends AbstractClient
             case "219":
                 //ToDo: implement
                 break;
-
+            case "220":
+                //ToDo: implement
+                break;
+            case "221":
+                //ToDo: implement
+                break;
+            case "222":
+                //ToDo: implement
+                break;
             //!/ remove this /////////////////////////////////
             case "0200":
                 // list of all the subscribers in db, in format List<Subscriber>
