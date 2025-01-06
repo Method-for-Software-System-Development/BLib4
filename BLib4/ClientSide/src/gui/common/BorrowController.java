@@ -76,7 +76,7 @@ public class BorrowController {
             	Date dueDate = (Date) calendar.getTime(); // Get the updated date
             	
             	// Sending to the DocumentationController the borrow of the book
-            	DocumentationController.receiveBorrow(new Borrow(today, dueDate, null, "Active", 0, null));
+            	DocumentationController.receiveBorrow(new Borrow(today, dueDate, null, "Active", 0));
             }
         }catch(Exception e) {
         	System.out.println(e.toString());

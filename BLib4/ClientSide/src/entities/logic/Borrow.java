@@ -10,7 +10,6 @@ public class Borrow {
 	private Date returnDate;
 	private String status;
 	private int lateTime;
-	private HashMap<String,ArrayList<Date>> manualExtention = new HashMap<>();
 	
 	/**
 	 * Constructor to initialize a Borrow record
@@ -22,14 +21,12 @@ public class Borrow {
 	 * @param lateTime        	The amount of time (in days) the return was late
 	 * @param manualExtention 	A map of manual extension dates, with the reason as the key and the extended date as the value
 	 */
-	public Borrow(Date brrowDate, Date dueDate, Date returnDate, String status, int lateTime,
-				  HashMap<String, ArrayList<Date>> manualExtention) {
+	public Borrow(Date brrowDate, Date dueDate, Date returnDate, String status, int lateTime) {
 		this.brrowDate = brrowDate;
 		this.dueDate = dueDate;
 		this.returnDate = returnDate;
 		this.status = status;
 		this.lateTime = lateTime;
-		this.manualExtention = manualExtention;
 	}
 
 	public Date getBrrowDate() {
@@ -50,17 +47,6 @@ public class Borrow {
 
 	public int getLateTime() {
 		return lateTime;
-	}
-
-	public HashMap<String, ArrayList<Date>> getManualExtention() {
-		return manualExtention;
-	}
-	
-	public void addManualExtention(String librarian, Date newDate) {
-		if(!manualExtention.containsKey(librarian)) {
-			manualExtention.put(librarian, new ArrayList<Date>());
-		}
-		manualExtention.get(librarian).add(newDate);
 	}
 	
 }
