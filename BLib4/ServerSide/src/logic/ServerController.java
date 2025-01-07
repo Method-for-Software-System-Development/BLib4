@@ -89,13 +89,13 @@ public class ServerController extends AbstractServer
                 break;
 
             case "106":
-                //? Borrow book request - find copy of the book
-                //ToDo: implement
+                // Borrow book request - find copy of the book
+                responseMsg = new MessageType("206", dbController.handleCheckBorrowedBookAvailability((String) receiveMsg.data));
                 break;
 
             case "107":
-                //? Borrow book request - create new borrow in the system
-                //ToDo: implement
+                // Borrow book request - create new borrow in the system
+                responseMsg = new MessageType("207", dbController.handleBorrowBook((List<String>) receiveMsg.data));
                 break;
 
             case "108":
@@ -288,19 +288,19 @@ public class ServerController extends AbstractServer
         switch(data.get(0))
         {
             case "name":
-                //responseMsg = new MessageType("205", dbController.handleBookSearchByName(data.get(1)));
+                responseMsg = new MessageType("205", dbController.handleBookSearchByName(data.get(1)));
                 break;
 
             case "category":
-                //responseMsg = new MessageType("205", dbController.handleBookSearchByCategory(data.get(1)));
+                responseMsg = new MessageType("205", dbController.handleBookSearchByCategory(data.get(1)));
                 break;
 
             case "freeText":
-                //responseMsg = new MessageType("205", dbController.handleBookSearchByFreeText(data.get(1)));
+                responseMsg = new MessageType("205", dbController.handleBookSearchByFreeText(data.get(1)));
                 break;
 
             default:
-                System.out.println("Error! invalid search type");
+                System.out.println("Error! invalid search type"); // ToDo: check if we need to send MessageType with null
                 break;
         }
 

@@ -1,7 +1,6 @@
 package entities.user;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.regex.Pattern;
 
 public class Subscriber implements Serializable

@@ -95,7 +95,7 @@ public class dbController
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
+            System.out.println("Error! subscriber login failed");
         }
 
         return subscriber;
@@ -129,7 +129,7 @@ public class dbController
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
+            System.out.println("Error! librarian login failed");
         }
 
         return librarian;
@@ -186,7 +186,7 @@ public class dbController
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
+            System.out.println("Error! subscriber sign up failed");
             return false;
         }
 
@@ -217,7 +217,7 @@ public class dbController
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
+            System.out.println("Error! book search by name failed");
         }
 
         return books;
@@ -247,7 +247,7 @@ public class dbController
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
+            System.out.println("Error! book search by category failed");
         }
 
         return books;
@@ -276,7 +276,7 @@ public class dbController
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
+            System.out.println("Error! book search by free text failed");
         }
 
         return books;
@@ -284,9 +284,9 @@ public class dbController
 
     /**
      * The method run SQL query to get the books from the result set
+     *
      * @param rs - the result set
      * @return - list of books
-     * @throws SQLException
      */
     private List<Book> getBooksFromResultSet(ResultSet rs) throws SQLException
     {
@@ -315,9 +315,9 @@ public class dbController
     }
 
 
-
     /**
      * The method run SQL query to update the subscriber details
+     *
      * @param subscriber - the new details of the subscriber
      * @return - true if the update succeeds, else false
      */
@@ -337,7 +337,7 @@ public class dbController
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
+            System.out.println("Error! update subscriber details failed");
             return false;
         }
 
@@ -346,6 +346,7 @@ public class dbController
 
     /**
      * The method run SQL query to update the subscriber password
+     *
      * @param data - the subscriber id and new password
      * @return - true if the update succeeds, else false
      */
@@ -364,13 +365,18 @@ public class dbController
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
+            System.out.println("Error! update subscriber password failed");
             return false;
         }
 
         return true;
     }
 
+    /**
+     * The method run SQL query to get all the subscribers in the db
+     *
+     * @return - list of all the subscribers
+     */
     public List<Subscriber> handleGetAllSubscribers()
     {
         List<Subscriber> subscribers = new ArrayList<>();
@@ -397,10 +403,146 @@ public class dbController
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
+            System.out.println("Error! get all subscribers failed");
         }
 
         return subscribers;
+    }
+
+    /**
+     * The method run SQL query to check if a copy of the book is available to borrow (not borrowed and not ordered)
+     *
+     * @param copyId - the id of the copy to check
+     * @return - true if the copy is available, else false
+     */
+    public boolean handleCheckBorrowedBookAvailability(String copyId)
+    {
+        PreparedStatement stmt;
+        boolean returnValue = true;
+        String bookId = "";
+
+        // check if the book is not borrowed
+        try
+        {
+            stmt = connection.prepareStatement("SELECT * from copy_of_the_book WHERE copy_id = ?;");
+            stmt.setString(1, copyId);
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next())
+            {
+                // save the book id for the next query
+                bookId = rs.getString("book_id");
+
+                if (rs.getBoolean("is_borrowed"))
+                {
+                    returnValue = false;
+                }
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! check borrowed book availability failed");
+        }
+
+        if (returnValue)
+        {
+            // check that we have enough copies of the book that not ordered
+            try
+            {
+                // count the number of copies of the book in the library that available to borrow
+                stmt = connection.prepareStatement("SELECT COUNT(*) from copy_of_the_book WHERE book_id = ? AND status = true;");
+                stmt.setString(1, bookId);
+
+                ResultSet rs = stmt.executeQuery();
+                rs.next();
+                int copyAvailableToBorrow = rs.getInt(1);
+
+                // count the number of copies of the book that are ordered
+                stmt = connection.prepareStatement("SELECT COUNT(*) from subscriber_order WHERE book_id = ? AND status = true;");
+                stmt.setString(1, bookId);
+
+                rs = stmt.executeQuery();
+                rs.next();
+                int ordered = rs.getInt(1);
+
+                // check if we have enough copies of the book that are not ordered
+                if (copyAvailableToBorrow - ordered < 1)
+                {
+                    returnValue = false;
+                }
+
+            }
+            catch (SQLException e)
+            {
+                System.out.println("Error! check borrowed book availability failed");
+            }
+        }
+
+        return returnValue;
+    }
+
+    /**
+     * The method run SQL query to handle the borrow of a book
+     *
+     * @param borrowDetails - the details of the borrow (subscriber id and copy id)
+     * @return - true if the borrow succeeds, else false
+     */
+    public boolean handleBorrowBook(List<String> borrowDetails)
+    {
+        PreparedStatement stmt;
+        String subscriberId = borrowDetails.get(0);
+        String copyId = borrowDetails.get(1);
+
+        // Check that the subscriber not frozen
+        try
+        {
+            stmt = connection.prepareStatement("SELECT * from subscriber WHERE subscriber_id = ?;");
+            stmt.setString(1, subscriberId);
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next())
+            {
+                if (!rs.getBoolean("subscriber_status"))
+                {
+                    return false;
+                }
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! borrow book failed");
+            return false;
+        }
+
+
+        try
+        {
+            // update the copy of the book to be borrowed
+            stmt = connection.prepareStatement("UPDATE copy_of_the_book SET status = true WHERE copy_id = ?;");
+            stmt.setString(1, copyId);
+            stmt.executeUpdate();
+
+
+            // get the last borrow id
+            stmt = connection.prepareStatement("SELECT MAX(borrow_id) FROM borrow_book;");
+            ResultSet rs = stmt.executeQuery();
+            rs.next();
+            int borrowId = rs.getInt(1) + 1;
+
+            // create a new row in the borrow table
+            stmt = connection.prepareStatement("INSERT INTO borrow_book (borrow_id, subscriber_id, copy_id, borrow_date, borrow_due_date, borrow_status) VALUES (?,?, ?, CURDATE(), CURDATE() + 14, true);");
+            stmt.setString(1, subscriberId);
+            stmt.setString(2, copyId);
+            stmt.setString(3, String.valueOf(borrowId));
+            stmt.executeUpdate();
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! borrow book failed");
+            return false;
+        }
+
+        return true;
     }
 
 }
