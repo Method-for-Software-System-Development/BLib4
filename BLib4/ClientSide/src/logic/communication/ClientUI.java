@@ -2,6 +2,7 @@ package logic.communication;
 
 import gui.common.*;
 import javafx.application.Application;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 public class ClientUI extends Application
@@ -19,19 +20,42 @@ public class ClientUI extends Application
         launch(args);
     } // end main
 
-    /**
-     * This method is called when the program is run as an application.
-     *
-     * @param primaryStage
-     * @throws Exception
-     */
-    @Override
-    public void start(Stage primaryStage) throws Exception
-    {
-        ClientPortFrameController aFrame = new ClientPortFrameController(); // create StudentFrame
+    // ********** OLD START METHOD - USE IT FOR TESTING YOUR CODE ("COMMENT" THE NEW START METHOD) **********
 
-        aFrame.start(primaryStage);
+//    /**
+//     * This method is called when the program is run as an application.
+//     *
+//     * @param primaryStage
+//     * @throws Exception
+//     */
+//    @Override
+//    public void start(Stage primaryStage) throws Exception
+//    {
+//        ClientPortFrameController aFrame = new ClientPortFrameController(); // create StudentFrame
+//
+//        aFrame.start(primaryStage);
+//    }
+
+    @Override
+    public void start(Stage primaryStage) {
+        // Load custom fonts
+        Font.loadFont(getClass().getResourceAsStream("/gui/assets/fonts/Montserrat/Montserrat-Regular.ttf"), 14);
+
+        // Set the primary stage
+        SceneManager.setStage(primaryStage);
+
+        // Set initial scene
+        SceneManager.switchScene("/gui/common/homePage/HomePage_UI.fxml", "BLib - Home Page");
+
+        // Set size constraints
+        primaryStage.setMinWidth(1280);  // Minimum width
+        primaryStage.setMinHeight(720); // Minimum height
+
+        // Set initial size
+        primaryStage.setWidth(1920);  // Initial width
+        primaryStage.setHeight(1080);  // Initial height
     }
+
 
     /**
      * This method is called to start the connection with the server.
