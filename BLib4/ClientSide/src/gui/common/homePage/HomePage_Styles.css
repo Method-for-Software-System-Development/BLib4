@@ -1,0 +1,30 @@
+.gridPane {
+    -fx-background-color: linear-gradient(to bottom, #D8DBFF, #B5BBFF);
+}
+.menu {
+    -fx-background-color: #525FE1;
+    -fx-background-radius: 15;
+    -fx-padding: 15;
+}
+.header {
+    -fx-background-color: #FFFFFF;
+    -fx-background-image: url("../../assets/images/booksBackground.png");
+    -fx-background-position: left center;
+    -fx-background-size: auto 94%;
+    -fx-background-repeat: repeat-x;
+    -fx-background-radius: 15;
+    -fx-padding: 15;
+}
+
+.header-title {
+    -fx-font-family: "Montserrat";
+    -fx-font-weight: bold;
+    -fx-font-size: 28px;
+    -fx-text-fill: #F86F03;
+}
+
+.main {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 15;
+    -fx-padding: 15;
+}

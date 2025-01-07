@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<GridPane alignment="CENTER" hgap="15.0" prefHeight="1080.0" prefWidth="1920.0" styleClass="gridPane" stylesheets="@HomePage_Styles.css" vgap="15.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.common.homePage.HomePage_Controller">
+
+   <!-- Row Constraints -->
+   <rowConstraints>
+      <RowConstraints maxHeight="250.0" minHeight="250.0" prefHeight="250.0" />
+      <RowConstraints vgrow="ALWAYS" />
+   </rowConstraints>
+
+   <!-- Column Constraints -->
+   <columnConstraints>
+      <ColumnConstraints maxWidth="500.0" minWidth="500.0" prefWidth="500.0" />
+      <ColumnConstraints hgrow="ALWAYS" />
+   </columnConstraints>
+
+   <!-- Children -->
+   <children>
+      <!-- Menu (Left Panel) -->
+      <VBox maxWidth="500.0" minWidth="500.0" prefWidth="500.0" styleClass="menu" GridPane.hgrow="NEVER" GridPane.rowSpan="2" GridPane.vgrow="ALWAYS">
+         <children>
+            <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../assets/images/logo.png" />
+               </image>
+            </ImageView>
+         </children></VBox>
+
+      <!-- Header (Top Panel) -->
+      <VBox maxHeight="250.0" minHeight="250.0" prefHeight="250.0" styleClass="header" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
+         <children>
+            <Label text="Braude College Library Management Application" styleClass="header-title" />
+         </children></VBox>
+
+      <!-- Main (Main Content Panel) -->
+      <VBox styleClass="main" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" />
+   </children>
+
+   <!-- Padding -->
+   <padding>
+      <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+   </padding>
+
+</GridPane>
