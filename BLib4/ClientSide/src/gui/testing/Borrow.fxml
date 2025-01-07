@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="372.0" prefWidth="318.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.yourpackage.BorrowController">
+   <children>
+      <Label layoutX="39.0" layoutY="169.0" text="Book ID:" />
+   	  <TextField fx:id="txtBookID" layoutX="114.0" layoutY="165.0" />
+  	  <Label layoutX="39.0" layoutY="169.0" text="Subscriber ID:" />
+   	  <TextField fx:id="txtSubscriberID" layoutX="114.0" layoutY="165.0" />
+      <Button fx:id="btnBorrow" layoutX="129.0" layoutY="75.0" mnemonicParsing="false" onAction="#createNewBorrow" text="borrow" />
+   </children>
+</AnchorPane>

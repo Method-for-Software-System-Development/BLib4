@@ -46,7 +46,7 @@ public class MainWindowFrameController
         FXMLLoader loader = new FXMLLoader();
 
         // send message to server to get all subscribers
-        ClientUI.chat.accept(new MessageType("0103", null));
+        ClientUI.chat.accept(new MessageType("103", null));
 
         // open the ShowAllSubscribers window
         ((Node) event.getSource()).getScene().getWindow().hide(); //hiding primary window

@@ -194,6 +194,7 @@ public class ServerController extends AbstractServer
         }
         catch (Exception e)
         {
+        	System.out.println(e.toString());
             System.out.println("Error sending message to client");
         }
     }
@@ -262,7 +263,7 @@ public class ServerController extends AbstractServer
                 break;
 
             case "librarian":
-                responseMsg = new MessageType("202", dbController.handleLibrarianLogin(data.get(0), data.get(1)));
+                //responseMsg = new MessageType("202", dbController.handleLibrarianLogin(data.get(0), data.get(1)));
                 break;
 
             default:
@@ -287,15 +288,15 @@ public class ServerController extends AbstractServer
         switch(data.get(0))
         {
             case "name":
-                responseMsg = new MessageType("205", dbController.handleBookSearchByName(data.get(1)));
+                //responseMsg = new MessageType("205", dbController.handleBookSearchByName(data.get(1)));
                 break;
 
             case "category":
-                responseMsg = new MessageType("205", dbController.handleBookSearchByCategory(data.get(1)));
+                //responseMsg = new MessageType("205", dbController.handleBookSearchByCategory(data.get(1)));
                 break;
 
             case "freeText":
-                responseMsg = new MessageType("205", dbController.handleBookSearchByFreeText(data.get(1)));
+                //responseMsg = new MessageType("205", dbController.handleBookSearchByFreeText(data.get(1)));
                 break;
 
             default:
