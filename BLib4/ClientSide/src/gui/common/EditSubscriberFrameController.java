@@ -50,7 +50,7 @@ public class EditSubscriberFrameController
     {
         // Populate the UI with the subscriber details
         txtID.setText("" + subscriber.getId());
-        txtName.setText(subscriber.getName());
+        txtName.setText(subscriber.getFirstName());
         //txtHistory.setText("" + subscriber.getSubscriptionHistory());
         txtPhone.setText(subscriber.getPhone());
         txtEmail.setText(subscriber.getEmail());
@@ -72,7 +72,7 @@ public class EditSubscriberFrameController
         String email = txtEmail.getText();
         //String id, String name, String phone, String email, boolean status
         // Update the subscriber details in db
-        ClientUI.chat.accept(new MessageType("0102", new Subscriber(id, name, phone, email, true)));
+        ClientUI.chat.accept(new MessageType("0102", new Subscriber(id, name,name, phone, email, true)));
 
         // check server response and show alert
         if (ChatClient.serverResponse)

@@ -6,7 +6,8 @@ import java.util.regex.Pattern;
 public class Subscriber implements Serializable
 {
     private final String id;
-    private final String name;
+    private final String firstName;
+    private final String lastName;
     //? save the subscription history in a file
     private String phone;
     private String email;
@@ -17,16 +18,19 @@ public class Subscriber implements Serializable
 
     /**
      * Default constructor
-     * @param id - the id of the subscriber
-     * @param name - the name of the subscriber
-     * @param phone - the phone number of the subscriber
-     * @param email - the email of the subscriber
-     * @param status - the status of the subscriber
+     *
+     * @param id        - the id of the subscriber
+     * @param firstName - the name of the subscriber
+     * @param lastName  - the last name of the subscriber
+     * @param phone     - the phone number of the subscriber
+     * @param email     - the email of the subscriber
+     * @param status    - the status of the subscriber
      */
-    public Subscriber(String id, String name, String phone, String email, boolean status)
+    public Subscriber(String id, String firstName, String lastName, String phone, String email, boolean status)
     {
         this.id = id;
-        this.name = name;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.phone = phone;
         this.email = email;
         this.status = status;
@@ -36,6 +40,7 @@ public class Subscriber implements Serializable
 
     /**
      * get the id of the subscriber
+     *
      * @return - the id of the subscriber
      */
     public String getId()
@@ -44,16 +49,28 @@ public class Subscriber implements Serializable
     }
 
     /**
-     * get the name of the subscriber
-     * @return - the name of the subscriber
+     * get the first name of the subscriber
+     *
+     * @return - the first name of the subscriber
      */
-    public String getName()
+    public String getFirstName()
     {
-        return name;
+        return firstName;
+    }
+
+    /**
+     * get the last name of the subscriber
+     *
+     * @return - the last name of the subscriber
+     */
+    public String getLastName()
+    {
+        return lastName;
     }
 
     /**
      * get the phone number of the subscriber
+     *
      * @return - the phone number of the subscriber
      */
     public String getPhone()
@@ -63,6 +80,7 @@ public class Subscriber implements Serializable
 
     /**
      * get the email of the subscriber
+     *
      * @return - the email of the subscriber
      */
     public String getEmail()
@@ -72,6 +90,7 @@ public class Subscriber implements Serializable
 
     /**
      * get the status of the subscriber
+     *
      * @return - the status of the subscriber
      */
     public boolean getStatus()
@@ -81,6 +100,7 @@ public class Subscriber implements Serializable
 
     /**
      * set the phone number of the subscriber
+     *
      * @param phone - the phone number of the subscriber
      */
     public void setPhone(String phone)
@@ -94,6 +114,7 @@ public class Subscriber implements Serializable
 
     /**
      * set the email of the subscriber
+     *
      * @param email - the email of the subscriber
      */
     public void setEmail(String email)
@@ -107,6 +128,7 @@ public class Subscriber implements Serializable
 
     /**
      * set the status of the subscriber
+     *
      * @param status - the status of the subscriber
      */
     public void setStatus(boolean status)
@@ -116,10 +138,12 @@ public class Subscriber implements Serializable
 
     /**
      * Validate the email
+     *
      * @param email - the email to validate
      * @return
      */
-    private boolean validateEmail(String email) {
+    private boolean validateEmail(String email)
+    {
         //Pattern for correct email
         Pattern validEmailPattern = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
 
@@ -129,6 +153,7 @@ public class Subscriber implements Serializable
 
     /**
      * The method returns if the subscriber data has changed
+     *
      * @return - true if the subscriber data has changed, false otherwise
      */
     public boolean isChanged()
@@ -147,6 +172,7 @@ public class Subscriber implements Serializable
 
     /**
      * The method returns the subscriber as string
+     *
      * @return the subscriber as string
      */
     @Override
@@ -154,13 +180,13 @@ public class Subscriber implements Serializable
     {
         return "Subscriber{" +
                 "id='" + id + '\'' +
-                ", name='" + name + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
                 ", phone='" + phone + '\'' +
                 ", email='" + email + '\'' +
                 ", status=" + status +
                 '}';
     }
-
 
 
 }

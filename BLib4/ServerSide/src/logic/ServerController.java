@@ -89,28 +89,28 @@ public class ServerController extends AbstractServer
                 break;
 
             case "106":
-                //? Borrow book request - find copy of the book
-                //ToDo: implement
+                // Borrow book request - find copy of the book
+                responseMsg = new MessageType("206", dbController.handleCheckBorrowedBookAvailability((String) receiveMsg.data));
                 break;
 
             case "107":
-                //? Borrow book request - create new borrow in the system
-                //ToDo: implement
+                // Borrow book request - create new borrow in the system
+                responseMsg = new MessageType("207", dbController.handleBorrowBook((List<String>) receiveMsg.data));
                 break;
 
             case "108":
                 // Client request to order a book
-                //ToDo: implement
+                responseMsg = new MessageType("208", dbController.handleOrderBook((List<String>) receiveMsg.data));
                 break;
 
             case "109":
                 // Request to return a borrowed book
-                //ToDo: implement
+                responseMsg = new MessageType("209", dbController.handleReturnBorrowedBook((String) receiveMsg.data));
                 break;
 
             case "110":
                 // Request to return all the active subscriber borrowed books
-                //ToDo: implement
+                responseMsg = new MessageType("210", dbController.handleGetSubscriberBorrowList((String) receiveMsg.data));
                 break;
 
             case "111":
@@ -162,13 +162,13 @@ public class ServerController extends AbstractServer
                 break;
 
             case "120":
-                // Request from the client to get 5 neweset books in the library
-                //ToDo: implement
+                // Request from the client to get 5 newest books in the library
+                responseMsg = new MessageType("220", dbController.handleGetFiveNewestBooks());
                 break;
 
             case "121":
                 // Request from the client to get 5 most borrowed books in the library
-                //ToDo: implement
+                responseMsg = new MessageType("221", dbController.handleGetFiveMostPopularBooks());
                 break;
 
             default:
@@ -181,7 +181,7 @@ public class ServerController extends AbstractServer
     }
 
     /**
-     * The method send message to specific client
+     * The method sends a message to a specific client
      *
      * @param client - the client to send the message
      * @param msg    - the message to send
@@ -194,7 +194,7 @@ public class ServerController extends AbstractServer
         }
         catch (Exception e)
         {
-        	System.out.println(e.toString());
+            System.out.println(e.toString());
             System.out.println("Error sending message to client");
         }
     }
@@ -285,22 +285,22 @@ public class ServerController extends AbstractServer
         MessageType responseMsg = null;
         List<String> data = (List<String>) receiveMsg.data;
 
-        switch(data.get(0))
+        switch (data.get(0))
         {
             case "name":
-                //responseMsg = new MessageType("205", dbController.handleBookSearchByName(data.get(1)));
+                responseMsg = new MessageType("205", dbController.handleBookSearchByName(data.get(1)));
                 break;
 
             case "category":
-                //responseMsg = new MessageType("205", dbController.handleBookSearchByCategory(data.get(1)));
+                responseMsg = new MessageType("205", dbController.handleBookSearchByCategory(data.get(1)));
                 break;
 
             case "freeText":
-                //responseMsg = new MessageType("205", dbController.handleBookSearchByFreeText(data.get(1)));
+                responseMsg = new MessageType("205", dbController.handleBookSearchByFreeText(data.get(1)));
                 break;
 
             default:
-                System.out.println("Error! invalid search type");
+                System.out.println("Error! invalid search type"); // ToDo: check if we need to send MessageType with null
                 break;
         }
 
