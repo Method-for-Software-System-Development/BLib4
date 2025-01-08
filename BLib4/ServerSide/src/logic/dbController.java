@@ -303,10 +303,10 @@ public class dbController
         {
             Book book = new Book(
                     rs.getInt("book_id"),
-                    rs.getString("title"),
+                    rs.getString("book_title"),
                     rs.getInt("edition_number"),
-                    rs.getDate("printDate"),
-                    rs.getString("subject"),
+                    rs.getDate("print_date"),
+                    rs.getString("book_subject"),
                     rs.getString("description")
             );
 
@@ -439,7 +439,7 @@ public class dbController
                 // save the book id for the next query
                 bookId = rs.getString("book_id");
 
-                if (rs.getBoolean("is_borrowed"))
+                if (rs.getBoolean("is_available"))
                 {
                     returnValue = false;
                 }
@@ -824,6 +824,7 @@ public class dbController
 
     /**
      * The method run SQL query to get the subscriber active borrow list
+     *
      * @param subscriberId - the id of the subscriber
      * @return - list of the active borrows
      */
