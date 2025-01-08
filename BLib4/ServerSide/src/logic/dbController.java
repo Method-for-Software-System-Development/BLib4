@@ -822,6 +822,49 @@ public class dbController
         return returnValue;
     }
 
+    /**
+     * The method run SQL query to get the subscriber active borrow list
+     * @param subscriberId - the id of the subscriber
+     * @return - list of the active borrows
+     */
+    public List<List<String>> handleGetSubscriberBorrowList(String subscriberId)
+    {
+        List<List<String>> borrowList = new ArrayList<>();
+        PreparedStatement stmt;
+
+        try
+        {
+            // Prepare the SQL query with the MATCH and AGAINST functions
+            stmt = connection.prepareStatement("SELECT BB.borrow_id, BB.copy_id, B.book_title, BB.borrow_date, BB.borrow_due_date\n" +
+                    "FROM book B, copy_of_the_book C, borrow_book BB\n" +
+                    "WHERE B.book_id = C.book_id AND C.copy_id = BB.copy_id AND BB.is_active = true AND BB.subscriber_id = ?;");
+            stmt.setString(1, subscriberId);
+
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next())
+            {
+                // save the borrow details in a list of row
+                List<String> row = new ArrayList<>();
+                row.add(rs.getString("borrow_id"));
+                row.add(rs.getString("copy_id"));
+                row.add(rs.getString("book_title"));
+                row.add(rs.getString("borrow_date"));
+                row.add(rs.getString("borrow_due_date"));
+
+                // add the borrow to the return list
+                borrowList.add(row);
+            }
+
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! get subscriber borrow list failed");
+        }
+
+        return borrowList;
+    }
+
 
     /**
      * The method run SQL query to get the five newest books in the library
@@ -858,6 +901,7 @@ public class dbController
 
     /**
      * The method run SQL query to get the five most popular books in the library
+     *
      * @return - list of the five most popular books
      */
     public List<Book> handleGetFiveMostPopularBooks()

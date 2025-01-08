@@ -110,7 +110,7 @@ public class ServerController extends AbstractServer
 
             case "110":
                 // Request to return all the active subscriber borrowed books
-                //ToDo: implement
+                responseMsg = new MessageType("210", dbController.handleGetSubscriberBorrowList((String) receiveMsg.data));
                 break;
 
             case "111":
