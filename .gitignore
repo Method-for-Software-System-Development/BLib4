@@ -201,9 +201,9 @@ modules.xml
 *.rar
 
 # Eclipse specific files
-.classpath
-.project
-.settings/
+*.classpath
+*.project
+*.settings/
 bin/
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
