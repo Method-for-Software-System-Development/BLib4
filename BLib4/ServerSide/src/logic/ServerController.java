@@ -100,12 +100,12 @@ public class ServerController extends AbstractServer
 
             case "108":
                 // Client request to order a book
-                //ToDo: implement
+                responseMsg = new MessageType("208", dbController.handleOrderBook((List<String>) receiveMsg.data));
                 break;
 
             case "109":
                 // Request to return a borrowed book
-                //ToDo: implement
+                responseMsg = new MessageType("209", dbController.handleReturnBorrowedBook((String) receiveMsg.data));
                 break;
 
             case "110":
@@ -194,7 +194,7 @@ public class ServerController extends AbstractServer
         }
         catch (Exception e)
         {
-        	System.out.println(e.toString());
+            System.out.println(e.toString());
             System.out.println("Error sending message to client");
         }
     }
@@ -285,7 +285,7 @@ public class ServerController extends AbstractServer
         MessageType responseMsg = null;
         List<String> data = (List<String>) receiveMsg.data;
 
-        switch(data.get(0))
+        switch (data.get(0))
         {
             case "name":
                 responseMsg = new MessageType("205", dbController.handleBookSearchByName(data.get(1)));

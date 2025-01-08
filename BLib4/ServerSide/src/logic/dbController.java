@@ -1,6 +1,8 @@
 package logic;
 
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -92,7 +94,7 @@ public class dbController
                 subscriber = new Subscriber(rs.getString("subscriber_id"),
                         rs.getString("subscriber_first_name"), rs.getString("subscriber_last_name"),
                         rs.getString("subscriber_phone_number"),
-                        rs.getString("subscriber_email"), rs.getBoolean("subscriber_status"));
+                        rs.getString("subscriber_email"), rs.getBoolean("is_active"));
             }
         }
         catch (SQLException e)
@@ -398,7 +400,7 @@ public class dbController
                 //create new subscriber
                 Subscriber subscriber = new Subscriber(rs.getString("subscriber_id"),
                         rs.getString("subscriber_first_name"), rs.getString("subscriber_last_name"), rs.getString("subscriber_phone_number"),
-                        rs.getString("subscriber_email"), rs.getBoolean("subscriber_status"));
+                        rs.getString("subscriber_email"), rs.getBoolean("is_active"));
 
                 //add the subscriber to the list
                 subscribers.add(subscriber);
@@ -506,7 +508,7 @@ public class dbController
             ResultSet rs = stmt.executeQuery();
             if (rs.next())
             {
-                if (!rs.getBoolean("subscriber_status"))
+                if (!rs.getBoolean("is_active"))
                 {
                     return false;
                 }
@@ -549,4 +551,274 @@ public class dbController
         return true;
     }
 
+
+    /**
+     * The method run SQL query to handle book order by the subscriber
+     *
+     * @param orderDetails - [0] the subscriber id
+     *                     [1] the book id
+     * @return - List<Boolean> [0] true if the order succeeds, else false
+     * [1] true if the subscriber is frozen, else false
+     */
+    public List<Boolean> handleOrderBook(List<String> orderDetails)
+    {
+        List<Boolean> returnValue = new ArrayList<>();
+        boolean validFlag = true;
+        PreparedStatement stmt;
+
+        // check if the subscriber account is frozen
+        try
+        {
+            stmt = connection.prepareStatement("SELECT * from subscriber WHERE subscriber_id = ?;");
+            stmt.setString(1, orderDetails.get(0));
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next())
+            {
+                if (!rs.getBoolean("is_active"))
+                {
+                    returnValue.add(false);
+                    returnValue.add(true);
+                    return returnValue;
+                }
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! order book failed");
+            returnValue.add(false);
+            returnValue.add(false);
+            validFlag = false;
+        }
+
+        if (validFlag)
+        {
+            // check that the subscriber not already ordered the book
+            try
+            {
+                stmt = connection.prepareStatement("SELECT * from subscriber_order WHERE subscriber_id = ? AND book_id = ? AND is_active = true;");
+                stmt.setString(1, orderDetails.get(0));
+                stmt.setString(2, orderDetails.get(1));
+
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next())
+                {
+                    returnValue.add(false);
+                    returnValue.add(false);
+
+                    validFlag = false;
+                }
+            }
+            catch (SQLException e)
+            {
+                System.out.println("Error! order book failed");
+                returnValue.add(false);
+                returnValue.add(false);
+                validFlag = false;
+            }
+        }
+
+        if (validFlag)
+        {
+            // check that we not have more orders than copies of the book in the library
+            try
+            {
+                // count the number of copies of the book in the library
+                stmt = connection.prepareStatement("SELECT COUNT(*) from copy_of_the_book WHERE book_id = ?");
+                stmt.setString(1, orderDetails.get(1));
+
+                ResultSet rs = stmt.executeQuery();
+                rs.next();
+                int copyAvailableInLibrary = rs.getInt(1);
+
+                // count the number of copies of the book that are ordered
+                stmt = connection.prepareStatement("SELECT COUNT(*) from subscriber_order WHERE book_id = ? AND is_active = true;");
+                stmt.setString(1, orderDetails.get(1));
+
+                rs = stmt.executeQuery();
+                rs.next();
+                int copyOrdered = rs.getInt(1);
+
+                // check if we have enough copies of the book that are not copyOrdered
+                if (copyAvailableInLibrary - copyOrdered < 1)
+                {
+                    returnValue.add(false);
+                    returnValue.add(false);
+
+                    validFlag = false;
+                }
+
+            }
+            catch (SQLException e)
+            {
+                System.out.println("Error! order book failed");
+                returnValue.add(false);
+                returnValue.add(false);
+                validFlag = false;
+            }
+        }
+
+        if (validFlag)
+        {
+            // check that all the copies of the book are borrowed
+            try
+            {
+                // count the number of copies of the book in the library
+                stmt = connection.prepareStatement("SELECT COUNT(*) from copy_of_the_book WHERE book_id = ? AND is_available = false;");
+                stmt.setString(1, orderDetails.get(1));
+
+                ResultSet rs = stmt.executeQuery();
+                rs.next();
+                int copyAvailableInLibrary = rs.getInt(1);
+
+                // check if we have enough copies of the book that are not borrowed
+                if (copyAvailableInLibrary < 1)
+                {
+                    returnValue.add(false);
+                    returnValue.add(false);
+
+                    validFlag = false;
+                }
+
+            }
+            catch (SQLException e)
+            {
+                System.out.println("Error! order book failed");
+                returnValue.add(false);
+                returnValue.add(false);
+                validFlag = false;
+            }
+        }
+
+        if (validFlag)
+        {
+            // add the order to the db to the subscriber_order table
+            try
+            {
+                // get the last order id
+                stmt = connection.prepareStatement("SELECT MAX(order_id) FROM subscriber_order;");
+                ResultSet rs = stmt.executeQuery();
+                rs.next();
+                int orderId = rs.getInt(1) + 1;
+
+                // create a new row in the subscriber_order table
+                stmt = connection.prepareStatement("INSERT INTO subscriber_order (order_id, subscriber_id, book_id, order_date, is_active) VALUES (?,?, ?, CURDATE(), true);");
+                stmt.setString(1, String.valueOf(orderId));
+                stmt.setString(2, orderDetails.get(0));
+                stmt.setString(3, orderDetails.get(1));
+                stmt.executeUpdate();
+
+                returnValue.add(true);
+                returnValue.add(false);
+            }
+            catch (SQLException e)
+            {
+                System.out.println("Error! order book failed");
+                returnValue.add(false);
+                returnValue.add(false);
+            }
+
+        }
+
+        return returnValue;
+    }
+
+    /**
+     * The method run SQL query to handle the return of a borrowed book
+     *
+     * @param borrowId - the id of the borrow
+     * @return - List<Boolean> [0] true if the return succeeds, else false
+     * [1] true if the subscriber is frozen, else false
+     */
+    public List<Boolean> handleReturnBorrowedBook(String borrowId)
+    {
+        List<Boolean> returnValue = new ArrayList<>();
+        boolean validFlag = true;
+        PreparedStatement stmt;
+
+        // check if the borrow is active
+        try
+        {
+            stmt = connection.prepareStatement("SELECT * from borrow_book WHERE borrow_id = ?;");
+            stmt.setString(1, borrowId);
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next())
+            {
+                if (!rs.getBoolean("is_active"))
+                {
+                    returnValue.add(false);
+                    returnValue.add(false);
+                    validFlag = false;
+                }
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! return borrowed book failed");
+            returnValue.add(false);
+            returnValue.add(false);
+            validFlag = false;
+        }
+
+        if (validFlag)
+        {
+            // return the borrowed book, update the copy of the book to be available + update the borrow to be inactive
+            try
+            {
+                // update the copy of the book to be available
+                stmt = connection.prepareStatement("UPDATE copy_of_the_book SET is_available = false WHERE copy_id = ?;");
+                stmt.setString(1, borrowId);
+                stmt.executeUpdate();
+
+                // update the borrow to be inactive
+                stmt = connection.prepareStatement("UPDATE borrow_book SET is_active = false WHERE borrow_id = ?;");
+                stmt.setString(1, borrowId);
+                stmt.executeUpdate();
+
+
+                // check the due date of the borrow
+                stmt = connection.prepareStatement("SELECT borrow_due_date from borrow_book WHERE borrow_id = ?;");
+                stmt.setString(1, borrowId);
+                ResultSet rs = stmt.executeQuery();
+                rs.next();
+                LocalDate dueDate = rs.getDate(1).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+                // check if the borrow is late by a week or more
+                if (dueDate.isBefore(LocalDate.now().minusWeeks(1)))
+                {
+                    // get the subscriber id
+                    stmt = connection.prepareStatement("SELECT subscriber_id from borrow_book WHERE borrow_id = ?;");
+                    stmt.setString(1, borrowId);
+                    rs = stmt.executeQuery();
+                    rs.next();
+                    String subscriberId = rs.getString(1);
+
+                    // update the subscriber status to be frozen
+                    stmt = connection.prepareStatement("UPDATE subscriber SET is_active = false WHERE subscriber_id = ?;");
+                    stmt.setString(1, subscriberId);
+                    stmt.executeUpdate();
+
+                    //ToDo: send to scheduler to unfreeze the subscriber after a month
+
+                    returnValue.add(true);
+                    returnValue.add(true);
+                }
+                else
+                {
+                    // borrow return succeeded
+                    returnValue.add(true);
+                    returnValue.add(false);
+                }
+            }
+            catch (SQLException e)
+            {
+                System.out.println("Error! return borrowed book failed");
+                returnValue.add(false);
+                returnValue.add(false);
+            }
+        }
+
+        return returnValue;
+    }
 }
