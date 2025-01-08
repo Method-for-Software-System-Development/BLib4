@@ -89,8 +89,10 @@ public class dbController
             // we have only on a result if existed, else zero.
             if (rs.next())
             {
-                subscriber = new Subscriber(rs.getString(1), rs.getString(2), /*add a file as 3*/
-                        rs.getString(4), rs.getString(5), rs.getBoolean(6));
+                subscriber = new Subscriber(rs.getString("subscriber_id"),
+                        rs.getString("subscriber_first_name"), rs.getString("subscriber_last_name"),
+                        rs.getString("subscriber_phone_number"),
+                        rs.getString("subscriber_email"), rs.getBoolean("subscriber_status"));
             }
         }
         catch (SQLException e)
@@ -124,7 +126,8 @@ public class dbController
             // we have only on a result if existed, else zero.
             if (rs.next())
             {
-                librarian = new Librarian(rs.getString(1), rs.getString(2));
+                librarian = new Librarian(rs.getString("librarian_id"),
+                        rs.getString("librarian_first_name"), rs.getString("librarian_last_name"));
             }
         }
         catch (SQLException e)
@@ -170,17 +173,18 @@ public class dbController
             int historyId = rs.getInt(1);
 
             //create a new row in the subscriber table
-            stmt = connection.prepareStatement("INSERT INTO subscriber (subscriber_id, subscriber_name, " +
-                    "detailed_subscription_history, subscriber_phone_number, subscriber_email, subscriber_status, " +
-                    "subscriber_password) VALUES (?, ?, ?, ?, ?, ?, ?);");
+            stmt = connection.prepareStatement("INSERT INTO subscriber (subscriber_id, subscriber_first_name, " +
+                    "subscriber_last_name, detailed_subscription_history,subscriber_phone_number, subscriber_email, " +
+                    "is_active, subscriber_password) VALUES (?,?, ?, ?, ?, ?, ?, ?);");
 
             stmt.setString(1, data.get(0));
             stmt.setString(2, data.get(1));
-            stmt.setInt(3, historyId);
-            stmt.setString(4, data.get(2));
+            stmt.setString(3, data.get(2));
+            stmt.setInt(4, historyId);
             stmt.setString(5, data.get(3));
-            stmt.setBoolean(6, true);
-            stmt.setString(7, data.get(4));
+            stmt.setString(6, data.get(4));
+            stmt.setBoolean(7, true);
+            stmt.setString(8, data.get(5));
 
             stmt.executeUpdate();
         }
@@ -393,7 +397,7 @@ public class dbController
             {
                 //create new subscriber
                 Subscriber subscriber = new Subscriber(rs.getString("subscriber_id"),
-                        rs.getString("subscriber_name"), rs.getString("subscriber_phone_number"),
+                        rs.getString("subscriber_first_name"), rs.getString("subscriber_last_name"), rs.getString("subscriber_phone_number"),
                         rs.getString("subscriber_email"), rs.getBoolean("subscriber_status"));
 
                 //add the subscriber to the list
@@ -450,7 +454,7 @@ public class dbController
             try
             {
                 // count the number of copies of the book in the library that available to borrow
-                stmt = connection.prepareStatement("SELECT COUNT(*) from copy_of_the_book WHERE book_id = ? AND status = true;");
+                stmt = connection.prepareStatement("SELECT COUNT(*) from copy_of_the_book WHERE book_id = ? AND is_available = true;");
                 stmt.setString(1, bookId);
 
                 ResultSet rs = stmt.executeQuery();
@@ -458,7 +462,7 @@ public class dbController
                 int copyAvailableToBorrow = rs.getInt(1);
 
                 // count the number of copies of the book that are ordered
-                stmt = connection.prepareStatement("SELECT COUNT(*) from subscriber_order WHERE book_id = ? AND status = true;");
+                stmt = connection.prepareStatement("SELECT COUNT(*) from subscriber_order WHERE book_id = ? AND is_active = true;");
                 stmt.setString(1, bookId);
 
                 rs = stmt.executeQuery();
@@ -518,7 +522,7 @@ public class dbController
         try
         {
             // update the copy of the book to be borrowed
-            stmt = connection.prepareStatement("UPDATE copy_of_the_book SET status = true WHERE copy_id = ?;");
+            stmt = connection.prepareStatement("UPDATE copy_of_the_book SET is_available = true WHERE copy_id = ?;");
             stmt.setString(1, copyId);
             stmt.executeUpdate();
 
@@ -530,7 +534,7 @@ public class dbController
             int borrowId = rs.getInt(1) + 1;
 
             // create a new row in the borrow table
-            stmt = connection.prepareStatement("INSERT INTO borrow_book (borrow_id, subscriber_id, copy_id, borrow_date, borrow_due_date, borrow_status) VALUES (?,?, ?, CURDATE(), CURDATE() + 14, true);");
+            stmt = connection.prepareStatement("INSERT INTO borrow_book (borrow_id, subscriber_id, copy_id, borrow_date, borrow_due_date, is_active) VALUES (?,?, ?, CURDATE(), CURDATE() + 14, true);");
             stmt.setString(1, subscriberId);
             stmt.setString(2, copyId);
             stmt.setString(3, String.valueOf(borrowId));
