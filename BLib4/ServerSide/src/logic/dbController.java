@@ -311,7 +311,7 @@ public class dbController
             );
 
             // get the image of the book
-            book.setImage(ImageUtil.convertBlobToImage(rs.getBlob("image")));
+            book.setImage(ImageUtil.convertBlobToImage(rs.getBlob("book_cover")));
 
             // add the book to the list
             books.add(book);
@@ -820,5 +820,71 @@ public class dbController
         }
 
         return returnValue;
+    }
+
+
+    /**
+     * The method run SQL query to get the five newest books in the library
+     *
+     * @return - list of the five newest books
+     */
+    public List<Book> handleGetFiveNewestBooks()
+    {
+        List<Book> books = new ArrayList<>();
+        PreparedStatement stmt;
+
+
+        try
+        {
+            // Prepare the SQL query with the MATCH and AGAINST functions
+            stmt = connection.prepareStatement("SELECT DISTINCT B.book_id, B.book_title, B.edition_number, B.print_date, B.book_subject, B.description, B.book_cover, C.purchase_date\n" +
+                    "FROM book B\n" +
+                    "         JOIN copy_of_the_book C ON B.book_id = C.book_id\n" +
+                    "ORDER BY C.purchase_date DESC\n" +
+                    "LIMIT 5;");
+
+            ResultSet rs = stmt.executeQuery();
+
+            books = getBooksFromResultSet(rs);
+
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! get five newest books failed");
+        }
+
+        return books;
+    }
+
+    /**
+     * The method run SQL query to get the five most popular books in the library
+     * @return - list of the five most popular books
+     */
+    public List<Book> handleGetFiveMostPopularBooks()
+    {
+        List<Book> books = new ArrayList<>();
+        PreparedStatement stmt;
+
+        try
+        {
+            // Prepare the SQL query with the MATCH and AGAINST functions
+            stmt = connection.prepareStatement("SELECT B.book_id, B.book_title, B.edition_number, B.print_date, B.book_subject, B.description, B.book_cover, COUNT(BB.borrow_id) AS borrow_count\n" +
+                    "FROM book B\n" +
+                    "         JOIN copy_of_the_book C ON B.book_id = C.book_id\n" +
+                    "         JOIN borrow_book BB ON C.copy_id = BB.copy_id\n" +
+                    "GROUP BY B.book_id, B.book_title, B.edition_number, B.print_date, B.book_subject, B.description, B.book_cover\n" +
+                    "ORDER BY borrow_count DESC\n" +
+                    "LIMIT 5;");
+
+            ResultSet rs = stmt.executeQuery();
+
+            books = getBooksFromResultSet(rs);
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! get five popular books failed");
+        }
+
+        return books;
     }
 }

@@ -162,13 +162,13 @@ public class ServerController extends AbstractServer
                 break;
 
             case "120":
-                // Request from the client to get 5 neweset books in the library
-                //ToDo: implement
+                // Request from the client to get 5 newest books in the library
+                responseMsg = new MessageType("220", dbController.handleGetFiveNewestBooks());
                 break;
 
             case "121":
                 // Request from the client to get 5 most borrowed books in the library
-                //ToDo: implement
+                responseMsg = new MessageType("221", dbController.handleGetFiveMostPopularBooks());
                 break;
 
             default:
@@ -181,7 +181,7 @@ public class ServerController extends AbstractServer
     }
 
     /**
-     * The method send message to specific client
+     * The method sends a message to a specific client
      *
      * @param client - the client to send the message
      * @param msg    - the message to send
