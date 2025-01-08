@@ -38,8 +38,38 @@ public class ClientUI extends Application
 
     @Override
     public void start(Stage primaryStage) {
-        // Load custom fonts
+        // Loading Montserrat fonts
+        Font.loadFont(getClass().getResourceAsStream("/gui/assets/fonts/Montserrat/Montserrat-Black.ttf"), 14);
+        Font.loadFont(getClass().getResourceAsStream("/gui/assets/fonts/Montserrat/Montserrat-BlackItalic.ttf"), 14);
+        Font.loadFont(getClass().getResourceAsStream("/gui/assets/fonts/Montserrat/Montserrat-Bold.ttf"), 14);
+        Font.loadFont(getClass().getResourceAsStream("/gui/assets/fonts/Montserrat/Montserrat-BoldItalic.ttf"), 14);
+        Font.loadFont(getClass().getResourceAsStream("/gui/assets/fonts/Montserrat/Montserrat-ExtraBold.ttf"), 14);
+        Font.loadFont(getClass().getResourceAsStream("/gui/assets/fonts/Montserrat/Montserrat-ExtraBoldItalic.ttf"), 14);
+        Font.loadFont(getClass().getResourceAsStream("/gui/assets/fonts/Montserrat/Montserrat-ExtraLight.ttf"), 14);
+        Font.loadFont(getClass().getResourceAsStream("/gui/assets/fonts/Montserrat/Montserrat-ExtraLightItalic.ttf"), 14);
+        Font.loadFont(getClass().getResourceAsStream("/gui/assets/fonts/Montserrat/Montserrat-Italic.ttf"), 14);
+        Font.loadFont(getClass().getResourceAsStream("/gui/assets/fonts/Montserrat/Montserrat-Light.ttf"), 14);
+        Font.loadFont(getClass().getResourceAsStream("/gui/assets/fonts/Montserrat/Montserrat-LightItalic.ttf"), 14);
+        Font.loadFont(getClass().getResourceAsStream("/gui/assets/fonts/Montserrat/Montserrat-Medium.ttf"), 14);
+        Font.loadFont(getClass().getResourceAsStream("/gui/assets/fonts/Montserrat/Montserrat-MediumItalic.ttf"), 14);
         Font.loadFont(getClass().getResourceAsStream("/gui/assets/fonts/Montserrat/Montserrat-Regular.ttf"), 14);
+        Font.loadFont(getClass().getResourceAsStream("/gui/assets/fonts/Montserrat/Montserrat-SemiBold.ttf"), 14);
+        Font.loadFont(getClass().getResourceAsStream("/gui/assets/fonts/Montserrat/Montserrat-SemiBoldItalic.ttf"), 14);
+        Font.loadFont(getClass().getResourceAsStream("/gui/assets/fonts/Montserrat/Montserrat-Thin.ttf"), 14);
+        Font.loadFont(getClass().getResourceAsStream("/gui/assets/fonts/Montserrat/Montserrat-ThinItalic.ttf"), 14);
+
+// Loading Roboto fonts
+        Font.loadFont(getClass().getResourceAsStream("/gui/assets/fonts/Roboto/Roboto-Black.ttf"), 14);
+        Font.loadFont(getClass().getResourceAsStream("/gui/assets/fonts/Roboto/Roboto-BlackItalic.ttf"), 14);
+        Font.loadFont(getClass().getResourceAsStream("/gui/assets/fonts/Roboto/Roboto-Bold.ttf"), 14);
+        Font.loadFont(getClass().getResourceAsStream("/gui/assets/fonts/Roboto/Roboto-BoldItalic.ttf"), 14);
+        Font.loadFont(getClass().getResourceAsStream("/gui/assets/fonts/Roboto/Roboto-Light.ttf"), 14);
+        Font.loadFont(getClass().getResourceAsStream("/gui/assets/fonts/Roboto/Roboto-LightItalic.ttf"), 14);
+        Font.loadFont(getClass().getResourceAsStream("/gui/assets/fonts/Roboto/Roboto-Medium.ttf"), 14);
+        Font.loadFont(getClass().getResourceAsStream("/gui/assets/fonts/Roboto/Roboto-MediumItalic.ttf"), 14);
+        Font.loadFont(getClass().getResourceAsStream("/gui/assets/fonts/Roboto/Roboto-Regular.ttf"), 14);
+        Font.loadFont(getClass().getResourceAsStream("/gui/assets/fonts/Roboto/Roboto-Thin.ttf"), 14);
+        Font.loadFont(getClass().getResourceAsStream("/gui/assets/fonts/Roboto/Roboto-ThinItalic.ttf"), 14);
 
         // Set the primary stage
         SceneManager.setStage(primaryStage);
