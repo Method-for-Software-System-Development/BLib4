@@ -4,6 +4,7 @@
 
 package logic.communication;
 
+import entities.book.Book;
 import logic.communication.ChatIF;
 import gui.common.*;
 import entities.logic.*;
@@ -36,6 +37,7 @@ public class ChatClient extends AbstractClient
     private ShowAllSubscribersFrameController showAllSubscribersController;
     private EditSubscriberFrameController editSubscriberFrameController;
     public static List<Subscriber> subscribers = new ArrayList<Subscriber>();
+    public static List<Book> books = new ArrayList<>();
     public static boolean serverResponse = false;
     public static boolean awaitResponse = false;
     public static Date todayDate;
@@ -84,7 +86,8 @@ public class ChatClient extends AbstractClient
                 break;
 
             case "204":
-                //ToDo: implement
+            	// status of update in the db, in format boolean
+                serverResponse = (boolean) receiveMsg.getData();
                 break;
 
             case "205":
@@ -148,10 +151,8 @@ public class ChatClient extends AbstractClient
                 //ToDo: implement
                 break;
             case "220":
-                //ToDo: implement
-                break;
             case "221":
-                //ToDo: implement
+                books = (List<Book>)receiveMsg.data;
                 break;
             case "222":
                 //ToDo: implement
