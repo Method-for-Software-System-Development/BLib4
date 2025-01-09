@@ -41,6 +41,7 @@ public class ChatClient extends AbstractClient
     public static boolean serverResponse = false;
     public static boolean awaitResponse = false;
     public static Date todayDate;
+    public static Librarian librarian;
 
     //Constructors ****************************************************
 
@@ -71,19 +72,29 @@ public class ChatClient extends AbstractClient
     {
         MessageType receiveMsg = (MessageType) msg;
         awaitResponse = false;
+        Subscriber subscriber;
         switch (receiveMsg.getId())
         {
             case "201":
-                //ToDo: implement
+            	// subscriber details, in format Subscriber
+            	serverResponse=true;
+                subscriber = (Subscriber) receiveMsg.getData();
+                subscribers.clear();
+                if (subscriber != null)
+                {
+                    subscribers.add(subscriber);
+                }
                 break;
 
             case "202":
-                //ToDo: implement
+            	// librarian details
+            	serverResponse=true;
+                librarian= (Librarian) receiveMsg.getData();
                 break;
 
             case "203":
-                //ToDo: implement
-                break;
+            	serverResponse=false;
+            	break;
 
             case "204":
             	// status of update in the db, in format boolean
