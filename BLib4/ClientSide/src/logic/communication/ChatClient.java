@@ -175,15 +175,15 @@ public class ChatClient extends AbstractClient
                 subscribers = (List<Subscriber>) receiveMsg.getData();
                 break;
 
-            case "0201":
-                // subscriber details, in format Subscriber
-                Subscriber subscriber = (Subscriber) receiveMsg.getData();
-                subscribers.clear();
-                if (subscriber != null)
-                {
-                    subscribers.add(subscriber);
-                }
-                break;
+//            case "0201":
+//                // subscriber details, in format Subscriber
+//                Subscriber subscriber = (Subscriber) receiveMsg.getData();
+//                subscribers.clear();
+//                if (subscriber != null)
+//                {
+//                    subscribers.add(subscriber);
+//                }
+//                break;
 
             case "0202":
                 // status of update in the db, in format boolean

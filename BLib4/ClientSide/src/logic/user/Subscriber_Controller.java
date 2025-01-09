@@ -97,67 +97,49 @@ public class Subscriber_Controller {
     	String userID = txtID.getText();
         String password = txtPassword.getText();
         String type = txtType.getText();
-        validate_login_Form(userID,password,type);
+//        attemptLogin(userID,password,type);
     }
-    
-    //validate log in details of subscriber or librarian
-    private void validate_login_Form(String userID, String password, String type) throws IOException {
-    	// Create a list of data of the new subscriber to send to the server
-        ArrayList<String> dataOfLogIn = new ArrayList<>();	
-        dataOfLogIn.add(userID);
-        dataOfLogIn.add(password);
-        dataOfLogIn.add(type);
-        ClientUI.chat.accept(new MessageType("100",dataOfLogIn));
-        //check user verification from db by type
-        if(ChatClient.serverResponse) {
-        	switch (type)
-        	{
-        	case "subscriber":
-        		logInSubscriber(ChatClient.subscribers.get(0));
-        		break;
-        		
-        	case "librarian":
-        		logInLibrarian(ChatClient.librarian);
-        		break;
-        		
-        	default:
-        		Alert alert = new Alert(Alert.AlertType.ERROR, "User type is not valid");
-        		alert.setHeaderText("Error");
-        		alert.showAndWait();
-        	}
-        }
-        else {
-        	Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to log in the "+type);
-			alert.setHeaderText("Error");
-			alert.showAndWait();
-        }
-    }
-    
-    //*****************need to put the correct windows of subscriber and librarian after log in*************************
-    
-    //open window of subscriber after successful log in
-	private void logInSubscriber(Subscriber subscriber) throws IOException {
-		//open first window as subscriber
-		currentStage.close();//hiding primary window
-		Parent root = FXMLLoader.load(getClass().getResource("/gui/testing/SuccessSubscriberLogInTestingWindow.fxml"));
-		
-		Scene scene = new Scene(root);
-		Stage primaryStage = new Stage();
-	    primaryStage.setTitle("Subscriber Sign Up");
-        primaryStage.setScene(scene);
-        primaryStage.show();
-	}
-	
-    //open window of librarian after successful log in
-	private void logInLibrarian(Librarian librarian) throws IOException {
-        //open first window as librarian
-		currentStage.close();//hiding primary window
-	    Parent root = FXMLLoader.load(getClass().getResource("/gui/testing/SuccessLibrarianLogInTestingWindow.fxml"));
 
-	    Scene scene = new Scene(root);
-	    Stage primaryStage = new Stage();
-	    primaryStage.setTitle("Subscriber Sign Up");
-        primaryStage.setScene(scene);
-        primaryStage.show();
-	}
+//    public Subscriber attemptLoginAsSubscriber(String userID, String password)
+//    {
+//        //if found return the subscriber, else return null. try use try-catch block to handle the IO exception from the server
+//    }
+//
+//    public Librarian attemptLoginAsLibrarian(String userID, String password)
+//    {
+//        //if found return the librarian, else return null. try use try-catch block to handle the IO exception from the server
+//    }
+//
+//    // DELETE:
+//    private void attemptLogin(String userID, String password, String type) throws IOException {
+//    	// Create a list of data of the new subscriber to send to the server
+//        ArrayList<String> dataOfLogIn = new ArrayList<>();
+//        dataOfLogIn.add(userID);
+//        dataOfLogIn.add(password);
+//        dataOfLogIn.add(type);
+//        ClientUI.chat.accept(new MessageType("100",dataOfLogIn));
+//        //check user verification from db by type
+//        if(ChatClient.serverResponse) {
+//        	switch (type)
+//        	{
+//        	case "subscriber":
+//        		logInSubscriber(ChatClient.subscribers.get(0));
+//        		break;
+//
+//        	case "librarian":
+//        		logInLibrarian(ChatClient.librarian);
+//        		break;
+//
+//        	default:
+//        		Alert alert = new Alert(Alert.AlertType.ERROR, "User type is not valid");
+//        		alert.setHeaderText("Error");
+//        		alert.showAndWait();
+//        	}
+//        }
+//        else {
+//        	Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to log in the "+type);
+//			alert.setHeaderText("Error");
+//			alert.showAndWait();
+//        }
+//    }
 }
