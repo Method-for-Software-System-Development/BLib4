@@ -17,7 +17,7 @@
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.text.TextFlow?>
 
-<GridPane alignment="CENTER" hgap="15.0" prefHeight="1080.0" prefWidth="1920.0" styleClass="gridPane" stylesheets="@HomePage_Styles.css" vgap="15.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.common.homePage.HomePage_Controller">
+<GridPane alignment="CENTER" hgap="15.0" prefHeight="1080.0" prefWidth="1920.0" styleClass="gridPane" stylesheets="@../../GlobalBLib_Styles.css, @HomePage_Styles.css" vgap="15.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.common.homePage.HomePage_Controller">
 
    <!-- Row Constraints -->
    <rowConstraints>
@@ -52,28 +52,28 @@
             <VBox alignment="TOP_LEFT" spacing="20.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
                <children>
                   <!-- Title -->
-                  <Text styleClass="login-title" text="Login:" />
+                  <Text styleClass="menu-title" text="Login:" />
 
                   <!-- Radio Buttons for Role Selection -->
                   <HBox alignment="CENTER_LEFT" spacing="10.0">
                      <Text text="Select Account Type:" />
                      <Region HBox.hgrow="ALWAYS" />
-                     <RadioButton styleClass="custom-radio-button" text="Subscriber" />
-                     <RadioButton styleClass="custom-radio-button" text="Librarian" />
+                     <RadioButton fx:id="subscriberRadioButton" styleClass="custom-radio-button" text="Subscriber" toggleGroup="$accountTypeGroup" />
+                     <RadioButton fx:id="librarianRadioButton" styleClass="custom-radio-button" text="Librarian" toggleGroup="$accountTypeGroup" />
                   </HBox>
 
                   <!-- Username Field -->
                   <HBox alignment="CENTER_LEFT">
                      <Text text="User's ID:" />
                      <Region HBox.hgrow="ALWAYS" />
-                     <TextField fx:id="idField" prefHeight="50.0" prefWidth="350.0" promptText="Enter your ID" styleClass="custom-text-field" />
+                     <TextField fx:id="idTextField" prefHeight="50.0" prefWidth="350.0" promptText="Enter your ID" styleClass="custom-text-field" />
                   </HBox>
 
                   <!-- Password Field -->
                   <HBox alignment="CENTER_LEFT">
                      <Text text="Password:" />
                      <Region HBox.hgrow="ALWAYS" />
-                     <PasswordField fx:id="passwordField" prefHeight="50.0" prefWidth="350.0" promptText="Enter your Password" styleClass="custom-text-field" />
+                     <PasswordField fx:id="passwordTextField" prefHeight="50.0" prefWidth="350.0" promptText="Enter your Password" styleClass="custom-text-field" />
                   </HBox>
 
                   <HBox>
@@ -91,7 +91,7 @@
                      <!-- Spacer Region -->
                      <Region HBox.hgrow="ALWAYS" />
 
-                     <Button fx:id="loginButton" prefHeight="50.0" prefWidth="150.0" styleClass="orange-button" text="Login">
+                     <Button fx:id="loginButton" prefHeight="50.0" prefWidth="150.0" styleClass="orange-button" text="Login" onAction="#validate_login_form">
                         <graphic>
                            <ImageView fx:id="loginImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
                               <image>
@@ -120,7 +120,7 @@
 
             <Separator prefHeight="5.0" styleClass="menu-separator" />
 
-            <Button fx:id="searchBooksButton" prefHeight="50.0" maxWidth="Infinity" styleClass="transparent-button" text="Search For Books">
+            <Button fx:id="searchBooksButton" maxWidth="Infinity" prefHeight="50.0" styleClass="transparent-button" text="Search For Books">
                <graphic>
                   <ImageView fx:id="searchBooksImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
                      <image>
@@ -136,7 +136,7 @@
             <!-- Spacer Region -->
             <Region VBox.vgrow="ALWAYS" />
 
-            <Button fx:id="exitButton" prefHeight="50.0" maxWidth="Infinity" styleClass="transparent-button" text="Exit Application">
+            <Button fx:id="exitButton" maxWidth="Infinity" prefHeight="50.0" styleClass="transparent-button" text="Exit Application">
                <graphic>
                   <ImageView fx:id="exitImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
                      <image>
@@ -162,11 +162,37 @@
       <!-- Header (Top Panel) -->
       <VBox alignment="BOTTOM_LEFT" maxHeight="200.0" minHeight="200.0" prefHeight="200.0" styleClass="header" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
          <children>
-            <Text styleClass="header-title" text="Braude College Library Management Application" />
-         </children></VBox>
+            <Text styleClass="header-title" text="Braude College Library Management Application">
+               <VBox.margin>
+                  <Insets bottom="10.0" left="15.0" />
+               </VBox.margin></Text>
+         </children>
+      </VBox>
 
       <!-- Main (Main Content Panel) -->
-      <VBox styleClass="main" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" />
+      <VBox styleClass="main" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS">
+
+         <children>
+         <Text styleClass="main-title" text="New Arrivals:" />
+      </children>
+         <children>
+         <HBox fx:id="newArrivalsHBox" alignment="CENTER" spacing="15.0">
+            <!-- Books will be dynamically added here -->
+         </HBox>
+         </children>
+
+         <Separator prefHeight="5.0" styleClass="main-separator" />
+
+         <children>
+            <Text styleClass="main-title" text="Most Borrowed Books:" />
+         </children>
+         <children>
+            <HBox fx:id="mostBorrowedHBox" alignment="CENTER" spacing="15.0">
+               <!-- Books will be dynamically added here -->
+            </HBox>
+         </children>
+
+      </VBox>
    </children>
 
    <!-- Padding -->
