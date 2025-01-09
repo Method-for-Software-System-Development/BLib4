@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+<GridPane alignment="CENTER" hgap="15.0" prefHeight="600.0" prefWidth="700.0" styleClass="gridPane"
+          stylesheets="@../../GlobalBLib_Styles.css" vgap="15.0" xmlns="http://javafx.com/javafx/8.0.171"
+          xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.common.clientConnection.ClientConnection_Controller">
+
+    <!-- Main container for the connection window -->
+    <VBox alignment="CENTER" prefHeight="570.0" prefWidth="670.0" styleClass="menu">
+
+        <!-- Logo at the top -->
+        <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@../../assets/images/logo.png"/>
+            </image>
+            <VBox.margin>
+                <Insets bottom="25.0" top="15.0"/>
+            </VBox.margin>
+        </ImageView>
+
+        <!-- Separator below the logo -->
+        <Separator prefHeight="5.0" styleClass="menu-separator"/>
+
+        <!-- Center section containing input fields and buttons -->
+        <VBox alignment="CENTER" spacing="20.0">
+
+            <!-- Title of the connection form -->
+            <Text styleClass="menu-title" text="Connect to BLib.4 Server"/>
+
+            <!-- Input for IP address -->
+            <HBox alignment="CENTER_LEFT">
+                <Text text="IP Address:"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <TextField fx:id="ipTextField" prefHeight="50.0" prefWidth="500.0" promptText="Enter IP address"
+                           styleClass="custom-text-field"/>
+            </HBox>
+
+            <!-- Input for server port -->
+            <HBox alignment="CENTER_LEFT">
+                <Text text="Server Port:"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <TextField fx:id="portTextField" prefHeight="50.0" prefWidth="500.0"
+                           promptText="Enter server port number" styleClass="custom-text-field"/>
+            </HBox>
+
+            <!-- Buttons for actions: Set My IP, Default Port, and Connect -->
+            <HBox alignment="CENTER">
+                <Button fx:id="myIpButton" prefHeight="50.0" prefWidth="200.0" styleClass="transparent-button"
+                        text="Set My IP" onAction="#handleSetMyIP"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="defaultPortButton" prefHeight="50.0" prefWidth="200.0" styleClass="transparent-button"
+                        text="Default Port" onAction="#handleSetDefaultPort"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="connectButton" prefHeight="50.0" prefWidth="200.0" styleClass="orange-button"
+                        text="Connect" onAction="#validate_connect_form"/>
+            </HBox>
+
+            <VBox.margin>
+                <Insets bottom="25.0" top="25.0"/>
+            </VBox.margin>
+        </VBox>
+    </VBox>
+
+    <!-- Padding for the overall layout -->
+    <padding>
+        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0"/>
+    </padding>
+
+</GridPane>
