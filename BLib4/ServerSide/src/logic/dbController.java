@@ -532,7 +532,7 @@ public class dbController
         }
         catch (SQLException e)
         {
-            System.out.println("Error! borrow book failed");
+            System.out.println("Error! borrow book failed - the subscriber is frozen");
             return false;
         }
 
@@ -553,14 +553,14 @@ public class dbController
 
             // create a new row in the borrow table
             stmt = connection.prepareStatement("INSERT INTO borrow_book (borrow_id, subscriber_id, copy_id, borrow_date, borrow_due_date, is_active) VALUES (?,?, ?, CURDATE(), CURDATE() + 14, true);");
-            stmt.setString(1, subscriberId);
-            stmt.setString(2, copyId);
-            stmt.setString(3, String.valueOf(borrowId));
+            stmt.setString(1, String.valueOf(borrowId));
+            stmt.setString(2, subscriberId);
+            stmt.setString(3, copyId);
             stmt.executeUpdate();
         }
         catch (SQLException e)
         {
-            System.out.println("Error! borrow book failed");
+            System.out.println("Error! borrow book failed - cant add the borrow to the db");
             return false;
         }
 
