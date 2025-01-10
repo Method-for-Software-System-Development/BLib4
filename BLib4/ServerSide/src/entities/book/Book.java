@@ -2,13 +2,15 @@ package entities.book;
 
 import javafx.scene.image.Image;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 
-public class Book
+public class Book implements Serializable
 {
     private final int book_id;
     private final String title;
+    private final String author;
     private final int edition_number;
     private final Date printDate;
     private final String subject;
@@ -21,15 +23,17 @@ public class Book
      *
      * @param book_id        The unique identifier for the book
      * @param title          The title of the book
+     * @param author         The author of the book
      * @param edition_number The edition number of the book
      * @param printDate      The date the book was printed
      * @param subject        The subject or genre of the book
      * @param description    A brief description of the book
      */
-    public Book(int book_id, String title, int edition_number, Date printDate, String subject, String description)
+    public Book(int book_id, String title, String author, int edition_number, Date printDate, String subject, String description)
     {
         this.book_id = book_id;
         this.title = title;
+        this.author = author;
         this.edition_number = edition_number;
         this.printDate = printDate;
         this.subject = subject;
@@ -53,6 +57,12 @@ public class Book
     {
         return title;
     }
+
+    /**
+     * Getter to the book author
+     * @return - The book author
+     */
+    public String getAuthor() { return author; }
 
     /**
      * Getter to the book edition number

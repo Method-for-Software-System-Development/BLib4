@@ -2,10 +2,11 @@ package entities.book;
 
 import javafx.scene.image.Image;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 
-public class Book
+public class Book implements Serializable
 {
     private final int book_id;
     private final String title;
