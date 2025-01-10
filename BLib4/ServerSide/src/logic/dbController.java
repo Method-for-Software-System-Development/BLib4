@@ -1,5 +1,6 @@
 package logic;
 
+import java.io.FileInputStream;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -313,7 +314,7 @@ public class dbController
             );
 
             // get the image of the book
-            book.setImage(ImageUtil.convertBlobToImage(rs.getBlob("book_cover")));
+            book.setImage(BlobUtil.convertBlobToImage(rs.getBlob("book_cover")));
 
             // add the book to the list
             books.add(book);
@@ -446,6 +447,11 @@ public class dbController
                     returnValue = false;
                 }
             }
+            else
+            {
+                // the copy not found
+                returnValue = false;
+            }
         }
         catch (SQLException e)
         {
@@ -454,6 +460,9 @@ public class dbController
 
         if (returnValue)
         {
+            //ToDo: what if the subscriber ordered the book and not borrowed it yet? how to handle it?
+
+
             // check that we have enough copies of the book that not ordered
             try
             {
@@ -553,6 +562,7 @@ public class dbController
         return true;
     }
 
+    //ToDo: add handle ordered book borrow: need to update the order table and then borrow the book
 
     /**
      * The method run SQL query to handle book order by the subscriber
@@ -753,6 +763,13 @@ public class dbController
                     returnValue.add(false);
                     validFlag = false;
                 }
+            }
+            else
+            {
+                // the borrow not found
+                returnValue.add(false);
+                returnValue.add(false);
+                validFlag = false;
             }
         }
         catch (SQLException e)
