@@ -263,7 +263,7 @@ public class ServerController extends AbstractServer
                 break;
 
             case "librarian":
-                //responseMsg = new MessageType("202", dbController.handleLibrarianLogin(data.get(0), data.get(1)));
+                responseMsg = new MessageType("202", dbController.handleLibrarianLogin(data.get(0), data.get(1)));
                 break;
 
             default:

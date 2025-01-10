@@ -41,6 +41,7 @@ public class ChatClient extends AbstractClient
     public static boolean serverResponse = false;
     public static boolean awaitResponse = false;
     public static Date todayDate;
+    public static Librarian librarian;
 
     //Constructors ****************************************************
 
@@ -71,22 +72,33 @@ public class ChatClient extends AbstractClient
     {
         MessageType receiveMsg = (MessageType) msg;
         awaitResponse = false;
+        Subscriber subscriber;
         switch (receiveMsg.getId())
         {
             case "201":
-                //ToDo: implement
+            	// log in succeed, save subscriber details
+            	serverResponse=true;
+                subscriber = (Subscriber) receiveMsg.getData();
+                subscribers.clear();
+                if (subscriber != null)
+                {
+                    subscribers.add(subscriber);
+                }
                 break;
 
             case "202":
-                //ToDo: implement
+            	// log in succeed, save librarian details
+            	serverResponse=true;
+                librarian= (Librarian) receiveMsg.getData();
                 break;
 
             case "203":
-                //ToDo: implement
-                break;
+            	// log in failed 
+            	serverResponse=false;
+            	break;
 
             case "204":
-            	// status of update in the db, in format boolean
+            	// status of sign up in the db, in format boolean
                 serverResponse = (boolean) receiveMsg.getData();
                 break;
 
@@ -124,7 +136,8 @@ public class ChatClient extends AbstractClient
                 break;
 
             case "213":
-                //ToDo: implement
+            	// status of update in the db, in format boolean
+                serverResponse = (boolean) receiveMsg.getData();
                 break;
 
             case "214":
@@ -164,15 +177,15 @@ public class ChatClient extends AbstractClient
                 subscribers = (List<Subscriber>) receiveMsg.getData();
                 break;
 
-            case "0201":
-                // subscriber details, in format Subscriber
-                Subscriber subscriber = (Subscriber) receiveMsg.getData();
-                subscribers.clear();
-                if (subscriber != null)
-                {
-                    subscribers.add(subscriber);
-                }
-                break;
+//            case "0201":
+//                // subscriber details, in format Subscriber
+//                Subscriber subscriber = (Subscriber) receiveMsg.getData();
+//                subscribers.clear();
+//                if (subscriber != null)
+//                {
+//                    subscribers.add(subscriber);
+//                }
+//                break;
 
             case "0202":
                 // status of update in the db, in format boolean
