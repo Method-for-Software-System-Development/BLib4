@@ -76,7 +76,7 @@ public class ChatClient extends AbstractClient
         switch (receiveMsg.getId())
         {
             case "201":
-            	// subscriber details, in format Subscriber
+            	// log in succeed, save subscriber details
             	serverResponse=true;
                 subscriber = (Subscriber) receiveMsg.getData();
                 subscribers.clear();
@@ -87,17 +87,18 @@ public class ChatClient extends AbstractClient
                 break;
 
             case "202":
-            	// librarian details
+            	// log in succeed, save librarian details
             	serverResponse=true;
                 librarian= (Librarian) receiveMsg.getData();
                 break;
 
             case "203":
+            	// log in failed 
             	serverResponse=false;
             	break;
 
             case "204":
-            	// status of update in the db, in format boolean
+            	// status of sign up in the db, in format boolean
                 serverResponse = (boolean) receiveMsg.getData();
                 break;
 
@@ -135,7 +136,8 @@ public class ChatClient extends AbstractClient
                 break;
 
             case "213":
-                //ToDo: implement
+            	// status of update in the db, in format boolean
+                serverResponse = (boolean) receiveMsg.getData();
                 break;
 
             case "214":

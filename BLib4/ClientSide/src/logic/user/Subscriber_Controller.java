@@ -47,28 +47,33 @@ public class Subscriber_Controller {
 	}
 
 	/**
-     * This method creates a log in request to the server of subscriber, 
-     * and returns the subscriber if log in succeed.
-     *
+     * This method creates a log in request to the server of subscriber
+     * 
      * @param userID ID of the user.
      * @param password	password of the user.
-     */
+	 * @return	the subscriber if log in succeed and null if not.
+	 */
     public Subscriber attemptLoginAsSubscriber(String userID, String password)
     {
+    	//send a request to the server to log in the subscriber
     	attemptLogin(userID,password,"subscriber");
+        // check server response
     	if(ChatClient.serverResponse)
     		return ChatClient.subscribers.get(0);
     	return null;    }
 
     /**
-     * This method creates a log in request to the server of librarian, 
-     * and returns the librarian if log in succeed.     *
+     * This method creates a log in request to the server of librarian.
+     * 
      * @param userID ID of the user.
      * @param password	password of the user.
+     * @return the librarian if log in succeed and null if not.
      */
     public Librarian attemptLoginAsLibrarian(String userID, String password)
     {
+    	//send a request to the server to log in the librarian
     	attemptLogin(userID,password,"librarian");
+        // check server response
     	if(ChatClient.serverResponse)
     		return ChatClient.librarian;
     	return null;
@@ -88,5 +93,34 @@ public class Subscriber_Controller {
         dataOfLogIn.add(password);
         dataOfLogIn.add(type);
         ClientUI.chat.accept(new MessageType("100",dataOfLogIn));
+    }
+    
+    /**
+     * This method sends a request to the server to update the given subscriber
+     * 
+     * @param userID ID of the subscriber.
+     * @param firstName	first name of the subscriber.
+     * @param lastName	last name of the subscriber.
+     * @param phoneNumber phone number of the subscriber.
+     * @param email email of the subscriber.
+     * @param status status of the subscriber user.
+     * @return return the updated subscriber if update succeed and null if not.
+     */
+    public Subscriber updateSubscriberDetails(String userID, String firstName, String lastName, String phoneNumber, String email, Boolean status) {
+    	//create a new subscriber with the updates and send to server
+    	Subscriber subscriber= new Subscriber(userID,firstName,lastName,phoneNumber,email,status);
+        ClientUI.chat.accept(new MessageType("113",subscriber));
+        //update succeed
+        if(ChatClient.serverResponse) {
+        	Alert alert = new Alert(Alert.AlertType.INFORMATION, "Subscriber updated successfully");
+            alert.setHeaderText("Success");
+            alert.showAndWait();
+        	return subscriber;
+        }
+        //update failed
+        Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to update the subscriber");
+        alert.setHeaderText("Error");
+        alert.showAndWait();
+		return null;    	
     }
 }
