@@ -12,24 +12,6 @@ import com.opencsv.CSVWriter;
 public class BlobUtil
 {
     /**
-     * The method converts a Blob object from the DB to an Image object
-     * @param blob - The Blob object to be converted
-     * @return
-     */
-    public static Image convertBlobToImage(Blob blob) {
-        Image image = null;
-        try {
-            int blobLength = (int) blob.length();
-            byte[] blobAsBytes = blob.getBytes(1, blobLength);
-            ByteArrayInputStream inputStream = new ByteArrayInputStream(blobAsBytes);
-            image = new Image(inputStream);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return image;
-    }
-
-    /**
      * The method converts CSVWriter object to a Blob object to be stored in the DB
      * @param csvWriter - The CSVWriter object to be converted
      * @return - The Blob object

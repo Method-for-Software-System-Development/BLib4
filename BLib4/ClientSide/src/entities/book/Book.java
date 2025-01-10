@@ -2,6 +2,7 @@ package entities.book;
 
 import javafx.scene.image.Image;
 
+import java.io.ByteArrayInputStream;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
@@ -15,7 +16,7 @@ public class Book implements Serializable
     private final Date printDate;
     private final String subject;
     private final String description;
-    private Image image;
+    private byte[] image;
     private final HashMap<String, Date> waitlist = new HashMap<>();
 
     /**
@@ -106,7 +107,8 @@ public class Book implements Serializable
      */
     public Image getImage()
     {
-        return image;
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(this.image);
+        return new Image(inputStream);
     }
 
     /**
@@ -122,7 +124,7 @@ public class Book implements Serializable
      * Set the book image
      * @param image - The book image
      */
-    public void setImage(Image image)
+    public void setImage(byte[] image)
     {
         this.image = image;
     }

@@ -304,9 +304,11 @@ public class dbController
         // Iterate through the result set and create Book objects
         while (rs.next())
         {
+            System.out.println("Here");
             Book book = new Book(
                     rs.getInt("book_id"),
                     rs.getString("book_title"),
+                    rs.getString("book_author"),
                     rs.getInt("edition_number"),
                     rs.getDate("print_date"),
                     rs.getString("book_subject"),
@@ -314,7 +316,10 @@ public class dbController
             );
 
             // get the image of the book
-            book.setImage(BlobUtil.convertBlobToImage(rs.getBlob("book_cover")));
+            Blob blob = rs.getBlob("book_cover");
+            int blobLength = (int) blob.length();
+            byte[] blobAsBytes = blob.getBytes(1, blobLength);
+            book.setImage(blobAsBytes);
 
             // add the book to the list
             books.add(book);
@@ -900,7 +905,7 @@ public class dbController
         try
         {
             // Prepare the SQL query with the MATCH and AGAINST functions
-            stmt = connection.prepareStatement("SELECT DISTINCT B.book_id, B.book_title, B.edition_number, B.print_date, B.book_subject, B.description, B.book_cover, C.purchase_date\n" +
+            stmt = connection.prepareStatement("SELECT DISTINCT B.book_id, B.book_title, B.book_author, B.edition_number, B.print_date, B.book_subject, B.description, B.book_cover, C.purchase_date\n" +
                     "FROM book B\n" +
                     "         JOIN copy_of_the_book C ON B.book_id = C.book_id\n" +
                     "ORDER BY C.purchase_date DESC\n" +
@@ -932,7 +937,7 @@ public class dbController
         try
         {
             // Prepare the SQL query with the MATCH and AGAINST functions
-            stmt = connection.prepareStatement("SELECT B.book_id, B.book_title, B.edition_number, B.print_date, B.book_subject, B.description, B.book_cover, COUNT(BB.borrow_id) AS borrow_count\n" +
+            stmt = connection.prepareStatement("SELECT B.book_id, B.book_title, B.book_author, B.edition_number, B.print_date, B.book_subject, B.description, B.book_cover, COUNT(BB.borrow_id) AS borrow_count\n" +
                     "FROM book B\n" +
                     "         JOIN copy_of_the_book C ON B.book_id = C.book_id\n" +
                     "         JOIN borrow_book BB ON C.copy_id = BB.copy_id\n" +

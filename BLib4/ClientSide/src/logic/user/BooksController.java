@@ -6,7 +6,6 @@ import java.util.List;
 import entities.book.Book;
 import entities.logic.MessageType;
 import javafx.scene.control.Alert;
-import logic.dbController;
 import logic.communication.ChatClient;
 import logic.communication.ClientUI;
 
