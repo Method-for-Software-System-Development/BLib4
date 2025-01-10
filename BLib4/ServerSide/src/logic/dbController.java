@@ -4,7 +4,9 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import entities.book.Book;
 import entities.user.Librarian;
@@ -932,4 +934,318 @@ public class dbController
 
         return books;
     }
+
+    public List<Subscriber> handleNotifyDayBeforeReturnDate() {
+        List<Subscriber> allSubscribers = handleGetAllSubscribers();
+        List<Subscriber> dueSubscribers = new ArrayList<>();
+
+        try (PreparedStatement stmt = connection.prepareStatement(
+                "SELECT subscriber_id FROM borrow_book WHERE borrow_return_date = DATE_ADD(CURRENT_DATE, INTERVAL 1 DAY)"
+        )) {
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                String subscriberId = rs.getString("subscriber_id");
+                // Find and add the matching subscriber
+                for (Subscriber subscriber : allSubscribers) {
+                    if (subscriber.getId().equals(subscriberId)) {
+                        dueSubscribers.add(subscriber);
+                        break;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return dueSubscribers;
+    }
+    /**
+     * Updates the database to mark subscribers eligible to extend their borrow period.
+     * This method performs the following:
+     * 1. Queries the database to find all subscribers whose return date is exactly one week away.
+     * 2. Updates the "can_extend" column in the database to TRUE for those subscribers.
+     */
+    //ToDO: maybe
+//    public String handleOpenOptionToExtendBorrow() {
+//        PreparedStatement selectStmt = null;
+//        PreparedStatement updateStmt = null;
+//
+//        try {
+//            // SQL query to find subscribers whose return date is a week from today
+//            String selectQuery = "SELECT subscriber_id FROM borrow_book WHERE return_date = DATE_ADD(CURRENT_DATE, INTERVAL 7 DAY)";
+//            selectStmt = connection.prepareStatement(selectQuery);
+//
+//            ResultSet rs = selectStmt.executeQuery();
+//
+//            // SQL query to update the "can_extend" field to TRUE
+//            String updateQuery = "UPDATE borrow_book SET can_extend = TRUE WHERE subscriber_id = ?";
+//            updateStmt = connection.prepareStatement(updateQuery);
+//
+//            while (rs.next()) {
+//                String subscriberId = rs.getString("subscriber_id");
+//
+//                // Update the database for each eligible subscriber
+//                updateStmt.setString(1, subscriberId);
+//                updateStmt.executeUpdate();
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        } finally {
+//            try {
+//                // Ensure resources are closed to prevent leaks
+//                if (selectStmt != null) selectStmt.close();
+//                if (updateStmt != null) updateStmt.close();
+//            } catch (SQLException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        return "Borrow extension options updated.";
+//    }
+    /**
+     * Removes unfulfilled reservations older than two days from the waitlist in the database.
+     */
+    /**
+     * Handles unfulfilled orders by retrieving books, updating the subscriber status,
+     * and returning a map of books to the last subscriber waiting for each book.
+     *
+     * @return A map where the key is the book ID, and the value is the last subscriber waiting for the book.
+     * @throws SQLException if a database access error occurs.
+     */
+    public Map<String, Subscriber> handleDeleteUnfulfilledOrder() {
+        PreparedStatement selectBookStmt = null;
+        PreparedStatement updateStmt = null;
+        PreparedStatement getLastWaitingSubscriberStmt = null;
+        ResultSet bookResultSet = null;
+        Map<String, Subscriber> bookToSubscriberMap = new HashMap<>();
+
+        try {
+            // Step 1: Select book IDs related to the unfulfilled orders
+            String selectBookQuery = "SELECT DISTINCT so.book_id\n" +
+                    "FROM subscriber_order so\n" +
+                    "         JOIN subscriber s ON so.subscriber_id = s.subscriber_id\n" +
+                    "         JOIN scheduler_triggers t ON t.relevent_id = s.subscriber_id\n" +
+                    "WHERE t.trigger_date = CURRENT_DATE\n" +
+                    "  AND t.trigger_operation = 'order'\n" +
+                    "  AND so.is_active = 1;";
+
+            selectBookStmt = connection.prepareStatement(selectBookQuery);
+            bookResultSet = selectBookStmt.executeQuery();
+
+            List<String> bookIds = new ArrayList<>();
+            while (bookResultSet.next()) {
+                String bookId = bookResultSet.getString("book_id");
+                bookIds.add(bookId);
+            }
+            System.out.println("Books related to unfulfilled orders: " + bookIds);
+
+            // Step 2: Update `is_active` status for the relevant subscribers
+            String updateQuery = "UPDATE subscriber_order\n" +
+                    "            SET is_active = 0\n" +
+                    "            WHERE subscriber_id IN\n" +
+                    "                (SELECT s.subscriber_id\n" +
+                    "               FROM scheduler_triggers t\n" +
+                    "               JOIN subscriber s ON t.relevent_id = s.subscriber_id\n" +
+                    "               WHERE t.trigger_date = CURRENT_DATE\n" +
+                    "                  AND t.trigger_operation = 'order'\n" +
+                    "                 AND s.is_active = 1);";
+
+            updateStmt = connection.prepareStatement(updateQuery);
+            int rowsUpdated = updateStmt.executeUpdate();
+            System.out.println("Number of rows updated in subscriber_order: " + rowsUpdated);
+
+            // Step 3: Retrieve the last subscriber waiting for each book based on order_date
+            String getLastWaitingSubscriberQuery = "SELECT s.subscriber_id, s.subscriber_first_name, s.subscriber_last_name,\n" +
+                    "       s.subscriber_phone_number, s.subscriber_email, so.is_active\n" +
+                    "FROM subscriber_order so\n" +
+                    "         JOIN subscriber s ON so.subscriber_id = s.subscriber_id\n" +
+                    "WHERE so.book_id = ?\n" +
+                    "  AND so.is_active = 1\n" +
+                    "ORDER BY so.order_date DESC\n" +
+                    "LIMIT 1";
+            getLastWaitingSubscriberStmt = connection.prepareStatement(getLastWaitingSubscriberQuery);
+
+            for (String bookId : bookIds) {
+                getLastWaitingSubscriberStmt.setString(1, bookId);
+                ResultSet subscriberResultSet = getLastWaitingSubscriberStmt.executeQuery();
+
+                if (subscriberResultSet.next()) {
+                    Subscriber lastWaitingSubscriber = new Subscriber(
+                            subscriberResultSet.getString("subscriber_id"),
+                            subscriberResultSet.getString("subscriber_first_name"),
+                            subscriberResultSet.getString("subscriber_last_name"),
+                            subscriberResultSet.getString("subscriber_phone_number"),
+                            subscriberResultSet.getString("subscriber_email"),
+                            subscriberResultSet.getBoolean("is_active")
+                    );
+
+                    bookToSubscriberMap.put(bookId, lastWaitingSubscriber);
+                    System.out.println("Last waiting subscriber for book ID " + bookId + ": " + lastWaitingSubscriber);
+                }
+                subscriberResultSet.close();
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (bookResultSet != null) bookResultSet.close();
+                if (selectBookStmt != null) selectBookStmt.close();
+                if (updateStmt != null) updateStmt.close();
+                if (getLastWaitingSubscriberStmt != null) getLastWaitingSubscriberStmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return bookToSubscriberMap;
+    }
+
+
+
+    /**
+     * Retrieves a list of subscribers who have been frozen for more than one calendar month.
+     *
+     * @return List of subscribers who have been frozen for more than one calendar month.
+     */
+    /**
+     * Updates subscribers who have been frozen exactly for one month.
+     *
+     * This method performs the following steps:
+     * 1. Finds all subscribers in the `scheduler_triggers` table where the trigger operation is 'freeze' and the trigger date is exactly 30 days ago.
+     * 2. Updates the `is_active` status in the `subscriber` table to 1 for these subscribers.
+     * 3. Prints to the console which subscribers were unfrozen.
+     *
+     * @throws SQLException if a database access error occurs.
+     */
+    public void handleOneMonthFromFreezeDate() {
+        PreparedStatement selectStmt = null;
+        PreparedStatement updateSubscriberStmt = null;
+        ResultSet rs = null;
+
+        try {
+            // Step 1: Select frozen subscribers from `scheduler_triggers` where freeze date is exactly 30 days ago
+            String selectQuery = "SELECT t.relevent_id, s.subscriber_first_name, s.subscriber_last_name\n" +
+                    "FROM scheduler_triggers t\n" +
+                    "         JOIN subscriber s ON t.relevent_id = s.subscriber_id\n" +
+                    "WHERE t.trigger_operation = 'freeze'\n" +
+                    "  AND DATEDIFF(CURRENT_DATE, t.trigger_date) = 30\n" +
+                    "  AND s.is_active = 0";
+            selectStmt = connection.prepareStatement(selectQuery);
+            rs = selectStmt.executeQuery();
+
+            List<String> frozenSubscriberIds = new ArrayList<>();
+
+            while (rs.next()) {
+                String subscriberId = rs.getString("relevent_id");
+                String subscriberName = rs.getString("subscriber_first_name") + " " + rs.getString("subscriber_last_name");
+                frozenSubscriberIds.add(subscriberId);
+                System.out.println("Unfreezing subscriber: " + subscriberName + " (ID: " + subscriberId + ")");
+            }
+
+            // Step 2: Update `subscriber` table to set `is_active = 1` for frozen subscribers
+            if (!frozenSubscriberIds.isEmpty()) {
+                String updateSubscriberQuery = "UPDATE subscriber\n" +
+                        "SET is_active = 1\n" +
+                        "WHERE subscriber_id = ?";
+                updateSubscriberStmt = connection.prepareStatement(updateSubscriberQuery);
+
+                for (String subscriberId : frozenSubscriberIds) {
+                    updateSubscriberStmt.setString(1, subscriberId);
+                    updateSubscriberStmt.executeUpdate();
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (selectStmt != null) selectStmt.close();
+                if (updateSubscriberStmt != null) updateSubscriberStmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Fetches the full name of a subscriber based on their ID.
+     *
+     * @param subscriberID The ID of the subscriber.
+     * @return The full name of the subscriber, or null if not found.
+     */
+    public String fetchSubscriberName(String subscriberID) {
+        String subscriberName = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            String query = "SELECT subscriber_first_name, subscriber_last_name FROM subscriber WHERE subscriber_id = ?";
+            stmt = connection.prepareStatement(query);
+            stmt.setString(1, subscriberID);
+
+            rs = stmt.executeQuery();
+            if (rs.next()) {
+                subscriberName = rs.getString("subscriber_first_name") + " " + rs.getString("subscriber_last_name");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return subscriberName;
+    }
+
+    /**
+     * Fetches the subscriber's name and the book title for their order.
+     *
+     * @param subscriberID The ID of the subscriber.
+     * @return A map containing the subscriber's name and the book title.
+     */
+    public Map<String, String> fetchOrderDetails(String subscriberID) {
+        Map<String, String> details = new HashMap<>();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            String query = "SELECT s.subscriber_first_name, s.subscriber_last_name, b.book_title\n" +
+                    "FROM subscriber_order so\n" +
+                    "         JOIN subscriber s ON so.subscriber_id = s.subscriber_id\n" +
+                    "         JOIN book b ON so.book_id = b.book_id\n" +
+                    "WHERE so.subscriber_id = ?\n" +
+                    "  AND so.is_active = 1";
+
+            stmt = connection.prepareStatement(query);
+            stmt.setString(1, subscriberID);
+
+            rs = stmt.executeQuery();
+            if (rs.next()) {
+                details.put("subscriberName", rs.getString("subscriber_first_name") + " " + rs.getString("subscriber_last_name"));
+                details.put("bookTitle", rs.getString("book_title"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return details;
+    }
+
+
+
+
+
 }
+
