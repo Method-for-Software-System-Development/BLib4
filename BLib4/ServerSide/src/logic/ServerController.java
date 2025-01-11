@@ -115,7 +115,7 @@ public class ServerController extends AbstractServer
 
             case "111":
                 // Request by the subscriber to extend book borrow
-                //ToDo: implement
+                responseMsg = new MessageType("211", dbController.handleSubscriberExtendBorrow((List<String>) receiveMsg.data));
                 break;
 
             case "112":
