@@ -457,7 +457,7 @@ public class dbController
         }
         catch (SQLException e)
         {
-            System.out.println("Error! check borrowed book availability failed");
+            System.out.println("Error! check borrowed book availability failed - cant check if the book is borrowed");
         }
 
         if (returnValue)
@@ -493,7 +493,7 @@ public class dbController
             }
             catch (SQLException e)
             {
-                System.out.println("Error! check borrowed book availability failed");
+                System.out.println("Error! check borrowed book availability failed - cant check if the book is ordered");
             }
         }
 
@@ -513,7 +513,7 @@ public class dbController
         }
         catch (SQLException e)
         {
-            System.out.println("Error! check borrowed book availability failed");
+            System.out.println("Error! check borrowed book availability failed - cant get the subscribers that have active orders for the book");
         }
 
         return returnList;
@@ -618,7 +618,7 @@ public class dbController
         }
         catch (SQLException e)
         {
-            System.out.println("Error! order book failed");
+            System.out.println("Error! order book failed - cant check if the subscriber is frozen");
             returnValue.add(false);
             returnValue.add(false);
             validFlag = false;
@@ -644,7 +644,7 @@ public class dbController
             }
             catch (SQLException e)
             {
-                System.out.println("Error! order book failed");
+                System.out.println("Error! order book failed - cant check if the subscriber already ordered the book");
                 returnValue.add(false);
                 returnValue.add(false);
                 validFlag = false;
@@ -684,7 +684,7 @@ public class dbController
             }
             catch (SQLException e)
             {
-                System.out.println("Error! order book failed");
+                System.out.println("Error! order book failed - cant check if we have enough copies of the book that are not ordered");
                 returnValue.add(false);
                 returnValue.add(false);
                 validFlag = false;
@@ -716,7 +716,7 @@ public class dbController
             }
             catch (SQLException e)
             {
-                System.out.println("Error! order book failed");
+                System.out.println("Error! order book failed - cant check if we have enough copies of the book that are not borrowed");
                 returnValue.add(false);
                 returnValue.add(false);
                 validFlag = false;
@@ -746,7 +746,7 @@ public class dbController
             }
             catch (SQLException e)
             {
-                System.out.println("Error! order book failed");
+                System.out.println("Error! order book failed - cant add the order to the db");
                 returnValue.add(false);
                 returnValue.add(false);
             }
@@ -795,7 +795,7 @@ public class dbController
         }
         catch (SQLException e)
         {
-            System.out.println("Error! return borrowed book failed");
+            System.out.println("Error! return borrowed book failed - cant check if the borrow is active");
             returnValue.add(false);
             returnValue.add(false);
             validFlag = false;
@@ -812,7 +812,7 @@ public class dbController
                 stmt.executeUpdate();
 
                 // update the borrow to be inactive
-                stmt = connection.prepareStatement("UPDATE borrow_book SET is_active = false WHERE borrow_id = ?;");
+                stmt = connection.prepareStatement("UPDATE borrow_book SET is_active = false, borrow_return_date = CURDATE() WHERE borrow_id = ?;");
                 stmt.setString(1, borrowId);
                 stmt.executeUpdate();
 
@@ -853,7 +853,7 @@ public class dbController
             }
             catch (SQLException e)
             {
-                System.out.println("Error! return borrowed book failed");
+                System.out.println("Error! return borrowed book failed - cant update the borrow in the db");
                 returnValue.add(false);
                 returnValue.add(false);
             }
