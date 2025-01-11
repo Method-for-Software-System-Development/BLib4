@@ -906,6 +906,123 @@ public class dbController
         return borrowList;
     }
 
+    /**
+     * The method run SQL query to extend the borrow period of a book by the subscriber
+     *
+     * @param extensionRequest - [0] the borrow id
+     *                         [1] the new due date
+     * @return - true if the extent succeeds, else false
+     */
+    public boolean handleSubscriberExtendBorrow(List<String> extensionRequest)
+    {
+        PreparedStatement stmt;
+        String borrowId = extensionRequest.get(0);
+        Date newDueDate = Date.valueOf(extensionRequest.get(1));
+        boolean returnValue = true;
+
+        // check if the borrow is active
+        try
+        {
+            stmt = connection.prepareStatement("SELECT * from borrow_book WHERE borrow_id = ?;");
+            stmt.setString(1, borrowId);
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next())
+            {
+                if (!rs.getBoolean("is_active"))
+                {
+                    returnValue = false;
+                }
+            }
+            else
+            {
+                // the borrow not found
+                returnValue = false;
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! extend borrow failed - cant check if the borrow is active");
+            returnValue = false;
+        }
+
+        // check if there is order for that book
+        try
+        {
+            // get the book id
+            stmt = connection.prepareStatement("SELECT book_id from copy_of_the_book WHERE copy_id = (SELECT copy_id FROM borrow_book WHERE borrow_id = ?);");
+            stmt.setString(1, borrowId);
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next())
+            {
+                String bookId = rs.getString(1);
+
+                // check if there is an order for the book that waits for the return of the book
+                stmt = connection.prepareStatement("SELECT * from subscriber_order WHERE book_id = ? AND is_active = true AND is_his_turn = false;");
+                stmt.setString(1, bookId);
+
+                rs = stmt.executeQuery();
+                if (rs.next())
+                {
+                    // we cant extend the borrow
+                    returnValue = false;
+                }
+            }
+            else
+            {
+                // the book not found
+                returnValue = false;
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! extend borrow failed - cant check if there is an order for the book");
+            returnValue = false;
+        }
+
+        if (returnValue)
+        {
+            // we can extend the borrow - update the borrow due date to the new due date and add to extend history
+            try
+            {
+                // get the last extend id
+                stmt = connection.prepareStatement("SELECT MAX(extention_id) FROM extension_book;");
+                ResultSet rs = stmt.executeQuery();
+                rs.next();
+                int extendId = rs.getInt(1) + 1;
+
+                // get the current due date
+                stmt = connection.prepareStatement("SELECT borrow_due_date from borrow_book WHERE borrow_id = ?;");
+                stmt.setString(1, borrowId);
+                rs = stmt.executeQuery();
+                rs.next();
+                Date currentDueDate = rs.getDate(1);
+
+                // create a new row in the extension_book table
+                stmt = connection.prepareStatement("INSERT INTO extension_book (extention_id, borrow_id, original_due_date, new_due_date, extention_type) VALUES (?,?, ?, ?, false);");
+                stmt.setString(1, String.valueOf(extendId));
+                stmt.setString(2, borrowId);
+                stmt.setDate(3, currentDueDate);
+                stmt.setDate(4, newDueDate);
+                stmt.executeUpdate();
+
+                // update the borrow due date
+                stmt = connection.prepareStatement("UPDATE borrow_book SET borrow_due_date = ? WHERE borrow_id = ?;");
+                stmt.setDate(1, newDueDate);
+                stmt.setString(2, borrowId);
+                stmt.executeUpdate();
+            }
+            catch (SQLException e)
+            {
+                System.out.println("Error! extend borrow failed - cant update the borrow in the db");
+                returnValue = false;
+            }
+        }
+
+        return returnValue;
+    }
+
 
     /**
      * The method run SQL query to get the five newest books in the library
@@ -1071,7 +1188,7 @@ public class dbController
             String selectBookQuery = "SELECT DISTINCT so.book_id\n" +
                     "FROM subscriber_order so\n" +
                     "         JOIN subscriber s ON so.subscriber_id = s.subscriber_id\n" +
-                    "         JOIN scheduler_triggers t ON t.relevent_id = s.subscriber_id\n" +
+                    "         JOIN scheduler_triggers t ON t.relevant_id = s.subscriber_id\n" +
                     "WHERE t.trigger_date = CURRENT_DATE\n" +
                     "  AND t.trigger_operation = 'order'\n" +
                     "  AND so.is_active = 1;";
@@ -1093,7 +1210,7 @@ public class dbController
                     "            WHERE subscriber_id IN\n" +
                     "                (SELECT s.subscriber_id\n" +
                     "               FROM scheduler_triggers t\n" +
-                    "               JOIN subscriber s ON t.relevent_id = s.subscriber_id\n" +
+                    "               JOIN subscriber s ON t.relevant_id = s.subscriber_id\n" +
                     "               WHERE t.trigger_date = CURRENT_DATE\n" +
                     "                  AND t.trigger_operation = 'order'\n" +
                     "                 AND s.is_active = 1);";
@@ -1166,8 +1283,6 @@ public class dbController
      * 1. Find all subscribers in the `scheduler_triggers` table where the trigger operation is 'freeze' and the trigger date is exactly 30 days ago.
      * 2. Updates the `is_active` status in the `subscriber` table to 1 for these subscribers.
      * 3. Prints to the console which subscribers were unfrozen.
-     *
-     * @throws SQLException if a database access error occurs.
      */
     public void handleOneMonthFromFreezeDate()
     {
@@ -1178,9 +1293,9 @@ public class dbController
         try
         {
             // Step 1: Select frozen subscribers from `scheduler_triggers` where the freeze date is exactly 30 days ago
-            String selectQuery = "SELECT t.relevent_id, s.subscriber_first_name, s.subscriber_last_name\n" +
+            String selectQuery = "SELECT t.relevant_id, s.subscriber_first_name, s.subscriber_last_name\n" +
                     "FROM scheduler_triggers t\n" +
-                    "         JOIN subscriber s ON t.relevent_id = s.subscriber_id\n" +
+                    "         JOIN subscriber s ON t.relevant_id = s.subscriber_id\n" +
                     "WHERE t.trigger_operation = 'freeze'\n" +
                     "  AND DATEDIFF(CURRENT_DATE, t.trigger_date) = 30\n" +
                     "  AND s.is_active = 0";
@@ -1191,7 +1306,7 @@ public class dbController
 
             while (rs.next())
             {
-                String subscriberId = rs.getString("relevent_id");
+                String subscriberId = rs.getString("relevant_id");
                 String subscriberName = rs.getString("subscriber_first_name") + " " + rs.getString("subscriber_last_name");
                 frozenSubscriberIds.add(subscriberId);
                 System.out.println("Unfreezing subscriber: " + subscriberName + " (ID: " + subscriberId + ")");
