@@ -2,14 +2,31 @@ package logic.user;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
-import entities.book.Book;
 import entities.logic.MessageType;
+import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 import logic.communication.ChatClient;
 import logic.communication.ClientUI;
 
+
 public class BooksController {
+	//Check Availability Section
+	@FXML
+    private TextField txtCopyID;
+	@FXML
+    private Button btnAvailable;
+	
+	//Add to Waitlist Section
+	@FXML
+	private TextField txtBookID;
+	@FXML
+	private TextField txtSubscriberID;
+	@FXML
+    private Button btnAddToWaitlist;
+	
+	
 	 /**
      * Checks the availability of a book copy by its ID.
      *
@@ -40,7 +57,22 @@ public class BooksController {
 	        return false;
 	    }
 	}
+	//Check Availability Section
+	@FXML
+	private void handleCheckAvailability() {
+	    String copyID = txtCopyID.getText();
+	    if (copyID.isEmpty()) {
+	        Alert alert = new Alert(Alert.AlertType.WARNING, "Please enter a copy ID.");
+	        alert.setHeaderText("Warning");
+	        alert.showAndWait();
+	        return;
+	    }
+
+	    checkAvailability(copyID);
+	}
 	
+	
+
 	
 	/**
      * Adds a subscriber to the waitlist for a book if the book is unavailable.
@@ -71,7 +103,24 @@ public class BooksController {
         }
     } catch (Exception e) {
         e.printStackTrace();
+        }
     }
+    
+	//Add to Waitlist Section
+    @FXML
+    private void handleAddToWaitlist() {
+        String bookID = txtBookID.getText();
+        String subscriberID = txtSubscriberID.getText();
+        
+        if (bookID.isEmpty() || subscriberID.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Please fill in both Book ID and Subscriber ID");
+            alert.setHeaderText("Input Error");
+            alert.showAndWait();
+            return;
+        }
+        
+        // Call the addToWaitlist method
+        addToWaitlist(bookID, subscriberID, LocalDateTime.now());
     }
     
     
