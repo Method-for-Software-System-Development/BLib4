@@ -735,7 +735,7 @@ public class dbController
                 int orderId = rs.getInt(1) + 1;
 
                 // create a new row in the subscriber_order table
-                stmt = connection.prepareStatement("INSERT INTO subscriber_order (order_id, subscriber_id, book_id, order_date, is_active) VALUES (?,?, ?, CURDATE(), true);");
+                stmt = connection.prepareStatement("INSERT INTO subscriber_order (order_id, subscriber_id, book_id, order_date, is_active) VALUES (?,?, ?, NOW(), true);");
                 stmt.setString(1, String.valueOf(orderId));
                 stmt.setString(2, orderDetails.get(0));
                 stmt.setString(3, orderDetails.get(1));
