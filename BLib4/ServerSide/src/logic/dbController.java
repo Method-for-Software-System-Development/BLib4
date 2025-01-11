@@ -816,16 +816,15 @@ public class dbController
                 stmt.setString(1, borrowId);
                 stmt.executeUpdate();
 
-
                 // check the due date of the borrow
                 stmt = connection.prepareStatement("SELECT borrow_due_date from borrow_book WHERE borrow_id = ?;");
                 stmt.setString(1, borrowId);
                 ResultSet rs = stmt.executeQuery();
                 rs.next();
-                LocalDate dueDate = rs.getDate(1).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                Date dueDate = rs.getDate(1);
 
                 // check if the borrow is late by a week or more
-                if (dueDate.isBefore(LocalDate.now().minusWeeks(1)))
+                if (LocalDate.now().isAfter(dueDate.toLocalDate().plusWeeks(1)))
                 {
                     // get the subscriber id
                     stmt = connection.prepareStatement("SELECT subscriber_id from borrow_book WHERE borrow_id = ?;");
@@ -846,6 +845,7 @@ public class dbController
                 }
                 else
                 {
+                    System.out.println("The borrow is not late by a week or more");
                     // borrow return succeeded
                     returnValue.add(true);
                     returnValue.add(false);
