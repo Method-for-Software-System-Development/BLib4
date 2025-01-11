@@ -27,6 +27,26 @@ public class BooksController {
     private Button btnAddToWaitlist;
 	
 	
+	private static BooksController instance = null;
+	
+	/*
+	 * Private constructor for BooksController
+	 */
+	private BooksController() {
+	}
+	
+	/*
+	 * Singleton pattern implementation for BooksController
+	 */
+	public static BooksController getInstance() {
+		if(instance == null) {
+			instance = new BooksController();
+			return instance;
+		}
+		return instance;
+	}
+	
+	
 	 /**
      * Checks the availability of a book copy by its ID.
      *

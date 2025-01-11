@@ -42,6 +42,7 @@ public class ChatClient extends AbstractClient
     public static boolean awaitResponse = false;
     public static Date todayDate;
     public static Librarian librarian;
+    public static ArrayList<Boolean> array;
 
     //Constructors ****************************************************
 
@@ -121,6 +122,7 @@ public class ChatClient extends AbstractClient
 
             case "209":
                 //ToDo: implement
+            	array = (ArrayList<Boolean>) receiveMsg.getData();
                 break;
 
             case "210":
