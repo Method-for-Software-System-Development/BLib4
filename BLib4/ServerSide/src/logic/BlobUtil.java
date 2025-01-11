@@ -1,48 +1,48 @@
 package logic;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
-import java.sql.Blob;
-import java.sql.SQLException;
+import java.nio.charset.StandardCharsets;
 
-import com.opencsv.CSVReader;
-import javafx.scene.image.Image;
-import com.opencsv.CSVWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+
 
 public class BlobUtil
 {
+
     /**
-     * The method converts CSVWriter object to a Blob object to be stored in the DB
-     * @param csvWriter - The CSVWriter object to be converted
-     * @return - The Blob object
+     * The method converts a Blob object to List<String[]>
+     * @param blobData - the Blob object to convert
+     * @return - the List<String[]> object
      */
-    public static Blob convertCsvToBlob(CSVWriter csvWriter) {
-        Blob blob = null;
-        try {
-            byte[] csvAsBytes = csvWriter.toString().getBytes();
-            blob = new javax.sql.rowset.serial.SerialBlob(csvAsBytes);
-        } catch (SQLException e) {
-            e.printStackTrace();
+    public static List<String[]> convertBlobToList(byte[] blobData) {
+        List<String[]> rows = new ArrayList<>();
+        try (Scanner scanner = new Scanner(new ByteArrayInputStream(blobData), String.valueOf(StandardCharsets.UTF_8))) {
+            while (scanner.hasNextLine()) {
+                rows.add(scanner.nextLine().split(",")); // Split rows into columns
+            }
         }
-        return blob;
+        return rows;
     }
 
     /**
-     * The method converts a Blob object to a CSVReader object
-     * @param blob - The Blob object to be converted from the DB
-     * @return - The CSVReader object
+     * The method converts a List<String[]> to a Blob object
+     * @param rows - the List<String[]> object to convert
+     * @return - the Blob object
+     * @throws IOException - if an I/O error occurs
      */
-    public static CSVReader convertBlobToCsv(Blob blob) {
-        CSVReader csvReader = null;
-        try {
-            int blobLength = (int) blob.length();
-            byte[] blobAsBytes = blob.getBytes(1, blobLength);
-            ByteArrayInputStream inputStream = new ByteArrayInputStream(blobAsBytes);
-            InputStreamReader reader = new InputStreamReader(inputStream);
-            csvReader = new CSVReader(reader);
-        } catch (SQLException e) {
-            e.printStackTrace();
+    public static byte[] convertListToBlob(List<String[]> rows) throws IOException
+    {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        for (String[] row : rows) {
+            String line = String.join(",", row); // Join columns with commas
+            outputStream.write((line + "\n").getBytes(StandardCharsets.UTF_8)); // Add newline
         }
-        return csvReader;
+        return outputStream.toByteArray();
     }
 }
