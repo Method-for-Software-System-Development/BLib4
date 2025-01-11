@@ -1,11 +1,9 @@
 package entities.logic;
 
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Borrow {
-	private Date brrowDate;
+	private Date borrowDate;
 	private Date dueDate;
 	private Date returnDate;
 	private String status;
@@ -22,15 +20,15 @@ public class Borrow {
 	 * @param manualExtention 	A map of manual extension dates, with the reason as the key and the extended date as the value
 	 */
 	public Borrow(Date brrowDate, Date dueDate, Date returnDate, String status, int lateTime) {
-		this.brrowDate = brrowDate;
+		this.borrowDate = brrowDate;
 		this.dueDate = dueDate;
 		this.returnDate = returnDate;
 		this.status = status;
 		this.lateTime = lateTime;
 	}
 
-	public Date getBrrowDate() {
-		return brrowDate;
+	public Date getBorrowDate() {
+		return borrowDate;
 	}
 
 	public Date getDueDate() {
