@@ -1,5 +1,7 @@
 package logic;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -168,6 +170,13 @@ public class dbController
             stmt = connection.prepareStatement("INSERT INTO subsribers_history (id) SELECT MAX(id)+  1 FROM subsribers_history;");
             stmt.executeUpdate();
 
+            // insert an empty history to the new row
+            List<String[]> emptyHistory = new ArrayList<>();
+            byte[] blob = BlobUtil.convertListToBlob(emptyHistory);
+            stmt = connection.prepareStatement("UPDATE subsribers_history SET history_file = ? WHERE id = (SELECT MAX(id) FROM subsribers_history);");
+            stmt.setBytes(1, blob);
+            stmt.executeUpdate();
+
             // get the id of the new row
             stmt = connection.prepareStatement("SELECT MAX(id) FROM subsribers_history;");
             rs = stmt.executeQuery();
@@ -194,6 +203,11 @@ public class dbController
         catch (SQLException e)
         {
             System.out.println("Error! subscriber sign up failed");
+            return false;
+        }
+        catch (IOException e)
+        {
+            System.out.println("Error! cant creaste empty history file");
             return false;
         }
 
@@ -1443,5 +1457,59 @@ public class dbController
     }
 
 
+    /**
+     * The method run SQL query to get the history of a subscriber by his id
+     * @param history_id - the id of the history
+     * @return - the history of the subscriber in byte array
+     */
+    public List<String[]> HandleGetHistoryFileById(String history_id)
+    {
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        byte[] blob = null;
+        try
+        {
+            String query = "SELECT history_file FROM subsribers_history WHERE id = ?";
+            stmt = connection.prepareStatement(query);
+            stmt.setString(1, history_id);
+            rs = stmt.executeQuery();
+            if (rs.next())
+            {
+                blob = rs.getBytes("history_file");
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! get history file failed");
+        }
+
+        return BlobUtil.convertBlobToList(blob);
+    }
+
+    /**
+     * The method run SQL query to update the history of a subscriber by his id
+     * @param history_id - the id of the history
+     * @param list - the new history file
+     */
+    public boolean handleUpdateHistoryFileById(String history_id, List<String[]> list) throws IOException
+    {
+        PreparedStatement stmt = null;
+        byte[] blob = BlobUtil.convertListToBlob(list);
+        try
+        {
+            String query = "UPDATE subsribers_history SET history_file = ? WHERE id = ?";
+            stmt = connection.prepareStatement(query);
+            stmt.setBytes(1, blob);
+            stmt.setString(2, history_id);
+            stmt.executeUpdate();
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! update history file failed");
+            return false;
+        }
+
+        return true;
+    }
 }
 
