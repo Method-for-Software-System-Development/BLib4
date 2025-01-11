@@ -1,6 +1,5 @@
 package logic;
 
-import java.io.FileInputStream;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -12,7 +11,6 @@ import java.util.Map;
 import entities.book.Book;
 import entities.user.Librarian;
 import entities.user.Subscriber;
-import javafx.scene.image.Image;
 
 public class dbController
 {
@@ -304,7 +302,6 @@ public class dbController
         // Iterate through the result set and create Book objects
         while (rs.next())
         {
-            System.out.println("Here");
             Book book = new Book(
                     rs.getInt("book_id"),
                     rs.getString("book_title"),
@@ -429,7 +426,7 @@ public class dbController
      * @param copyId - the id of the copy to check
      * @return - true if the copy is available, else false
      */
-    public boolean handleCheckBorrowedBookAvailability(String copyId)
+    public List<String> handleCheckBorrowedBookAvailability(String copyId)
     {
         PreparedStatement stmt;
         boolean returnValue = true;
@@ -500,7 +497,26 @@ public class dbController
             }
         }
 
-        return returnValue;
+        List<String> returnList = new ArrayList<>();
+        returnList.add(String.valueOf(returnValue));
+
+        // Add all the subscribers that have active orders for the book and got notified
+        try
+        {
+            stmt = connection.prepareStatement("SELECT subscriber_id FROM subscriber_order WHERE book_id = ? AND is_active = true AND is_his_turn = true;");
+            stmt.setString(1, bookId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next())
+            {
+                returnList.add(rs.getString("subscriber_id"));
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! check borrowed book availability failed");
+        }
+
+        return returnList;
     }
 
     /**
@@ -540,7 +556,7 @@ public class dbController
         try
         {
             // update the copy of the book to be borrowed
-            stmt = connection.prepareStatement("UPDATE copy_of_the_book SET is_available = true WHERE copy_id = ?;");
+            stmt = connection.prepareStatement("UPDATE copy_of_the_book SET is_available = false WHERE copy_id = ?;");
             stmt.setString(1, copyId);
             stmt.executeUpdate();
 
@@ -791,7 +807,7 @@ public class dbController
             try
             {
                 // update the copy of the book to be available
-                stmt = connection.prepareStatement("UPDATE copy_of_the_book SET is_available = false WHERE copy_id = ?;");
+                stmt = connection.prepareStatement("UPDATE copy_of_the_book SET is_available = true WHERE copy_id = ?;");
                 stmt.setString(1, borrowId);
                 stmt.executeUpdate();
 
@@ -957,30 +973,38 @@ public class dbController
         return books;
     }
 
-    public List<Subscriber> handleNotifyDayBeforeReturnDate() {
+    public List<Subscriber> handleNotifyDayBeforeReturnDate()
+    {
         List<Subscriber> allSubscribers = handleGetAllSubscribers();
         List<Subscriber> dueSubscribers = new ArrayList<>();
 
         try (PreparedStatement stmt = connection.prepareStatement(
                 "SELECT subscriber_id FROM borrow_book WHERE borrow_return_date = DATE_ADD(CURRENT_DATE, INTERVAL 1 DAY)"
-        )) {
+        ))
+        {
             ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
+            while (rs.next())
+            {
                 String subscriberId = rs.getString("subscriber_id");
                 // Find and add the matching subscriber
-                for (Subscriber subscriber : allSubscribers) {
-                    if (subscriber.getId().equals(subscriberId)) {
+                for (Subscriber subscriber : allSubscribers)
+                {
+                    if (subscriber.getId().equals(subscriberId))
+                    {
                         dueSubscribers.add(subscriber);
                         break;
                     }
                 }
             }
-        } catch (SQLException e) {
+        }
+        catch (SQLException e)
+        {
             e.printStackTrace();
         }
 
         return dueSubscribers;
     }
+
     /**
      * Updates the database to mark subscribers eligible to extend their borrow period.
      * This method performs the following:
@@ -1033,14 +1057,16 @@ public class dbController
      * @return A map where the key is the book ID, and the value is the last subscriber waiting for the book.
      * @throws SQLException if a database access error occurs.
      */
-    public Map<String, Subscriber> handleDeleteUnfulfilledOrder() {
+    public Map<String, Subscriber> handleDeleteUnfulfilledOrder()
+    {
         PreparedStatement selectBookStmt = null;
         PreparedStatement updateStmt = null;
         PreparedStatement getLastWaitingSubscriberStmt = null;
         ResultSet bookResultSet = null;
         Map<String, Subscriber> bookToSubscriberMap = new HashMap<>();
 
-        try {
+        try
+        {
             // Step 1: Select book IDs related to the unfulfilled orders
             String selectBookQuery = "SELECT DISTINCT so.book_id\n" +
                     "FROM subscriber_order so\n" +
@@ -1054,7 +1080,8 @@ public class dbController
             bookResultSet = selectBookStmt.executeQuery();
 
             List<String> bookIds = new ArrayList<>();
-            while (bookResultSet.next()) {
+            while (bookResultSet.next())
+            {
                 String bookId = bookResultSet.getString("book_id");
                 bookIds.add(bookId);
             }
@@ -1086,11 +1113,13 @@ public class dbController
                     "LIMIT 1";
             getLastWaitingSubscriberStmt = connection.prepareStatement(getLastWaitingSubscriberQuery);
 
-            for (String bookId : bookIds) {
+            for (String bookId : bookIds)
+            {
                 getLastWaitingSubscriberStmt.setString(1, bookId);
                 ResultSet subscriberResultSet = getLastWaitingSubscriberStmt.executeQuery();
 
-                if (subscriberResultSet.next()) {
+                if (subscriberResultSet.next())
+                {
                     Subscriber lastWaitingSubscriber = new Subscriber(
                             subscriberResultSet.getString("subscriber_id"),
                             subscriberResultSet.getString("subscriber_first_name"),
@@ -1106,15 +1135,22 @@ public class dbController
                 subscriberResultSet.close();
             }
 
-        } catch (SQLException e) {
+        }
+        catch (SQLException e)
+        {
             e.printStackTrace();
-        } finally {
-            try {
+        }
+        finally
+        {
+            try
+            {
                 if (bookResultSet != null) bookResultSet.close();
                 if (selectBookStmt != null) selectBookStmt.close();
                 if (updateStmt != null) updateStmt.close();
                 if (getLastWaitingSubscriberStmt != null) getLastWaitingSubscriberStmt.close();
-            } catch (SQLException e) {
+            }
+            catch (SQLException e)
+            {
                 e.printStackTrace();
             }
         }
@@ -1123,29 +1159,25 @@ public class dbController
     }
 
 
-
-    /**
-     * Retrieves a list of subscribers who have been frozen for more than one calendar month.
-     *
-     * @return List of subscribers who have been frozen for more than one calendar month.
-     */
     /**
      * Updates subscribers who have been frozen exactly for one month.
-     *
+     * <p>
      * This method performs the following steps:
-     * 1. Finds all subscribers in the `scheduler_triggers` table where the trigger operation is 'freeze' and the trigger date is exactly 30 days ago.
+     * 1. Find all subscribers in the `scheduler_triggers` table where the trigger operation is 'freeze' and the trigger date is exactly 30 days ago.
      * 2. Updates the `is_active` status in the `subscriber` table to 1 for these subscribers.
      * 3. Prints to the console which subscribers were unfrozen.
      *
      * @throws SQLException if a database access error occurs.
      */
-    public void handleOneMonthFromFreezeDate() {
+    public void handleOneMonthFromFreezeDate()
+    {
         PreparedStatement selectStmt = null;
         PreparedStatement updateSubscriberStmt = null;
         ResultSet rs = null;
 
-        try {
-            // Step 1: Select frozen subscribers from `scheduler_triggers` where freeze date is exactly 30 days ago
+        try
+        {
+            // Step 1: Select frozen subscribers from `scheduler_triggers` where the freeze date is exactly 30 days ago
             String selectQuery = "SELECT t.relevent_id, s.subscriber_first_name, s.subscriber_last_name\n" +
                     "FROM scheduler_triggers t\n" +
                     "         JOIN subscriber s ON t.relevent_id = s.subscriber_id\n" +
@@ -1157,7 +1189,8 @@ public class dbController
 
             List<String> frozenSubscriberIds = new ArrayList<>();
 
-            while (rs.next()) {
+            while (rs.next())
+            {
                 String subscriberId = rs.getString("relevent_id");
                 String subscriberName = rs.getString("subscriber_first_name") + " " + rs.getString("subscriber_last_name");
                 frozenSubscriberIds.add(subscriberId);
@@ -1165,26 +1198,35 @@ public class dbController
             }
 
             // Step 2: Update `subscriber` table to set `is_active = 1` for frozen subscribers
-            if (!frozenSubscriberIds.isEmpty()) {
+            if (!frozenSubscriberIds.isEmpty())
+            {
                 String updateSubscriberQuery = "UPDATE subscriber\n" +
                         "SET is_active = 1\n" +
                         "WHERE subscriber_id = ?";
                 updateSubscriberStmt = connection.prepareStatement(updateSubscriberQuery);
 
-                for (String subscriberId : frozenSubscriberIds) {
+                for (String subscriberId : frozenSubscriberIds)
+                {
                     updateSubscriberStmt.setString(1, subscriberId);
                     updateSubscriberStmt.executeUpdate();
                 }
             }
 
-        } catch (SQLException e) {
+        }
+        catch (SQLException e)
+        {
             e.printStackTrace();
-        } finally {
-            try {
+        }
+        finally
+        {
+            try
+            {
                 if (rs != null) rs.close();
                 if (selectStmt != null) selectStmt.close();
                 if (updateSubscriberStmt != null) updateSubscriberStmt.close();
-            } catch (SQLException e) {
+            }
+            catch (SQLException e)
+            {
                 e.printStackTrace();
             }
         }
@@ -1196,27 +1238,37 @@ public class dbController
      * @param subscriberID The ID of the subscriber.
      * @return The full name of the subscriber, or null if not found.
      */
-    public String fetchSubscriberName(String subscriberID) {
+    public String fetchSubscriberName(String subscriberID)
+    {
         String subscriberName = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
 
-        try {
+        try
+        {
             String query = "SELECT subscriber_first_name, subscriber_last_name FROM subscriber WHERE subscriber_id = ?";
             stmt = connection.prepareStatement(query);
             stmt.setString(1, subscriberID);
 
             rs = stmt.executeQuery();
-            if (rs.next()) {
+            if (rs.next())
+            {
                 subscriberName = rs.getString("subscriber_first_name") + " " + rs.getString("subscriber_last_name");
             }
-        } catch (SQLException e) {
+        }
+        catch (SQLException e)
+        {
             e.printStackTrace();
-        } finally {
-            try {
+        }
+        finally
+        {
+            try
+            {
                 if (rs != null) rs.close();
                 if (stmt != null) stmt.close();
-            } catch (SQLException e) {
+            }
+            catch (SQLException e)
+            {
                 e.printStackTrace();
             }
         }
@@ -1230,12 +1282,14 @@ public class dbController
      * @param subscriberID The ID of the subscriber.
      * @return A map containing the subscriber's name and the book title.
      */
-    public Map<String, String> fetchOrderDetails(String subscriberID) {
+    public Map<String, String> fetchOrderDetails(String subscriberID)
+    {
         Map<String, String> details = new HashMap<>();
         PreparedStatement stmt = null;
         ResultSet rs = null;
 
-        try {
+        try
+        {
             String query = "SELECT s.subscriber_first_name, s.subscriber_last_name, b.book_title\n" +
                     "FROM subscriber_order so\n" +
                     "         JOIN subscriber s ON so.subscriber_id = s.subscriber_id\n" +
@@ -1247,26 +1301,31 @@ public class dbController
             stmt.setString(1, subscriberID);
 
             rs = stmt.executeQuery();
-            if (rs.next()) {
+            if (rs.next())
+            {
                 details.put("subscriberName", rs.getString("subscriber_first_name") + " " + rs.getString("subscriber_last_name"));
                 details.put("bookTitle", rs.getString("book_title"));
             }
-        } catch (SQLException e) {
+        }
+        catch (SQLException e)
+        {
             e.printStackTrace();
-        } finally {
-            try {
+        }
+        finally
+        {
+            try
+            {
                 if (rs != null) rs.close();
                 if (stmt != null) stmt.close();
-            } catch (SQLException e) {
+            }
+            catch (SQLException e)
+            {
                 e.printStackTrace();
             }
         }
 
         return details;
     }
-
-
-
 
 
 }
