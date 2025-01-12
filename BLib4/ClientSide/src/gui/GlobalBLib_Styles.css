@@ -1,16 +1,18 @@
+/* ====== GENERAL ====== */
+
 .gridPane {
     -fx-background-color: linear-gradient(to bottom, #D8DBFF, #B5BBFF);
 }
+
 .menu {
     -fx-background-color: #525FE1;
     -fx-background-radius: 15;
     -fx-padding: 15;
-    -fx-text-fill: #FFFFFF;
-    -fx-font-family: "Roboto Medium";
-    -fx-font-size: 20px;
 }
 .menu Text {
     -fx-fill: #FFFFFF;
+    -fx-font-family: "Roboto Medium";
+    -fx-font-size: 20px;
 }
 .menu-separator {
     -fx-background-color: white;
@@ -19,33 +21,115 @@
     -fx-pref-height: 5px;
     -fx-border-width: 0;
 }
+
+.header {
+    -fx-background-color: #FFFFFF;
+    -fx-background-image: url("assets/images/booksBackground.png");
+    -fx-background-position: left center;
+    -fx-background-size: auto 94%;
+    -fx-background-repeat: repeat-x;
+    -fx-background-radius: 15;
+    -fx-padding: 15;
+}
+
+.main {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 15;
+    -fx-padding: 15;
+}
+.main-separator {
+    -fx-background-color: #454545;
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
+    -fx-pref-height: 5px;
+    -fx-border-width: 0;
+}
+
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-border-width: none;
+    -fx-padding: 0 0 15px 0;
+}
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+.scroll-pane .scroll-bar:horizontal {
+    -fx-background-color: transparent;
+    -fx-pref-height: 10px;
+}
+.scroll-pane .scroll-bar:horizontal .increment-button,
+.scroll-pane .scroll-bar:horizontal .decrement-button {
+    -fx-opacity: 0;
+}
+.scroll-pane .thumb {
+    -fx-background-color: #454545;
+    -fx-background-radius: 5px;
+}
+.scroll-pane .thumb:hover {
+    -fx-background-color: #525FE1;
+}
+
+.bookContainer {
+    -fx-background-color: linear-gradient(to bottom, #D8DBFF, #B5BBFF);
+    -fx-background-radius: 15;
+    -fx-padding: 15;
+}
+
+/* ====== TEXTS ====== */
+
 .menu-title {
     -fx-font-family: "Roboto Bold";
     -fx-font-size: 30px;
     -fx-fill: #FFFFFF;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 5, 0.2, 0, 2);
 }
-.custom-radio-button {
-    -fx-mark-color: #F86F03;
-    -fx-text-fill: #FFFFFF;
-    -fx-focus-color: transparent; /* Remove blue focus ring */
-    -fx-faint-focus-color: transparent; /* Remove faint focus effect */
+.header-title {
+    -fx-font-family: "Montserrat Bold";
+    -fx-font-size: 40px;
+    -fx-fill: #F86F03;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 5, 0.2, 0, 2);
 }
-.custom-text-field {
-    -fx-border-color: #FFFFFF;
-    -fx-border-radius: 8px;
-    -fx-background-radius: 8px;
-    -fx-border-width: 2px;
-    -fx-text-fill: #454545;
-    -fx-padding: 8px;
-    -fx-prompt-text-fill: #999999;
+.main-title {
+    -fx-font-family: "Roboto Bold";
+    -fx-font-size: 30px;
+    -fx-fill: #454545;
 }
-.custom-text-field:focused {
-    -fx-border-color: #F86F03;
+
+.medium-bold-white-text {
+    -fx-font-family: "Roboto Bold";
+    -fx-font-size: 24px;
+    -fx-fill: #FFFFFF;
 }
-.error-text-field {
-    -fx-prompt-text-fill: #E74C3C;
+.small-white-text {
+    -fx-font-family: "Roboto";
+    -fx-font-size: 20px;
+    -fx-fill: #FFFFFF;
 }
+.verySmall-white-text {
+    -fx-font-family: "Roboto";
+    -fx-font-size: 14px;
+    -fx-fill: #FFFFFF;
+}
+
+.small-grey-text {
+    -fx-font-family: "Roboto";
+    -fx-font-size: 20px;
+    -fx-fill: #454545;
+}
+.small-bold-grey-text {
+    -fx-font-family: "Roboto Bold";
+    -fx-font-size: 20px;
+    -fx-fill: #454545;
+}
+
+.medium-bold-purple-text {
+    -fx-font-family: "Montserrat Bold";
+    -fx-font-size: 24px;
+    -fx-fill: #525FE1;
+}
+
+/* ====== BUTTONS ====== */
+
 .transparent-button {
     -fx-background-color: transparent;
     -fx-border-color: #FFFFFF;
@@ -64,6 +148,26 @@
     -fx-border-radius: 25px;
     -fx-background-radius: 25px;
 }
+
+.purple-transparent-button {
+    -fx-background-color: transparent;
+    -fx-border-color: #525FE1;
+    -fx-border-width: 2px;
+    -fx-border-radius: 25px;
+    -fx-text-fill: #525FE1;
+    -fx-font-family: "Montserrat Bold";
+    -fx-font-size: 24px;
+    -fx-padding: 10 20;
+    -fx-cursor: hand;
+    -fx-background-radius: 25px; /* Ensure background also has rounded corners */
+}
+.purple-transparent-button:hover {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #525FE1;
+    -fx-border-radius: 25px;
+    -fx-background-radius: 25px;
+}
+
 .orange-button {
     -fx-background-color: #F86F03;
     -fx-border-color: #F86F03;
@@ -83,50 +187,32 @@
     -fx-border-radius: 25px;
     -fx-background-radius: 25px;
 }
-.medium-bold-white-text {
-    -fx-font-family: "Roboto Bold";
-    -fx-font-size: 24px;
-    -fx-fill: #FFFFFF;
-}
-.small-white-text {
-    -fx-font-family: "Roboto";
+
+/* ====== FORM ELEMENTS ====== */
+
+.custom-radio-button {
+    -fx-mark-color: #F86F03;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-family: "Roboto Medium";
     -fx-font-size: 20px;
-    -fx-fill: #FFFFFF;
+    -fx-focus-color: transparent; /* Remove blue focus ring */
+    -fx-faint-focus-color: transparent; /* Remove faint focus effect */
 }
-.verySmall-white-text {
-    -fx-font-family: "Roboto";
-    -fx-font-size: 14px;
-    -fx-fill: #FFFFFF;
+
+.custom-text-field {
+    -fx-border-color: #FFFFFF;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-border-width: 2px;
+    -fx-text-fill: #454545;
+    -fx-font-family: "Roboto Medium";
+    -fx-font-size: 20px;
+    -fx-padding: 8px;
+    -fx-prompt-text-fill: #999999;
 }
-.header {
-    -fx-background-color: #FFFFFF;
-    -fx-background-image: url("assets/images/booksBackground.png");
-    -fx-background-position: left center;
-    -fx-background-size: auto 94%;
-    -fx-background-repeat: repeat-x;
-    -fx-background-radius: 15;
-    -fx-padding: 15;
+.custom-text-field:focused {
+    -fx-border-color: #F86F03;
 }
-.header-title {
-    -fx-font-family: "Montserrat Bold";
-    -fx-font-size: 40px;
-    -fx-fill: #F86F03;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 5, 0.2, 0, 2);
-}
-.main {
-    -fx-background-color: #FFFFFF;
-    -fx-background-radius: 15;
-    -fx-padding: 15;
-}
-.main-title {
-    -fx-font-family: "Roboto Bold";
-    -fx-font-size: 30px;
-    -fx-fill: #454545;
-}
-.main-separator {
-    -fx-background-color: #454545;
-    -fx-background-radius: 5;
-    -fx-border-radius: 5;
-    -fx-pref-height: 5px;
-    -fx-border-width: 0;
+.error-text-field {
+    -fx-prompt-text-fill: #E74C3C;
 }
