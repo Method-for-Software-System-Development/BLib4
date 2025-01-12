@@ -14,7 +14,7 @@ public class Subscriber_Controller {
     public static Subscriber loggedSubscriber=null;
     public static Librarian loggedLibrarian=null;
     
-	public Subscriber_Controller getInstance() {
+	public static Subscriber_Controller getInstance() {
 	    if(instance == null) {
 	    	instance = new Subscriber_Controller();
 	    	return instance;
