@@ -10,6 +10,18 @@ import logic.communication.ClientUI;
 
 public class Subscriber_Controller {   
 
+    private static Subscriber_Controller instance = null;
+    public static Subscriber loggedSubscriber=null;
+    public static Librarian loggedLibrarian=null;
+    
+	public Subscriber_Controller getInstance() {
+	    if(instance == null) {
+	    	instance = new Subscriber_Controller();
+	    	return instance;
+	    }
+	    return instance;
+	}
+	
 	/**
      * This method send a request to the server to sign up a new subscriber.
      *
@@ -58,8 +70,10 @@ public class Subscriber_Controller {
     	//send a request to the server to log in the subscriber
     	attemptLogin(userID,password,"subscriber");
         // check server response
-    	if(ChatClient.serverResponse)
+    	if(ChatClient.serverResponse) {
+    		loggedSubscriber=ChatClient.subscribers.get(0);
     		return ChatClient.subscribers.get(0);
+    	}
     	return null;    }
 
     /**
@@ -74,8 +88,10 @@ public class Subscriber_Controller {
     	//send a request to the server to log in the librarian
     	attemptLogin(userID,password,"librarian");
         // check server response
-    	if(ChatClient.serverResponse)
+    	if(ChatClient.serverResponse) {
+    		loggedLibrarian=ChatClient.librarian;
     		return ChatClient.librarian;
+    	}
     	return null;
     }
     

@@ -33,7 +33,7 @@ public class DocumentationController {
 	public static void receiveBorrow(Borrow clientBorrow) {
 		// To-Do
         System.out.println("Borrow received in DocumentationController:");
-        System.out.println("Borrow Date: " + clientBorrow.getBrrowDate());
+        System.out.println("Borrow Date: " + clientBorrow.getBorrowDate());
         System.out.println("Due Date: " + clientBorrow.getDueDate());
         System.out.println("Status: " + clientBorrow.getStatus());
 	}
