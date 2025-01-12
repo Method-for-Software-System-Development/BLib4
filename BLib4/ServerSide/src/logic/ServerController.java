@@ -120,8 +120,7 @@ public class ServerController extends AbstractServer
 
             case "112":
                 // Request to get all the subscriber history
-                //? return json, how to do it?
-                //ToDo: implement
+                responseMsg = new MessageType("212", dbController.handleReturnSubscriberHistory((String) receiveMsg.data));
                 break;
 
             case "113":

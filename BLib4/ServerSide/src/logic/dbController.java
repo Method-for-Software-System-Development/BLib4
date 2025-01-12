@@ -339,6 +339,34 @@ public class dbController
         return books;
     }
 
+    /**
+     * The method run SQL query to get the subscriber history from the db
+     * @param subscriber_id - the id of the subscriber
+     * @return - the subscriber history as List<String[]>
+     */
+    public List<String[]> handleReturnSubscriberHistory(String subscriber_id)
+    {
+        PreparedStatement stmt;
+        List<String[]> history = null;
+
+        try
+        {
+            stmt = connection.prepareStatement("SELECT detailed_subscription_history FROM subscriber WHERE subscriber_id = ?;");
+            stmt.setString(1, subscriber_id);
+
+            ResultSet rs = stmt.executeQuery();
+            rs.next();
+            byte[] blob = rs.getBytes(1);
+
+            history = BlobUtil.convertBlobToList(blob);
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! return subscriber history failed");
+        }
+
+        return history;
+    }
 
     /**
      * The method run SQL query to update the subscriber details
