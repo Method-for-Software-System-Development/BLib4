@@ -22,8 +22,16 @@ public class Subscriber_Controller {
 	    }
 	    return instance;
 	}
-	
-	/**
+
+    public Subscriber getLoggedSubscriber() {
+        return loggedSubscriber;
+    }
+
+    public Librarian getLoggedLibrarian() {
+        return loggedLibrarian;
+    }
+
+    /**
      * This method send a request to the server to sign up a new subscriber.
      *
      * @param userID ID of the user.
