@@ -306,6 +306,11 @@ public class ServerController extends AbstractServer
                 responseMsg = new MessageType("221", dbController.handleGetFiveMostPopularBooks());
                 break;
 
+            case "123":
+                // Request to get book location in the library
+                responseMsg = new MessageType("223", dbController.handleGetBookLocation((String) receiveMsg.data));
+                break;
+
             default:
                 System.out.println("Invalid message type");
                 return;

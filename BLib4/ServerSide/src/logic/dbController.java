@@ -1435,13 +1435,11 @@ public class dbController
     }
 
     /**
-     * Fetches the subscriber's name and the book title for their order.
-     *
-     * @param subscriberID The ID of the subscriber.
-     * @return A map containing the subscriber's name and the book title.
-     */
-    public Map<String, String> fetchOrderDetails(String subscriberID)
-    {
+
+     Fetches the subscriber's name and the book title for their order.*
+     @param subscriberID The ID of the subscriber.
+     @return A map containing the subscriber's name and the book title.*/
+    public Map<String, String> fetchOrderDetails(String subscriberID){
         Map<String, String> details = new HashMap<>();
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -1806,8 +1804,9 @@ public class dbController
         List<String> returnValue = new ArrayList<>();
         PreparedStatement stmt = null;
         boolean inLibrary = true;
+        int ordered = 0;
 
-        // check if there are copy of the book available in the library
+        // check if there is copy of the book available in the library
         try
         {
             // count the number of copies of the book in the library that available to borrow
@@ -1824,7 +1823,7 @@ public class dbController
 
             rs = stmt.executeQuery();
             rs.next();
-            int ordered = rs.getInt(1);
+            ordered = rs.getInt(1);
 
             // check if we have enough copies of the book that are not ordered
             if (copyAvailableToBorrow - ordered < 1)
@@ -1840,20 +1839,314 @@ public class dbController
         catch (SQLException e)
         {
             System.out.println("Error! check borrowed book availability failed - cant check if the book is ordered");
+            return null;
         }
 
         if (inLibrary)
         {
             // find the location of the book in the library
-            // ToDo: find the available book location in the library
+            try
+            {
+                stmt = connection.prepareStatement("SELECT location_on_shelf FROM copy_of_the_book WHERE book_id = ? AND is_available = true;");
+                stmt.setString(1, bookId);
+                stmt.executeQuery();
+
+                ResultSet rs = stmt.executeQuery();
+                rs.next();
+                returnValue.add(rs.getString(1));
+            }
+            catch (SQLException e)
+            {
+                System.out.println("Error! get book location failed - cant get the book location");
+
+            }
         }
         else
         {
             // check the first available date the book available
-            // ToDo: how to handle that all the books is ordered? or some of them
+
+            // check how much copies of the book exists
+            try
+            {
+                stmt = connection.prepareStatement("SELECT COUNT(*) from copy_of_the_book WHERE book_id = ?;");
+                stmt.setString(1, bookId);
+
+                ResultSet rs = stmt.executeQuery();
+                rs.next();
+                int copies = rs.getInt(1);
+                returnValue.add(String.valueOf(copies));
+
+                if (copies == ordered)
+                {
+                    // we need to check the closest return date and add 2 weeks
+                    stmt = connection.prepareStatement("SELECT MIN(borrow_due_date) from borrow_book WHERE copy_id IN (SELECT copy_id from copy_of_the_book WHERE book_id = ?);");
+                    stmt.setString(1, bookId);
+                    stmt.executeQuery();
+
+                    rs = stmt.executeQuery();
+                    rs.next();
+                    Date expectedReturnDate = rs.getDate(1);
+
+                    returnValue.add(expectedReturnDate.toLocalDate().plusWeeks(2).toString());
+                }
+                else
+                {
+                    // get all the active borrow due date ordered by the due date
+                    stmt = connection.prepareStatement("SELECT borrow_due_date from borrow_book WHERE copy_id IN (SELECT copy_id from copy_of_the_book WHERE book_id = ?) ORDER BY borrow_due_date;");
+                    stmt.setString(1, bookId);
+                    stmt.executeQuery();
+
+                    rs = stmt.executeQuery();
+                    int i = 0;
+                    while (i < ordered)
+                    {
+                        rs.next();
+                        i++;
+                    }
+
+                    Date expectedReturnDate = rs.getDate(1);
+                    returnValue.add(expectedReturnDate.toLocalDate().toString());
+
+                }
+            }
+            catch (SQLException e)
+            {
+                System.out.println("Error! get book location failed - cant get the book location");
+            }
+
+
         }
 
         return returnValue;
+    }
+
+    public int fetchActiveSubscribersCount() {
+        String query = "SELECT COUNT(*) FROM subscriber WHERE is_active = 1";
+        try (PreparedStatement stmt = connection.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public int fetchFrozenSubscribersCount() {
+        String query = "SELECT COUNT(*) FROM subscriber WHERE is_active = 0";
+        try (PreparedStatement stmt = connection.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    /**
+     * Fetches the monthly subscriber status report for the current month.
+     *
+     * @return List<String[]> where each row contains frozen_count, active_count, and day.
+     */
+    public List<String[]> fetchMonthlySubscribersStatusReport() {
+        String query = "SELECT report_file " +
+                "FROM monthly_reports " +
+                "WHERE report_type = 'SubscribersStatus' " +
+                "AND MONTH(report_date) = MONTH(CURRENT_DATE) " +
+                "AND YEAR(report_date) = YEAR(CURRENT_DATE)";
+        try (PreparedStatement stmt = connection.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            if (rs.next()) {
+                byte[] blobData = rs.getBytes("report_file");
+                return BlobUtil.convertBlobToList(blobData); // Convert Blob to List<String[]>
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null; // Return null if no data found or error occurred
+    }
+    /**
+     * Updates the monthly subscribers' status report in the database with the given Blob data.
+     *
+     * @param updatedBlob The Blob data representing the updated report.
+     */
+    public void updateMonthlySubscribersStatusReport(byte[] updatedBlob) {
+        String updateQuery = "UPDATE monthly_reports " +
+                "SET report_file = ? " +
+                "WHERE report_type = 'SubscribersStatus' " +
+                "AND MONTH(report_date) = MONTH(CURRENT_DATE) " +
+                "AND YEAR(report_date) = YEAR(CURRENT_DATE)";
+
+        try (PreparedStatement stmt = connection.prepareStatement(updateQuery)) {
+            stmt.setBytes(1, updatedBlob);
+            int rowsAffected = stmt.executeUpdate();
+            System.out.println("Report updated successfully. Rows affected: " + rowsAffected);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    public Map<String, String> fetchTotalBorrowTime() {
+        String query = "SELECT b.book_title, " +
+                "SUM(DATEDIFF(bb.borrow_return_date, DATE_FORMAT(CURRENT_DATE, '%Y-%m-01'))) AS total_borrow_time " +
+                "FROM borrow_book bb " +
+                "JOIN copy_of_the_book cob ON bb.copy_id = cob.copy_id " +
+                "JOIN book b ON cob.book_id = b.book_id " +
+                "WHERE bb.borrow_return_date >= DATE_FORMAT(CURRENT_DATE, '%Y-%m-01') " +
+                "AND MONTH(bb.borrow_return_date) = MONTH(CURRENT_DATE) " +
+                "AND YEAR(bb.borrow_return_date) = YEAR(CURRENT_DATE) " +
+                "GROUP BY b.book_title";
+        Map<String, String> totalBorrowTimeMap = new HashMap<>();
+
+        try (PreparedStatement stmt = connection.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                String bookTitle = rs.getString("book_title");
+                String totalBorrowTime = rs.getString("total_borrow_time");
+                totalBorrowTimeMap.put(bookTitle, totalBorrowTime);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return totalBorrowTimeMap;
+    }
+
+
+    public Map<String, String> fetchLateBorrowTime() {
+        String query = "SELECT b.book_title, " +
+                "SUM(DATEDIFF(bb.borrow_return_date, bb.borrow_due_date)) AS late_borrow_time " +
+                "FROM borrow_book bb " +
+                "JOIN copy_of_the_book cob ON bb.copy_id = cob.copy_id " +
+                "JOIN book b ON cob.book_id = b.book_id " +
+                "WHERE bb.borrow_return_date > bb.borrow_due_date " +
+                "AND MONTH(bb.borrow_due_date) = MONTH(CURRENT_DATE) " +
+                "AND YEAR(bb.borrow_due_date) = YEAR(CURRENT_DATE) " +
+                "GROUP BY b.book_title";
+        Map<String, String> lateBorrowTimeMap = new HashMap<>();
+
+        try (PreparedStatement stmt = connection.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                String bookTitle = rs.getString("book_title");
+                String lateBorrowTime = rs.getString("late_borrow_time");
+                lateBorrowTimeMap.put(bookTitle, lateBorrowTime);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return lateBorrowTimeMap;
+    }
+
+    /**
+     * Saves a monthly report to the monthly_reports table in the database.
+     *
+     * @param reportType The type of the report (e.g., BorrowingReport).
+     * @param reportBlob The Blob data representing the report.
+     */
+    public void saveMonthlyReport(String reportType, byte[] reportBlob) {
+        String query = "INSERT INTO monthly_reports (report_type, report_file, report_date) " +
+                "VALUES (?, ?, DATE_FORMAT(CURRENT_DATE, '%Y-%m-01'), NOW()) " +
+                "ON DUPLICATE KEY UPDATE report_file = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, reportType);
+            stmt.setBytes(2, reportBlob);
+            stmt.setBytes(3, reportBlob); // For the ON DUPLICATE KEY UPDATE clause
+            int rowsAffected = stmt.executeUpdate();
+            System.out.println("Report saved to database. Rows affected: " + rowsAffected);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to save the monthly report");
+        }
+    }
+    /**
+     * Inserts an empty report into the monthly_reports table for the next month.
+     * Each new report gets a unique report_id automatically.
+     *
+     * @param reportType The type of the report .
+     * @param nextMonth The first day of the next month.
+     */
+    public void insertEmptyMonthlyReport(String reportType, String nextMonth) {
+        String query = "INSERT INTO monthly_reports (report_type, report_date, report_file) " +
+                "VALUES (?, ?, '')";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, reportType);
+            stmt.setString(2, nextMonth);
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Empty report created for the next month. Rows affected: " + rowsAffected);
+            } else {
+                System.out.println("No report was inserted.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to insert empty monthly report.");
+        }
+    }
+
+    /**
+     * Fetches the report ID for a given type, month, and year.
+     *
+     * @param reportType The type of the report (e.g., BorrowingReport).
+     * @param month The month of the report.
+     * @param year The year of the report.
+     * @return The report ID, or -1 if not found.
+     */
+    public int fetchReportId(String reportType, String month, String year) {
+        String query = "SELECT report_id " +
+                "FROM monthly_reports " +
+                "WHERE report_type = ? " +
+                "AND MONTH(report_date) = MONTH(STR_TO_DATE(?, '%M')) " +
+                "AND YEAR(report_date) = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, reportType);
+            stmt.setString(2, month);
+            stmt.setString(3, year);
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("report_id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to fetch report ID");
+        }
+        return -1; // Return -1 if no report is found
+    }
+
+    /**
+     * Fetches the Blob data for a specific report from the database.
+     *
+     * @param reportType The type of the report (e.g., BorrowingReport).
+     * @param month The month of the report.
+     * @param year The year of the report.
+     * @return The Blob data as a byte array, or null if not found.
+     */
+    public byte[] fetchReportBlob(String reportType, String month, String year) {
+        String query = "SELECT report_file " +
+                "FROM monthly_reports " +
+                "WHERE report_type = ? " +
+                "AND MONTH(report_date) = MONTH(STR_TO_DATE(?, '%M')) " +
+                "AND YEAR(report_date) = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, reportType);
+            stmt.setString(2, month);
+            stmt.setString(3, year);
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getBytes("report_file");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to fetch report Blob");
+        }
+        return null; // Return null if no report is found or an error occurs
     }
 
 }
