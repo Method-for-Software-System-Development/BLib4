@@ -23,7 +23,7 @@ public class BooksView_controller {
 		@FXML
 	    private Button btnAddToWaitlist;
 		
-		private BooksController bk;
+		private BooksController bk= new BooksController();  // Initialize the BooksController here
 		
 		//Check Availability Section
 		@FXML
