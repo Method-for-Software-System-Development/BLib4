@@ -6,7 +6,9 @@ package logic;
 import java.io.Console;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.mysql.cj.protocol.Message;
 import gui.ServerMonitorFrameController;
@@ -32,6 +34,8 @@ public class ServerController extends AbstractServer
 
     //Class variables *************************************************
     private dbController dbController;
+    private Map<String, ConnectionToClient> activeSubscribers;
+    private Map<String, ConnectionToClient> activeLibrarians;
     //Constructors ****************************************************
 
     /**
@@ -44,6 +48,9 @@ public class ServerController extends AbstractServer
     {
         super(port);
         this.monitorController = monitorController;
+
+        activeSubscribers = new HashMap<>();
+        activeLibrarians = new HashMap<>();
     }
 
     //Instance methods ************************************************
@@ -75,7 +82,13 @@ public class ServerController extends AbstractServer
 
             case "100":
                 // Client wants to log in (subscriber/librarian)
-                responseMsg = handleLoginRequest(receiveMsg);
+                responseMsg = handleLoginRequest(receiveMsg, client);
+                break;
+
+            case "101":
+                // Client wants to log out
+                handleLogoutRequest((List<String>) receiveMsg.data, client);
+                responseMsg = new MessageType("2011", null);
                 break;
 
             case "104":
@@ -248,9 +261,10 @@ public class ServerController extends AbstractServer
      * This method handles the received "100" message and return response message to send to the client
      *
      * @param receiveMsg - received message from the client
+     * @param client     - the client connection
      * @return response message to send the client
      */
-    private MessageType handleLoginRequest(MessageType receiveMsg)
+    private MessageType handleLoginRequest(MessageType receiveMsg, ConnectionToClient client)
     {
         MessageType responseMsg = null;
         List<String> data = (List<String>) receiveMsg.data;
@@ -259,10 +273,20 @@ public class ServerController extends AbstractServer
         {
             case "subscriber":
                 responseMsg = new MessageType("201", dbController.handleSubscriberLogin(data.get(0), data.get(1)));
+
+                if (responseMsg.data != null)
+                {
+                    activeSubscribers.put(data.get(0), client);
+                }
                 break;
 
             case "librarian":
                 responseMsg = new MessageType("202", dbController.handleLibrarianLogin(data.get(0), data.get(1)));
+
+                if (responseMsg.data != null)
+                {
+                    activeLibrarians.put(data.get(0), client);
+                }
                 break;
 
             default:
@@ -279,7 +303,36 @@ public class ServerController extends AbstractServer
         return responseMsg;
     }
 
-    public MessageType handleBookSearchRequest(MessageType receiveMsg)
+    /**
+     * This method handles the received "101" message and update the active subscribers/librarians list
+     *
+     * @param receiveMsg - received message from the client
+     * @param client     - the client connection
+     */
+    private void handleLogoutRequest(List<String> receiveMsg, ConnectionToClient client)
+    {
+        switch (receiveMsg.get(0))
+        {
+            case "librarian":
+                activeLibrarians.remove(receiveMsg.get(1));
+                break;
+            case "subscriber":
+                activeSubscribers.remove(receiveMsg.get(1));
+                break;
+            default:
+                System.out.println("Error! invalid logout type");
+                break;
+        }
+
+    }
+
+    /**
+     * This method handles the received "105" message and return response message to send to the client
+     *
+     * @param receiveMsg - received message from the client
+     * @return - response message to send the client
+     */
+    private MessageType handleBookSearchRequest(MessageType receiveMsg)
     {
         MessageType responseMsg = null;
         List<String> data = (List<String>) receiveMsg.data;
