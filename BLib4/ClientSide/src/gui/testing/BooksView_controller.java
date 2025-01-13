@@ -23,7 +23,7 @@ public class BooksView_controller {
 		@FXML
 	    private Button btnAddToWaitlist;
 		
-		private BooksController bk= new BooksController();  // Initialize the BooksController here
+		private BooksController bk = BooksController.getInstance(); // Use the Singleton instance
 		
 		//Check Availability Section
 		@FXML
