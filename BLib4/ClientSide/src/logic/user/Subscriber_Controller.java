@@ -1,5 +1,6 @@
 package logic.user;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import entities.logic.MessageType;
 import entities.user.Librarian;
@@ -139,4 +140,40 @@ public class Subscriber_Controller {
         alert.showAndWait();
 		return null;    	
     }
+    /**
+     * This method send a request to server to extend a borrow by subscriber
+     * 
+     * @param subscriberID ID of subscriber.
+     * @param copyID ID of the copy of book.
+     * @param newReturnDate the return date after extend.
+     * @return returns if extension succeed or not.
+     */
+    public boolean extendBorrowBySubscriber(String subscriberID,String copyID,Date newReturnDate) {
+    	//Get the borrow ID from server
+    	String borrowID=null;
+    	ArrayList<ArrayList<String>>listOfBorrows=ChatClient.listOfBorrows;
+        ClientUI.chat.accept(new MessageType("110",subscriberID));
+        //Search for the borrow ID in the list of borrows of subscriber
+        for (int i = 0; i < listOfBorrows.size(); i++) {
+        	if(listOfBorrows.get(i).get(1).equals(copyID)) {
+        		borrowID=listOfBorrows.get(i).get(0);
+        		break;
+        	}
+        }
+        //copy ID not found in list of borrows
+        if(borrowID==null) {
+        	Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to extend the borrow-copy is not borrowed");
+            alert.setHeaderText("Error");
+            alert.showAndWait();
+            return false;
+        }	
+      	// Create a list of data of the borrow extension and send to server
+        ArrayList<String> dataOfExtension = new ArrayList<>();
+        dataOfExtension.add(borrowID);
+        dataOfExtension.add(newReturnDate.toString());
+        ClientUI.chat.accept(new MessageType("111",dataOfExtension));
+        // return server response
+        return ChatClient.serverResponse;
+    }
 }
+
