@@ -16,6 +16,10 @@ public class SceneManager {
      */
     public static void setStage(Stage stage) {
         primaryStage = stage;
+
+        // Set an initial empty scene to avoid resetting the stage on scene switch
+        Scene initialScene = new Scene(new Parent() {});
+        primaryStage.setScene(initialScene);
     }
 
     /**
@@ -28,7 +32,7 @@ public class SceneManager {
     }
 
     /**
-     * Switches the scene of the primary stage.
+     * Switches the scene of the primary stage without altering stage properties.
      *
      * @param fxmlPath The path to the FXML file.
      * @param title    The title for the new scene.
@@ -37,11 +41,10 @@ public class SceneManager {
         try {
             FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource(fxmlPath));
             Parent root = loader.load();
-            Scene scene = new Scene(root);
 
-            primaryStage.setScene(scene);
+            // Update the current scene's root without resetting the stage
+            primaryStage.getScene().setRoot(root);
             primaryStage.setTitle(title);
-            primaryStage.show();
         } catch (Exception e) {
             System.out.println("Error loading scene: " + e.getMessage());
         }
@@ -65,10 +68,9 @@ public class SceneManager {
                 ((DataReceiver) controller).receiveData(data);
             }
 
-            Scene scene = new Scene(root);
-            primaryStage.setScene(scene);
+            // Update the current scene's root without resetting the stage
+            primaryStage.getScene().setRoot(root);
             primaryStage.setTitle(title);
-            primaryStage.show();
         } catch (Exception e) {
             System.out.println("Error loading scene with data: " + e.getMessage());
         }

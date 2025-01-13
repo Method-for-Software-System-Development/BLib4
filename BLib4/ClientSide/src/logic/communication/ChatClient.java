@@ -105,7 +105,7 @@ public class ChatClient extends AbstractClient
                 break;
 
             case "205":
-                //ToDo: implement
+                books = (List<Book>)receiveMsg.data;
                 break;
 
             case "206":
