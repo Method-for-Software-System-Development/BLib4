@@ -53,7 +53,7 @@ public class BooksView_controller {
 	        }
 	        
 	        // Call the addToWaitlist method
-	        bk.addToWaitlist(bookID, subscriberID, LocalDateTime.now());
+	        bk.addToWaitlist(bookID, subscriberID);
 	    }
 	   
 }
