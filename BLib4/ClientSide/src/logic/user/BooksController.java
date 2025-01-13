@@ -17,7 +17,7 @@ public class BooksController {
 	/*
 	 * Private constructor for BooksControllers
 	 */
-	private BooksController() {
+	public BooksController() {
 	}
 	/*
 	 * Singleton pattern implementation for BooksController
