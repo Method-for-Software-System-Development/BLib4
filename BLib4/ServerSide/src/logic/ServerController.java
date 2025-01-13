@@ -402,6 +402,8 @@ public class ServerController extends AbstractServer
                 {
                     activeSubscribers.put(data.get(0), client);
                 }
+
+                handleSendingMissedSmsOnSubscriberLogIn(data.get(0));
                 break;
 
             case "librarian":
@@ -411,6 +413,8 @@ public class ServerController extends AbstractServer
                 {
                     activeLibrarians.put(data.get(0), client);
                 }
+
+                //Send notification to the librarian
                 break;
 
             default:
@@ -482,6 +486,25 @@ public class ServerController extends AbstractServer
 
         return responseMsg;
     }
-}
 
-//End of EchoServer class
+    /**
+     * This method handles the sending of missed sms to the subscriber when he logs in
+     * @param subscriberId - the subscriber id to send the sms to
+     */
+    private void handleSendingMissedSmsOnSubscriberLogIn(String subscriberId)
+    {
+        List<String> missedSms = null;//ToDO: implement = dbController.handleGetSubscriberMissedSms(subscriberId);
+        if (missedSms != null)
+        {
+            ConnectionToClient client = activeSubscribers.get(subscriberId);
+            if (client != null)
+            {
+                for (String sms : missedSms)
+                {
+                    MessageType responseMsg = new MessageType("222", missedSms);
+                    sendMessageToClient(client, responseMsg);
+                }
+            }
+        }
+    }
+}
