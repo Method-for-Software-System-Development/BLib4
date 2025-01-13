@@ -12,32 +12,17 @@ import logic.communication.ClientUI;
 
 
 public class BooksController {
-	//Check Availability Section
-	@FXML
-    private TextField txtCopyID;
-	@FXML
-    private Button btnAvailable;
-	
-	//Add to Waitlist Section
-	@FXML
-	private TextField txtBookID;
-	@FXML
-	private TextField txtSubscriberID;
-	@FXML
-    private Button btnAddToWaitlist;
-	
-	
 	private static BooksController instance = null;
-	
+
 	/*
-	 * Private constructor for BooksController
+	 * Private constructor for BooksControllers
 	 */
 	private BooksController() {
 	}
-	
 	/*
 	 * Singleton pattern implementation for BooksController
 	 */
+
 	public static BooksController getInstance() {
 		if(instance == null) {
 			instance = new BooksController();
@@ -45,7 +30,6 @@ public class BooksController {
 		}
 		return instance;
 	}
-	
 	
 	 /**
      * Checks the availability of a book copy by its ID.
@@ -77,19 +61,6 @@ public class BooksController {
 	        return false;
 	    }
 	}
-	//Check Availability Section
-	@FXML
-	private void handleCheckAvailability() {
-	    String copyID = txtCopyID.getText();
-	    if (copyID.isEmpty()) {
-	        Alert alert = new Alert(Alert.AlertType.WARNING, "Please enter a copy ID.");
-	        alert.setHeaderText("Warning");
-	        alert.showAndWait();
-	        return;
-	    }
-
-	    checkAvailability(copyID);
-	}
 	
 	
 
@@ -101,7 +72,7 @@ public class BooksController {
      * @param subscriberID The ID of the subscriber requesting the book.
      * @param orderDateTime The date and time the order was placed.
      */
-    public void addToWaitlist(String bookID, String subscriberID, LocalDateTime orderDateTime) {
+    public void addToWaitlist(String bookID, String subscriberID) {
        try {
     	// Create a list to be sent in the message to the server
         ArrayList<String> detailsOfOrder = new ArrayList<>();
@@ -124,23 +95,6 @@ public class BooksController {
     } catch (Exception e) {
         e.printStackTrace();
         }
-    }
-    
-	//Add to Waitlist Section
-    @FXML
-    private void handleAddToWaitlist() {
-        String bookID = txtBookID.getText();
-        String subscriberID = txtSubscriberID.getText();
-        
-        if (bookID.isEmpty() || subscriberID.isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Please fill in both Book ID and Subscriber ID");
-            alert.setHeaderText("Input Error");
-            alert.showAndWait();
-            return;
-        }
-        
-        // Call the addToWaitlist method
-        addToWaitlist(bookID, subscriberID, LocalDateTime.now());
     }
     
     
