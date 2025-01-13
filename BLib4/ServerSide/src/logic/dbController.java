@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import entities.book.Book;
+import entities.logic.Borrow;
 import entities.user.Librarian;
 import entities.user.Subscriber;
 
@@ -1538,6 +1539,230 @@ public class dbController
         }
 
         return true;
+    }
+
+    /**
+     * The method run SQL query to get the history of a subscriber by his id
+     * @param subscriberId - the id of the subscriber
+     * @return - the history of the subscriber in byte array
+     */
+    public List<String[]> getHistoryFileBySubscriberId(String subscriberId)
+    {
+        List<String[]> historyList = null;
+        PreparedStatement stmt = null;
+
+        String historyId = getHistoryIdBySubscriberId(subscriberId);
+        historyList = HandleGetHistoryFileById(historyId);
+
+        return historyList;
+    }
+
+    /**
+     * The method run SQL query to update the history of a subscriber by his id
+     * @param subscriberId - the id of the subscriber
+     * @param list - the new history file
+     *
+     * @throws IOException
+     */
+    public void handleUpdateHistoryFileBySubscriberId(String subscriberId, List<String[]> list)
+    {
+        PreparedStatement stmt = null;
+
+        try
+        {
+            byte[] blob = BlobUtil.convertListToBlob(list);
+
+            String query = "UPDATE subsribers_history SET history_file = ? WHERE id = ?";
+            stmt = connection.prepareStatement(query);
+            stmt.setBytes(1, blob);
+            stmt.setString(2, getHistoryIdBySubscriberId(subscriberId));
+            stmt.executeUpdate();
+        }
+        catch (IOException e)
+        {
+            System.out.println("Error! update history file by subscriber id failed - cant convert list to blob");
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! update history file by subscriber id failed");
+        }
+    }
+
+    private String getHistoryIdBySubscriberId(String subscriberId)
+    {
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        String historyId = null;
+        try
+        {
+            String query = "SELECT detailed_subscription_history FROM subscriber WHERE subscriber_id = ?";
+            stmt = connection.prepareStatement(query);
+            stmt.setString(1, subscriberId);
+            rs = stmt.executeQuery();
+            if (rs.next())
+            {
+                historyId = rs.getString("detailed_subscription_history");
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! get history id by subscriber id failed");
+        }
+        return historyId;
+    }
+
+    /**
+     * The method run SQL query to get the book by book id
+     * @param bookId - the id of the book to get
+     * @return - Book object with the book details
+     */
+    public Book getBookByBookId(String bookId)
+    {
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        Book book = null;
+
+        try
+        {
+            String query = "SELECT * FROM book WHERE book_id = ?";
+            stmt = connection.prepareStatement(query);
+            stmt.setString(1, bookId);
+            rs = stmt.executeQuery();
+            if (rs.next())
+            {
+                book = new Book(rs.getInt("book_id"), rs.getString("book_title"), rs.getString("book_author"),
+                        rs.getInt("edition_number"), rs.getDate("print_date"), rs.getString("book_subject"),
+                        rs.getString("description"));
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! get book by book id failed");
+        }
+
+        return book;
+    }
+
+    /**
+     * The method run SQL query to get the book by copy id
+     * @param copyId - the id of the copy to get the book
+     * @return - Book object with the book details
+     */
+    public Book getBookByCopyId(String copyId)
+    {
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        Book book = null;
+
+        try
+        {
+            String query = "SELECT book_id FROM copy_of_the_book WHERE copy_id = ?";
+            stmt = connection.prepareStatement(query);
+            stmt.setString(1, copyId);
+            rs = stmt.executeQuery();
+            if (rs.next())
+            {
+                book = getBookByBookId(rs.getString("book_id"));
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! get book by copy id failed");
+        }
+
+        return book;
+    }
+
+    /**
+     * The method run SQL query to get the subscriber id by the borrow id
+     * @param borrowId - the id of the borrow
+     * @return - the subscriber id
+     */
+    public String getSubscriberIdFromBorrowId(String borrowId)
+    {
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        String subscriberId = null;
+
+        try
+        {
+            String query = "SELECT subscriber_id FROM borrow_book WHERE borrow_id = ?";
+            stmt = connection.prepareStatement(query);
+            stmt.setString(1, borrowId);
+            rs = stmt.executeQuery();
+            if (rs.next())
+            {
+                subscriberId = rs.getString("subscriber_id");
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! get subscriber id from borrow id failed");
+        }
+
+        return subscriberId;
+    }
+
+    /**
+     * The method run SQL query to get the borrow due date by the borrow id
+     * @param borrowId - the id of the borrow
+     * @return - the due date of the borrow
+     */
+    public Date getBorrowDueDateByBorrowId(String borrowId)
+    {
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        Date dueDate = null;
+
+        try
+        {
+            String query = "SELECT borrow_due_date FROM borrow_book WHERE borrow_id = ?";
+            stmt = connection.prepareStatement(query);
+            stmt.setString(1, borrowId);
+            rs = stmt.executeQuery();
+            if (rs.next())
+            {
+                dueDate = rs.getDate("borrow_due_date");
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! get borrow due date by borrow id failed");
+        }
+
+        return dueDate;
+    }
+
+    /**
+     * The method run SQL query to get the subscriber by subscriber id
+     * @param subscriberId - the id of the subscriber
+     * @return - Subscriber object with the subscriber details
+     */
+    public Subscriber getSubscriberBySubscriberId(String subscriberId)
+    {
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        Subscriber subscriber = null;
+
+        try
+        {
+            String query = "SELECT * FROM subscriber WHERE subscriber_id = ?";
+            stmt = connection.prepareStatement(query);
+            stmt.setString(1, subscriberId);
+            rs = stmt.executeQuery();
+            if (rs.next())
+            {
+                subscriber = new Subscriber(rs.getString("subscriber_id"), rs.getString("subscriber_first_name"),
+                        rs.getString("subscriber_last_name"), rs.getString("subscriber_phone_number"),
+                        rs.getString("subscriber_email"), rs.getBoolean("is_active"));
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! get subscriber by subscriber id failed");
+        }
+
+        return subscriber;
     }
 }
 
