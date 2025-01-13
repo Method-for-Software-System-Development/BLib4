@@ -6,19 +6,27 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.stage.Stage;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 
 import static javafx.application.Application.launch;
 
 public class LibraryReports_UI {
+	
+		@FXML
+		private BarChart<String, Number> borrowingReportChart;
 
+		@FXML
+	    private BarChart<String, Number> subscriberStatusReportChart;
 
-
-
-
-
-
+		@FXML
+	    private void initialize() {
+			// Initialize both charts with data
+			borrowingReportChart.getData().setAll(generateBorrowingReportChart().getData());
+		    subscriberStatusReportChart.getData().setAll(generateSubscriberStatusReportChart().getData());
+	    }
+	    
         /**
          * Generates a sample BarChart for borrowing reports.
          *
@@ -43,7 +51,7 @@ public class LibraryReports_UI {
             XYChart.Series<String, Number> lateReturnTimeSeries = new XYChart.Series<>();
             lateReturnTimeSeries.setName("Late Return Time");
 
-            // Example data
+            // load data
             totalBorrowTimeSeries.getData().add(new XYChart.Data<>("Book A", 120));
             totalBorrowTimeSeries.getData().add(new XYChart.Data<>("Book B", 90));
 

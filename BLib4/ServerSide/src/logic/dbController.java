@@ -2155,16 +2155,16 @@ public class dbController
      * Inserts an empty report into the monthly_reports table for the next month.
      * Each new report gets a unique report_id automatically.
      *
-     * @param reportType The type of the report .
-     * @param nextMonth The first day of the next month.
+     * @param data- [0] the report type
+     *              [1] the next month
      */
-    public void insertEmptyMonthlyReport(String reportType, String nextMonth) {
+    public void insertEmptyMonthlyReport(List<String> data) {
         String query = "INSERT INTO monthly_reports (report_type, report_date, report_file) " +
                 "VALUES (?, ?, '')";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, reportType);
-            stmt.setString(2, nextMonth);
+            stmt.setString(1, data.get(0));
+            stmt.setString(2, data.get(1));
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected > 0) {
                 System.out.println("Empty report created for the next month. Rows affected: " + rowsAffected);
@@ -2180,21 +2180,21 @@ public class dbController
     /**
      * Fetches the report ID for a given type, month, and year.
      *
-     * @param reportType The type of the report (e.g., BorrowingReport).
-     * @param month The month of the report.
-     * @param year The year of the report.
+     * @param data- [0] the report type
+     *              [1] the month
+     *              [2] the year
      * @return The report ID, or -1 if not found.
      */
-    public int fetchReportId(String reportType, String month, String year) {
+    public int fetchReportId(List<String> data) {
         String query = "SELECT report_id " +
                 "FROM monthly_reports " +
                 "WHERE report_type = ? " +
                 "AND MONTH(report_date) = MONTH(STR_TO_DATE(?, '%M')) " +
                 "AND YEAR(report_date) = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, reportType);
-            stmt.setString(2, month);
-            stmt.setString(3, year);
+            stmt.setString(1, data.get(0));
+            stmt.setString(2, data.get(1));
+            stmt.setString(3, data.get(2));
 
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -2210,21 +2210,21 @@ public class dbController
     /**
      * Fetches the Blob data for a specific report from the database.
      *
-     * @param reportType The type of the report (e.g., BorrowingReport).
-     * @param month The month of the report.
-     * @param year The year of the report.
+     * @param data - [0] the report type
+     *               [1] the month
+     *               [2] the year
      * @return The Blob data as a byte array, or null if not found.
      */
-    public byte[] fetchReportBlob(String reportType, String month, String year) {
+    public byte[] fetchReportBlob(List<String> data) {
         String query = "SELECT report_file " +
                 "FROM monthly_reports " +
                 "WHERE report_type = ? " +
                 "AND MONTH(report_date) = MONTH(STR_TO_DATE(?, '%M')) " +
                 "AND YEAR(report_date) = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, reportType);
-            stmt.setString(2, month);
-            stmt.setString(3, year);
+        	stmt.setString(1, data.get(0));
+            stmt.setString(2, data.get(1));
+            stmt.setString(3, data.get(2));
 
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -2236,6 +2236,6 @@ public class dbController
         }
         return null; // Return null if no report is found or an error occurs
     }
-
+   
 }
 

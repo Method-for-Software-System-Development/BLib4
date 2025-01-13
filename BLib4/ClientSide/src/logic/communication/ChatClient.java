@@ -44,6 +44,8 @@ public class ChatClient extends AbstractClient
     public static Librarian librarian;
     public static ArrayList<Boolean> array;
     public static ArrayList<ArrayList<String>> listOfBorrows;
+    public static int reportID;
+    public static byte[] blobData;
 
     //Constructors ****************************************************
 
@@ -175,6 +177,12 @@ public class ChatClient extends AbstractClient
             case "222":
                 //ToDo: implement
                 break;
+            case "225":
+            	//response for report id request
+            	reportID=(int) receiveMsg.data;
+            case "226":
+            	//response for blob data of report request
+            	blobData=(byte[]) receiveMsg.data;
             //!/ remove this /////////////////////////////////
             case "0200":
                 // list of all the subscribers in db, in format List<Subscriber>
