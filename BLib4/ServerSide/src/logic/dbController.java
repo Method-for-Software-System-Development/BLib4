@@ -1764,5 +1764,41 @@ public class dbController
 
         return subscriber;
     }
+
+    /**
+     * The method run SQL query to get the book object by the borrow id
+     * @param borrowId - the id of the borrow
+     * @return - Book object with the book details
+     */
+    public Book getBookDetailsByBorrowId(String borrowId)
+    {
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        Book book = null;
+
+        try
+        {
+            String query = "SELECT B.book_id, B.book_title, B.book_author, B.edition_number, B.print_date, B.book_subject, B.description\n" +
+                    "FROM book B\n" +
+                    "         JOIN copy_of_the_book C ON B.book_id = C.book_id\n" +
+                    "         JOIN borrow_book BB ON C.copy_id = BB.copy_id\n" +
+                    "WHERE BB.borrow_id = ?;";
+            stmt = connection.prepareStatement(query);
+            stmt.setString(1, borrowId);
+            rs = stmt.executeQuery();
+            if (rs.next())
+            {
+                book = new Book(rs.getInt("book_id"), rs.getString("book_title"), rs.getString("book_author"),
+                        rs.getInt("edition_number"), rs.getDate("print_date"), rs.getString("book_subject"),
+                        rs.getString("description"));
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! get book details by borrow id failed");
+        }
+
+        return book;
+    }
 }
 
