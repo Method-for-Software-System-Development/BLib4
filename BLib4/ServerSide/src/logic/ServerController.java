@@ -311,6 +311,10 @@ public class ServerController extends AbstractServer
                 responseMsg = new MessageType("223", dbController.handleGetBookLocation((String) receiveMsg.data));
                 break;
 
+            case "124":
+                // check if the book is available for order
+                responseMsg = new MessageType("224", dbController.handleCheckIfBookIsAvailableForOrder((String) receiveMsg.data));
+                break;
             default:
                 System.out.println("Invalid message type");
                 return;
