@@ -43,6 +43,7 @@ public class ChatClient extends AbstractClient
     public static Date todayDate;
     public static Librarian librarian;
     public static ArrayList<Boolean> array;
+    public static ArrayList<ArrayList<String>> listOfBorrows;
 
     //Constructors ****************************************************
 
@@ -126,11 +127,13 @@ public class ChatClient extends AbstractClient
                 break;
 
             case "210":
-                //ToDo: implement
-                break;
+            	//list of borrows of subscriber
+            	listOfBorrows=(ArrayList<ArrayList<String>>) receiveMsg.getData(); 
+            	break;
 
             case "211":
-                //ToDo: implement
+                //response from server for borrow extension
+                serverResponse = (boolean) receiveMsg.getData();
                 break;
 
             case "212":

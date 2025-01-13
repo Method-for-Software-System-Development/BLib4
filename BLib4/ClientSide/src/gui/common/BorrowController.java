@@ -8,12 +8,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import logic.communication.*;
-import entities.logic.Borrow;
 import entities.logic.MessageType;
-import java.sql.Date;
 import java.util.ArrayList;
-import java.util.Calendar;
-import gui.user.*;
 import logic.user.*;
 
 public class BorrowController {
@@ -81,20 +77,10 @@ public class BorrowController {
                 ClientUI.chat.accept(new MessageType("107", detailsOfBorrow));
                 
                 // Wait for message response - handled by ChatClient class
-                if(ChatClient.serverResponse) {
-                	// Getting today's date
-                	Date today = new Date(System.currentTimeMillis());
-                	
-                	// Using the calendar to set the return time to be 14 days from today
-                	Calendar calendar = Calendar.getInstance();
-                	calendar.setTime(today);
-                	calendar.add(Calendar.DATE, 14); // Add 14 days to return date
-                	
-                	// Convert Calendar's date to java.sql.Date
-                	Date dueDate = new Date(calendar.getTimeInMillis());
-                	
-                	// Sending to the DocumentationController the borrow of the book
-                	DocumentationController.receiveBorrow(new Borrow(today, dueDate, null, "Active", 0));
+                if(!ChatClient.serverResponse) {
+                	alert =  new Alert(Alert.AlertType.ERROR, "Failed to borrow the book");
+                	alert.setHeaderText("Borrow failed");
+                	alert.showAndWait();
                 }
             }
         }catch(Exception e) {

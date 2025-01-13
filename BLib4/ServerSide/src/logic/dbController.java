@@ -487,7 +487,7 @@ public class dbController
                 // save the book id for the next query
                 bookId = rs.getString("book_id");
 
-                if (rs.getBoolean("is_available"))
+                if (!rs.getBoolean("is_available"))
                 {
                     returnValue = false;
                 }
@@ -1800,5 +1800,61 @@ public class dbController
 
         return book;
     }
+
+    public List<String> handleGetBookLocation(String bookId)
+    {
+        List<String> returnValue = new ArrayList<>();
+        PreparedStatement stmt = null;
+        boolean inLibrary = true;
+
+        // check if there are copy of the book available in the library
+        try
+        {
+            // count the number of copies of the book in the library that available to borrow
+            stmt = connection.prepareStatement("SELECT COUNT(*) from copy_of_the_book WHERE book_id = ? AND is_available = true;");
+            stmt.setString(1, bookId);
+
+            ResultSet rs = stmt.executeQuery();
+            rs.next();
+            int copyAvailableToBorrow = rs.getInt(1);
+
+            // count the number of copies of the book that are ordered
+            stmt = connection.prepareStatement("SELECT COUNT(*) from subscriber_order WHERE book_id = ? AND is_active = true;");
+            stmt.setString(1, bookId);
+
+            rs = stmt.executeQuery();
+            rs.next();
+            int ordered = rs.getInt(1);
+
+            // check if we have enough copies of the book that are not ordered
+            if (copyAvailableToBorrow - ordered < 1)
+            {
+                returnValue.add("Date");
+                inLibrary = false;
+            }
+            else
+            {
+                returnValue.add("Library");
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! check borrowed book availability failed - cant check if the book is ordered");
+        }
+
+        if (inLibrary)
+        {
+            // find the location of the book in the library
+            // ToDo: find the available book location in the library
+        }
+        else
+        {
+            // check the first available date the book available
+            // ToDo: how to handle that all the books is ordered? or some of them
+        }
+
+        return returnValue;
+    }
+
 }
 
