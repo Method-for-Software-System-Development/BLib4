@@ -109,7 +109,7 @@ public class ChatClient extends AbstractClient
                 break;
 
             case "206":
-                //ToDo: implement
+            	serverResponse = ((List<String>) receiveMsg.getData()).get(0).equals("true");
                 break;
 
             case "207":
@@ -118,8 +118,8 @@ public class ChatClient extends AbstractClient
                 break;
 
             case "208":
-                //ToDo: implement
-                break;
+            	serverResponse = ((List<String>) receiveMsg.getData()).get(0).equals("true");
+            	break;
 
             case "209":
                 //ToDo: implement
