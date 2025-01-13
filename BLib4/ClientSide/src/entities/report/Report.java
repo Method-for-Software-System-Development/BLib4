@@ -88,6 +88,5 @@ public abstract class Report {
 		return isIssued;
 	}
 	
-	//Abstract class in order to generate the report needed for each report 
-	public abstract void generateContent();
+
 }
