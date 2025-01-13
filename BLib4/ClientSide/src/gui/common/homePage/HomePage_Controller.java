@@ -5,7 +5,6 @@ import entities.logic.MessageType;
 import entities.user.Librarian;
 import entities.user.Subscriber;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -20,43 +19,123 @@ import logic.user.Subscriber_Controller;
 
 import java.util.List;
 
+/**
+ * Controller class for the Home Page (HomePage_UI.fxml).
+ * This class is responsible for handling user interactions on the home page,
+ * including login functionality, scanning a reader card, and displaying books in HBoxes.
+ */
 public class HomePage_Controller {
 
+    /**
+     * A RadioButton used to indicate a Subscriber account type.
+     */
     @FXML
     private RadioButton subscriberRadioButton;
+
+    /**
+     * A RadioButton used to indicate a Librarian account type.
+     */
     @FXML
     private RadioButton librarianRadioButton;
+
+    /**
+     * The ToggleGroup that holds the account type radio buttons (Subscriber or Librarian).
+     */
     @FXML
     private ToggleGroup accountTypeGroup;
+
+    /**
+     * A TextField for entering the user ID.
+     */
     @FXML
     private TextField idTextField;
+
+    /**
+     * A TextField for entering the user password.
+     */
     @FXML
     private TextField passwordTextField;
+
+    /**
+     * A Button that triggers scanning of a reader card.
+     */
     @FXML
     private Button scanReaderCardButton;
+
+    /**
+     * The ImageView associated with the scanReaderCardButton.
+     */
     @FXML
     private ImageView scanReaderCardImageView;
+
+    /**
+     * The Button used to submit the login form.
+     */
     @FXML
     private Button loginButton;
+
+    /**
+     * The ImageView associated with the loginButton.
+     */
     @FXML
     private ImageView loginImageView;
+
+    /**
+     * A Button that directs the user to the search screen.
+     */
     @FXML
     private Button searchBooksButton;
+
+    /**
+     * The ImageView associated with the searchBooksButton.
+     */
     @FXML
     private ImageView searchBooksImageView;
+
+    /**
+     * A Button used to exit the application.
+     */
     @FXML
     private Button exitButton;
+
+    /**
+     * The ImageView associated with the exitButton.
+     */
     @FXML
     private ImageView exitImageView;
+
+    /**
+     * An HBox that displays newly arrived books.
+     */
     @FXML
     private HBox newArrivalsHBox;
+
+    /**
+     * An HBox that displays the most borrowed books.
+     */
     @FXML
     private HBox mostBorrowedHBox;
 
+    /**
+     * The singleton controller for handling subscriber-related logic.
+     */
     private Subscriber_Controller subscriberController;
+
+    /**
+     * A list of Book entities representing new arrivals.
+     */
     private List<Book> newArrivalBooks;
+
+    /**
+     * A list of Book entities representing the most borrowed books.
+     */
     private List<Book> mostBorrowedBooks;
 
+    /**
+     * Initializes the HomePage_Controller.
+     * Sets up event handlers for hover effects on buttons, retrieves books data,
+     * and populates the corresponding UI elements.
+     */
     @FXML
     public void initialize() {
         // Get the singleton instance of Subscriber_Controller
@@ -108,6 +187,12 @@ public class HomePage_Controller {
         populateBooksHBox(mostBorrowedHBox, mostBorrowedBooks);
     }
 
+    /**
+     * Populates the specified HBox with a list of books, each represented by a GridPane.
+     *
+     * @param targetHBox the HBox in which to place book displays
+     * @param books      the list of books to be displayed
+     */
     public void populateBooksHBox(HBox targetHBox, List<Book> books) {
         targetHBox.getChildren().clear(); // Clear previous content
 
@@ -193,6 +278,10 @@ public class HomePage_Controller {
         }
     }
 
+    /**
+     * Prompts the user to enter a reader card ID in a custom Alert dialog,
+     * then automatically populates the login form fields if valid input is provided.
+     */
     @FXML
     private void validate_scanReaderCard_login() {
         // Create a custom Alert
@@ -231,12 +320,18 @@ public class HomePage_Controller {
                     errorAlert.setTitle("Error");
                     errorAlert.setHeaderText("Invalid ID");
                     errorAlert.setContentText("Please enter a valid Reader Card ID.");
+                    alert.initOwner(SceneManager.getStage());
                     errorAlert.showAndWait();
                 }
             }
         });
     }
 
+    /**
+     * Validates the login form fields for user ID, password, and account type selection.
+     * Attempts to log in as either a Subscriber or a Librarian based on the selected radio button.
+     * If the login is successful, navigates to the corresponding UI screen; otherwise, shows an error alert.
+     */
     @FXML
     public void validate_login_form() {
         // Reset styles before validation
@@ -292,24 +387,40 @@ public class HomePage_Controller {
         }
     }
 
+    /**
+     * Clears the ID and Password text fields.
+     */
     private void clearFields() {
         idTextField.clear();
         passwordTextField.clear();
     }
 
+    /**
+     * Displays an error alert with the specified title and message.
+     *
+     * @param title   the title of the error alert
+     * @param message the message displayed in the error alert
+     */
     private void showErrorAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
+        alert.initOwner(SceneManager.getStage());
         alert.showAndWait();
     }
 
+    /**
+     * Navigates to the Search screen.
+     */
     @FXML
     private void goToSearch() {
         SceneManager.switchScene("/gui/common/search/Search_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Exits the application by quitting the client connection.
+     */
     @FXML
     private void exitApp() {
         ClientUI.chat.getClient().quit();

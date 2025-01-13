@@ -1799,6 +1799,11 @@ public class dbController
         return book;
     }
 
+    /**
+     * The method run SQL query to get the book location by the book id
+     * @param bookId - the id of the book
+     * @return - The location in the library / the date the book will be available
+     */
     public List<String> handleGetBookLocation(String bookId)
     {
         List<String> returnValue = new ArrayList<>();
@@ -1919,6 +1924,89 @@ public class dbController
 
         return returnValue;
     }
+
+    /**
+     * The method run SQL query to check if the book is available for order
+     * @param bookId - the id of the book
+     * @return - true if the book is available for order, false otherwise
+     */
+    public boolean handleCheckIfBookIsAvailableForOrder(String bookId)
+    {
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        boolean returnValue = false;
+        int ordered = 0;
+
+        // check if we can add order (max the number of copies of the book)
+        try
+        {
+            // count the number of copies of the book in the library
+            stmt = connection.prepareStatement("SELECT COUNT(*) from copy_of_the_book WHERE book_id = ?;");
+            stmt.setString(1, bookId);
+            rs = stmt.executeQuery();
+
+            if (rs.next())
+            {
+                int copies = rs.getInt(1);
+
+                stmt = connection.prepareStatement("SELECT COUNT(*) from subscriber_order WHERE book_id = ? AND is_active = true;");
+                stmt.setString(1, bookId);
+                rs = stmt.executeQuery();
+
+                if (rs.next())
+                {
+                    ordered = rs.getInt(1);
+                    if (copies - ordered > 0)
+                    {
+                        // there is a copy available to borrow, we cant order the book
+                        returnValue = false;
+                    }
+                    else
+                    {
+                        // there is no copy available to borrow, we can order the book
+                        returnValue = true;
+                    }
+                }
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! check borrowed book availability failed - cant check if the book is ordered");
+            return false;
+        }
+
+
+        if (returnValue)
+        {
+            try
+            {
+                // check if there is a copy that is available to borrow -> we cant make an order
+                stmt = connection.prepareStatement("SELECT COUNT(*) from copy_of_the_book WHERE book_id = ? AND is_available = true;");
+                stmt.setString(1, bookId);
+                rs = stmt.executeQuery();
+
+                if (rs.next())
+                {
+                    int copies = rs.getInt(1);
+
+                    if (copies - ordered > 0)
+                    {
+                        returnValue = false;
+                    }
+                }
+
+            }
+            catch (SQLException e)
+            {
+                System.out.println("Error! check borrowed book availability failed - cant check if the book is ordered");
+                return false;
+            }
+
+        }
+
+        return returnValue;
+    }
+
 
     public int fetchActiveSubscribersCount() {
         String query = "SELECT COUNT(*) FROM subscriber WHERE is_active = 1";
