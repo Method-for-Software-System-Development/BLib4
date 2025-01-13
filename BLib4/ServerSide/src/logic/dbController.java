@@ -487,7 +487,7 @@ public class dbController
                 // save the book id for the next query
                 bookId = rs.getString("book_id");
 
-                if (rs.getBoolean("is_available"))
+                if (!rs.getBoolean("is_available"))
                 {
                     returnValue = false;
                 }
