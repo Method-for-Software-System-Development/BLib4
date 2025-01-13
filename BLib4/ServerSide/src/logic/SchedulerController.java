@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 public class SchedulerController {
 
     private ScheduledExecutorService scheduler;
-    private dbController dbController; // Assumes existence of a DBController class to manage database connections.
+    private dbController dbController; // Controller for database interactions
 
     /**
      * Constructor for SchedulerController.
@@ -29,6 +29,7 @@ public class SchedulerController {
     public SchedulerController() {
         this.scheduler = Executors.newScheduledThreadPool(1);
         this.dbController = logic.dbController.getInstance();
+
     }
 
     /**
@@ -41,6 +42,7 @@ public class SchedulerController {
         scheduler.scheduleAtFixedRate(this::notifyDayBeforeReturnDate, 0, 1, TimeUnit.DAYS);
         scheduler.scheduleAtFixedRate(this::notifyDeleteUnfulfilledOrder, 0, 1, TimeUnit.DAYS);
         scheduler.scheduleAtFixedRate(this::triggerOneMonthFromFreezeDate, 0, 1, TimeUnit.DAYS);
+
 
     }
 
