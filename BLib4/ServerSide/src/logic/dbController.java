@@ -1231,7 +1231,7 @@ public class dbController
             String selectBookQuery = "SELECT DISTINCT so.book_id\n" +
                     "FROM subscriber_order so\n" +
                     "         JOIN subscriber s ON so.subscriber_id = s.subscriber_id\n" +
-                    "         JOIN scheduler_triggers t ON t.relevent_id = s.subscriber_id\n" +
+                    "         JOIN scheduler_triggers t ON t.relevant_id = s.subscriber_id\n" +
                     "WHERE t.trigger_date = CURRENT_DATE\n" +
                     "  AND t.trigger_operation = 'order'\n" +
                     "  AND so.is_active = 1;";
@@ -1253,7 +1253,7 @@ public class dbController
                     "            WHERE subscriber_id IN\n" +
                     "                (SELECT s.subscriber_id\n" +
                     "               FROM scheduler_triggers t\n" +
-                    "               JOIN subscriber s ON t.relevent_id = s.subscriber_id\n" +
+                    "               JOIN subscriber s ON t.relevant_id = s.subscriber_id\n" +
                     "               WHERE t.trigger_date = CURRENT_DATE\n" +
                     "                  AND t.trigger_operation = 'order'\n" +
                     "                 AND s.is_active = 1);";
@@ -1336,9 +1336,9 @@ public class dbController
         try
         {
             // Step 1: Select frozen subscribers from `scheduler_triggers` where the freeze date is exactly 30 days ago
-            String selectQuery = "SELECT t.relevent_id, s.subscriber_first_name, s.subscriber_last_name\n" +
+            String selectQuery = "SELECT t.relevant_id, s.subscriber_first_name, s.subscriber_last_name\n" +
                     "FROM scheduler_triggers t\n" +
-                    "         JOIN subscriber s ON t.relevent_id = s.subscriber_id\n" +
+                    "         JOIN subscriber s ON t.relevant_id = s.subscriber_id\n" +
                     "WHERE t.trigger_operation = 'freeze'\n" +
                     "  AND DATEDIFF(CURRENT_DATE, t.trigger_date) = 30\n" +
                     "  AND s.is_active = 0";
@@ -1804,8 +1804,9 @@ public class dbController
         List<String> returnValue = new ArrayList<>();
         PreparedStatement stmt = null;
         boolean inLibrary = true;
+        int ordered = 0;
 
-        // check if there are copy of the book available in the library
+        // check if there is copy of the book available in the library
         try
         {
             // count the number of copies of the book in the library that available to borrow
@@ -1822,7 +1823,7 @@ public class dbController
 
             rs = stmt.executeQuery();
             rs.next();
-            int ordered = rs.getInt(1);
+            ordered = rs.getInt(1);
 
             // check if we have enough copies of the book that are not ordered
             if (copyAvailableToBorrow - ordered < 1)
@@ -1838,17 +1839,82 @@ public class dbController
         catch (SQLException e)
         {
             System.out.println("Error! check borrowed book availability failed - cant check if the book is ordered");
+            return null;
         }
 
         if (inLibrary)
         {
             // find the location of the book in the library
-            // ToDo: find the available book location in the library
+            try
+            {
+                stmt = connection.prepareStatement("SELECT location_on_shelf FROM copy_of_the_book WHERE book_id = ? AND is_available = true;");
+                stmt.setString(1, bookId);
+                stmt.executeQuery();
+
+                ResultSet rs = stmt.executeQuery();
+                rs.next();
+                returnValue.add(rs.getString(1));
+            }
+            catch (SQLException e)
+            {
+                System.out.println("Error! get book location failed - cant get the book location");
+
+            }
         }
         else
         {
             // check the first available date the book available
-            // ToDo: how to handle that all the books is ordered? or some of them
+
+            // check how much copies of the book exists
+            try
+            {
+                stmt = connection.prepareStatement("SELECT COUNT(*) from copy_of_the_book WHERE book_id = ?;");
+                stmt.setString(1, bookId);
+
+                ResultSet rs = stmt.executeQuery();
+                rs.next();
+                int copies = rs.getInt(1);
+                returnValue.add(String.valueOf(copies));
+
+                if (copies == ordered)
+                {
+                    // we need to check the closest return date and add 2 weeks
+                    stmt = connection.prepareStatement("SELECT MIN(borrow_due_date) from borrow_book WHERE copy_id IN (SELECT copy_id from copy_of_the_book WHERE book_id = ?);");
+                    stmt.setString(1, bookId);
+                    stmt.executeQuery();
+
+                    rs = stmt.executeQuery();
+                    rs.next();
+                    Date expectedReturnDate = rs.getDate(1);
+
+                    returnValue.add(expectedReturnDate.toLocalDate().plusWeeks(2).toString());
+                }
+                else
+                {
+                    // get all the active borrow due date ordered by the due date
+                    stmt = connection.prepareStatement("SELECT borrow_due_date from borrow_book WHERE copy_id IN (SELECT copy_id from copy_of_the_book WHERE book_id = ?) ORDER BY borrow_due_date;");
+                    stmt.setString(1, bookId);
+                    stmt.executeQuery();
+
+                    rs = stmt.executeQuery();
+                    int i = 0;
+                    while (i < ordered)
+                    {
+                        rs.next();
+                        i++;
+                    }
+
+                    Date expectedReturnDate = rs.getDate(1);
+                    returnValue.add(expectedReturnDate.toLocalDate().toString());
+
+                }
+            }
+            catch (SQLException e)
+            {
+                System.out.println("Error! get book location failed - cant get the book location");
+            }
+
+
         }
 
         return returnValue;
