@@ -4,8 +4,10 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -58,7 +60,10 @@
                   <HBox alignment="CENTER_LEFT" spacing="10.0">
                      <Text text="Select Account Type:" />
                      <Region HBox.hgrow="ALWAYS" />
-                     <RadioButton fx:id="subscriberRadioButton" styleClass="custom-radio-button" text="Subscriber" toggleGroup="$accountTypeGroup" />
+                     <RadioButton fx:id="subscriberRadioButton" styleClass="custom-radio-button" text="Subscriber">
+                        <toggleGroup>
+                           <ToggleGroup fx:id="accountTypeGroup" />
+                        </toggleGroup></RadioButton>
                      <RadioButton fx:id="librarianRadioButton" styleClass="custom-radio-button" text="Librarian" toggleGroup="$accountTypeGroup" />
                   </HBox>
 
@@ -78,7 +83,7 @@
 
                   <HBox>
 
-                     <Button fx:id="scanReaderCardButton" prefHeight="50.0" styleClass="transparent-button" text="Scan Reader Card">
+                     <Button fx:id="scanReaderCardButton" prefHeight="50.0" styleClass="transparent-button" text="Scan Reader Card" onAction="#validate_scanReaderCard_login">
                         <graphic>
                            <ImageView fx:id="scanReaderCardImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
                               <image>
@@ -120,7 +125,7 @@
 
             <Separator prefHeight="5.0" styleClass="menu-separator" />
 
-            <Button fx:id="searchBooksButton" maxWidth="Infinity" prefHeight="50.0" styleClass="transparent-button" text="Search For Books">
+            <Button fx:id="searchBooksButton" maxWidth="Infinity" onAction="#goToSearch" prefHeight="50.0" styleClass="transparent-button" text="Search For Books">
                <graphic>
                   <ImageView fx:id="searchBooksImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
                      <image>
@@ -136,7 +141,7 @@
             <!-- Spacer Region -->
             <Region VBox.vgrow="ALWAYS" />
 
-            <Button fx:id="exitButton" maxWidth="Infinity" prefHeight="50.0" styleClass="transparent-button" text="Exit Application">
+            <Button fx:id="exitButton" maxWidth="Infinity" onAction="#exitApp" prefHeight="50.0" styleClass="transparent-button" text="Exit Application">
                <graphic>
                   <ImageView fx:id="exitImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
                      <image>
@@ -172,26 +177,41 @@
       <!-- Main (Main Content Panel) -->
       <VBox styleClass="main" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS">
 
-         <children>
-         <Text styleClass="main-title" text="New Arrivals:" />
-      </children>
-         <children>
-         <HBox fx:id="newArrivalsHBox" alignment="CENTER" spacing="15.0">
-            <!-- Books will be dynamically added here -->
-         </HBox>
-         </children>
+            <Text styleClass="main-title" text="New Arrivals:">
+            <VBox.margin>
+               <Insets bottom="15.0" />
+            </VBox.margin></Text>
 
-         <Separator prefHeight="5.0" styleClass="main-separator" />
 
-         <children>
-            <Text styleClass="main-title" text="Most Borrowed Books:" />
-         </children>
-         <children>
-            <HBox fx:id="mostBorrowedHBox" alignment="CENTER" spacing="15.0">
-               <!-- Books will be dynamically added here -->
-            </HBox>
-         </children>
+         <!-- ScrollPane for New Arrivals HBox -->
 
+            <ScrollPane hbarPolicy="ALWAYS" pannable="true" styleClass="scroll-pane" vbarPolicy="NEVER">
+               <content>
+                  <HBox fx:id="newArrivalsHBox" alignment="CENTER" spacing="15.0">
+                     <!-- Books will be dynamically added here -->
+                  </HBox>
+               </content>
+            </ScrollPane>
+
+         <!-- Spacer Region -->
+         <Region VBox.vgrow="ALWAYS" />
+
+            <Text styleClass="main-title" text="Most Borrowed Books:">
+            <VBox.margin>
+               <Insets bottom="15.0" />
+            </VBox.margin></Text>
+
+
+         <!-- ScrollPane for Most Borrowed HBox -->
+
+            <ScrollPane hbarPolicy="ALWAYS" pannable="true" styleClass="scroll-pane" vbarPolicy="NEVER">
+               <content>
+                  <HBox fx:id="mostBorrowedHBox" alignment="CENTER" spacing="15.0">
+                     <!-- Books will be dynamically added here -->
+                  </HBox>
+               </content>
+            </ScrollPane>
+         
       </VBox>
    </children>
 
