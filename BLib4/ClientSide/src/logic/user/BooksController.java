@@ -72,7 +72,7 @@ public class BooksController {
      * @param subscriberID The ID of the subscriber requesting the book.
      * @param orderDateTime The date and time the order was placed.
      */
-    public void addToWaitlist(String bookID, String subscriberID, LocalDateTime orderDateTime) {
+    public void addToWaitlist(String bookID, String subscriberID) {
        try {
     	// Create a list to be sent in the message to the server
         ArrayList<String> detailsOfOrder = new ArrayList<>();
