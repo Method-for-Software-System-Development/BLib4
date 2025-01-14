@@ -1,11 +1,7 @@
 package logic;
-import entities.logic.MessageType;
 import entities.logic.Notification;
 import entities.user.Subscriber;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 public class SchedulerController {
 
     private ScheduledExecutorService scheduler;
-    private dbController dbController; // Controller for database interactions
+    private DbController dbController; // Controller for database interactions
 
     /**
      * Constructor for SchedulerController.
@@ -28,7 +24,7 @@ public class SchedulerController {
      */
     public SchedulerController() {
         this.scheduler = Executors.newScheduledThreadPool(1);
-        this.dbController = logic.dbController.getInstance();
+        this.dbController = DbController.getInstance();
 
     }
 

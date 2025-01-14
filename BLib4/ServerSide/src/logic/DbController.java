@@ -1,29 +1,26 @@
 package logic;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.*;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import entities.book.Book;
-import entities.logic.Borrow;
 import entities.user.Librarian;
 import entities.user.Subscriber;
 
-public class dbController
+public class DbController
 {
-    private static dbController instance = null;
+    private static DbController instance = null;
     private Connection connection;
 
     /**
      * private constructor for the dbController
      */
-    private dbController()
+    private DbController()
     {
         connect();
     }
@@ -33,11 +30,11 @@ public class dbController
      *
      * @return the instance of the dbController
      */
-    public static dbController getInstance()
+    public static DbController getInstance()
     {
         if (instance == null)
         {
-            instance = new dbController();
+            instance = new DbController();
         }
         return instance;
     }

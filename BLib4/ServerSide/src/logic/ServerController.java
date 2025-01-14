@@ -3,21 +3,17 @@
 // license found at www.lloseng.com
 package logic;
 
-import java.io.Console;
 import java.io.IOException;
 import java.sql.Date;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import logic.DocumentationController;
-import com.mysql.cj.protocol.Message;
+
 import gui.ServerMonitorFrameController;
 import entities.book.Book;
 import entities.logic.MessageType;
 import entities.user.Subscriber;
-import logic.dbController;
 import ocsf.server.*;
 
 /**
@@ -36,7 +32,7 @@ public class ServerController extends AbstractServer
     private ServerMonitorFrameController monitorController;
 
     //Class variables *************************************************
-    private dbController dbController;
+    private DbController dbController;
     private DocumentationController documantaionController;
     private Map<String, ConnectionToClient> activeSubscribers;
     private Map<String, ConnectionToClient> activeLibrarians;
@@ -365,7 +361,7 @@ public class ServerController extends AbstractServer
         System.out.println("Server listening for connections on port " + getPort());
 
         // get connection to the db
-        this.dbController = logic.dbController.getInstance();
+        this.dbController = DbController.getInstance();
     }
 
     /**
