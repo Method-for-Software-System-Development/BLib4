@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.sun.jmx.snmp.SnmpStatusException;
 import gui.ServerMonitorFrameController;
 import entities.book.Book;
 import entities.logic.MessageType;
@@ -49,6 +50,7 @@ public class ServerController extends AbstractServer
         super(port);
         this.monitorController = monitorController;
 
+        documantaionController = DocumentationController.getInstance();
         activeSubscribers = new HashMap<>();
         activeLibrarians = new HashMap<>();
     }
@@ -95,13 +97,14 @@ public class ServerController extends AbstractServer
                 // Sign up request to add new subscriber
                 responseMsg = new MessageType("204", dbController.handleSubscriberSignUp((List<String>) receiveMsg.data));
                 // If query to sign a new subscriber returns true - document on reader card
-                if((boolean)responseMsg.getData()) {
-                	// Getting the history file of the subscriber by his id
-                	List<String[]> historyList =  dbController.getHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0));
-                	// Document sign up on subscriber card
-                	List<String[]> newHistoryList = documantaionController.documentOnReaderCard("104", historyList, null, null);
-                	// Updating subscriber history file in DB
-                	dbController.handleUpdateHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0), newHistoryList);
+                if ((boolean) responseMsg.getData())
+                {
+                    // Getting the history file of the subscriber by his id
+                    List<String[]> historyList = dbController.getHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0));
+                    // Document sign up on subscriber card
+                    List<String[]> newHistoryList = documantaionController.documentOnReaderCard("104", historyList, null, null);
+                    // Updating subscriber history file in DB
+                    dbController.handleUpdateHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0), newHistoryList);
                 }
                 break;
 
@@ -119,58 +122,61 @@ public class ServerController extends AbstractServer
                 // Borrow book request - create new borrow in the system
                 responseMsg = new MessageType("207", dbController.handleBorrowBook((List<String>) receiveMsg.data));
                 // If query to sign a new subscriber returns true - document on reader card
-                if((boolean)responseMsg.getData()) {
-                	// Getting book by copyID for DB 
-                	Book book = dbController.getBookByCopyId(((List<String>) receiveMsg.getData()).get(1));
-                	// Getting the history file of the subscriber by his id
-                	List<String[]> historyList =  dbController.getHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0));
+                if ((boolean) responseMsg.getData())
+                {
+                    // Getting book by copyID for DB
+                    Book book = dbController.getBookByCopyId(((List<String>) receiveMsg.getData()).get(1));
+                    // Getting the history file of the subscriber by his id
+                    List<String[]> historyList = dbController.getHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0));
                     // Get the current date
                     Date today = new Date(System.currentTimeMillis());
                     // Use Calendar to add 14 days
                     Calendar calendar = Calendar.getInstance();
                     calendar.setTime(today);
                     // Add 14 days
-                    calendar.add(Calendar.DATE, 14); 
+                    calendar.add(Calendar.DATE, 14);
                     // Get the new date
                     Date futureDate = (Date) calendar.getTime();
                     // Convert to String
                     String futureDateString = futureDate.toString();
                     // Document book borrow on subscriber card
-                	List<String[]> newHistoryList = documantaionController.documentOnReaderCard("107", historyList, book.getTitle(), futureDateString);
-                	// Updating subscriber history file in DB
-                	dbController.handleUpdateHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0), newHistoryList);
+                    List<String[]> newHistoryList = documantaionController.documentOnReaderCard("107", historyList, book.getTitle(), futureDateString);
+                    // Updating subscriber history file in DB
+                    dbController.handleUpdateHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0), newHistoryList);
                 }
                 break;
 
             case "108":
                 // Client request to order a book
                 responseMsg = new MessageType("208", dbController.handleOrderBook((List<String>) receiveMsg.data));
-                if((boolean)responseMsg.getData()) {
-                	// Getting book by bookID for DB 
-                	Book book = dbController.getBookByBookId(((List<String>) receiveMsg.getData()).get(1));
-                	// Getting the history file of the subscriber by his id
-                	List<String[]> historyList =  dbController.getHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0));
-                	// Document book order on subscriber card
-                	List<String[]> newHistoryList = documantaionController.documentOnReaderCard("108", historyList, book.getTitle(), null);
-                	// Updating subscriber history file in DB
-                	dbController.handleUpdateHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0), newHistoryList);
+                if (((List<Boolean>) responseMsg.getData()).get(0))
+                {
+                    // Getting book by bookID for DB
+                    Book book = dbController.getBookByBookId(((List<String>) receiveMsg.getData()).get(1));
+                    // Getting the history file of the subscriber by his id
+                    List<String[]> historyList = dbController.getHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0));
+                    // Document book order on subscriber card
+                    List<String[]> newHistoryList = documantaionController.documentOnReaderCard("108", historyList, book.getTitle(), "");
+                    // Updating subscriber history file in DB
+                    dbController.handleUpdateHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0), newHistoryList);
                 }
                 break;
 
             case "109":
                 // Request to return a borrowed book
                 responseMsg = new MessageType("209", dbController.handleReturnBorrowedBook((String) receiveMsg.data));
-                if(((List<Boolean>) responseMsg).get(0)) {
-                	// Getting book name by borrow ID
-                	String bookName = (dbController.getBookDetailsByBorrowId((String) receiveMsg.data)).getTitle();
-                	// Getting subscriber ID from DB using borrow ID
-                	String subscriberID = dbController.getSubscriberIdFromBorrowId((String) receiveMsg.data);
-                	// Getting history file of subscriber
-                	List<String[]> historyList =  dbController.getHistoryFileBySubscriberId(subscriberID);
-                	// Document return of a book
-                	List<String[]> newHistoryList = documantaionController.documentOnReaderCard("109", historyList, bookName, null);
-                	// Updating subscriber history file in DB
-                	dbController.handleUpdateHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0), newHistoryList);
+                if (((List<Boolean>) responseMsg).get(0))
+                {
+                    // Getting book name by borrow ID
+                    String bookName = (dbController.getBookDetailsByBorrowId((String) receiveMsg.data)).getTitle();
+                    // Getting subscriber ID from DB using borrow ID
+                    String subscriberID = dbController.getSubscriberIdFromBorrowId((String) receiveMsg.data);
+                    // Getting history file of subscriber
+                    List<String[]> historyList = dbController.getHistoryFileBySubscriberId(subscriberID);
+                    // Document return of a book
+                    List<String[]> newHistoryList = documantaionController.documentOnReaderCard("109", historyList, bookName, null);
+                    // Updating subscriber history file in DB
+                    dbController.handleUpdateHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0), newHistoryList);
                 }
                 break;
 
@@ -182,27 +188,29 @@ public class ServerController extends AbstractServer
             case "111":
                 // Request by the subscriber to extend book borrow
                 responseMsg = new MessageType("211", dbController.handleSubscriberExtendBorrow((List<String>) receiveMsg.data));
-            	// Getting book name by borrow ID
-            	String bookName = (dbController.getBookDetailsByBorrowId((String) receiveMsg.data)).getTitle();
-                if((boolean) responseMsg.getData()) {
-                	// Getting subscriber ID by borrow ID
-                	String subscriberID = dbController.getSubscriberIdFromBorrowId((String) receiveMsg.data);
-                	// Getting history file of subscriber
-                	List<String[]> historyList =  dbController.getHistoryFileBySubscriberId(subscriberID);
-                	// Document extend granted
-                	List<String[]> newHistoryList = documantaionController.documentOnReaderCard("111-1", historyList, bookName, ((List<String>)receiveMsg.getData()).get(1));
-                	// Updating subscriber history file in DB
-                	dbController.handleUpdateHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0), newHistoryList);
+                // Getting book name by borrow ID
+                String bookName = (dbController.getBookDetailsByBorrowId((String) receiveMsg.data)).getTitle();
+                if ((boolean) responseMsg.getData())
+                {
+                    // Getting subscriber ID by borrow ID
+                    String subscriberID = dbController.getSubscriberIdFromBorrowId((String) receiveMsg.data);
+                    // Getting history file of subscriber
+                    List<String[]> historyList = dbController.getHistoryFileBySubscriberId(subscriberID);
+                    // Document extend granted
+                    List<String[]> newHistoryList = documantaionController.documentOnReaderCard("111-1", historyList, bookName, ((List<String>) receiveMsg.getData()).get(1));
+                    // Updating subscriber history file in DB
+                    dbController.handleUpdateHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0), newHistoryList);
                 }
-                else {
-                	// Getting subscriber ID by borrow ID
-                	String subscriberID = dbController.getSubscriberIdFromBorrowId((String) receiveMsg.data);
-                	// Getting history file of subscriber
-                	List<String[]> historyList =  dbController.getHistoryFileBySubscriberId(subscriberID);
-                	// TODO change first null to book name 
-                	List<String[]> newHistoryList = documantaionController.documentOnReaderCard("111-2", historyList, bookName, null);
-                	// Updating subscriber history file in DB
-                	dbController.handleUpdateHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0), newHistoryList);
+                else
+                {
+                    // Getting subscriber ID by borrow ID
+                    String subscriberID = dbController.getSubscriberIdFromBorrowId((String) receiveMsg.data);
+                    // Getting history file of subscriber
+                    List<String[]> historyList = dbController.getHistoryFileBySubscriberId(subscriberID);
+                    // TODO change first null to book name
+                    List<String[]> newHistoryList = documantaionController.documentOnReaderCard("111-2", historyList, bookName, null);
+                    // Updating subscriber history file in DB
+                    dbController.handleUpdateHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0), newHistoryList);
                 }
                 break;
 
@@ -214,42 +222,47 @@ public class ServerController extends AbstractServer
             case "113":
                 // Request to update subscriber email and phone number
                 responseMsg = new MessageType("213", dbController.handleUpdateSubscriberDetails((Subscriber) receiveMsg.data));
-                if((boolean) responseMsg.getData()) {
-                	Subscriber subscriber = dbController.getSubscriberBySubscriberId(((Subscriber) receiveMsg.data).getId());
-                	// Getting history file of subscriber
-                	List<String[]> historyList =  dbController.getHistoryFileBySubscriberId(subscriber.getId());
-                	// Setting the new list to the old list in-case there will be no changes
-                	List<String[]> newHistoryList = historyList;
-                	// Case for phone number and mail change
-                	if(subscriber.getEmail() != ((Subscriber) receiveMsg.data).getEmail() && subscriber.getPhone() != ((Subscriber) receiveMsg.data).getPhone()) {
-                		// Document phone number and mail change
-                		newHistoryList = documantaionController.documentOnReaderCard("113-3", historyList, ((Subscriber) receiveMsg.data).getPhone(), ((Subscriber) receiveMsg.data).getEmail());
-                	}
-                	// Case for only mail change
-                	else if(subscriber.getEmail() != ((Subscriber) receiveMsg.data).getEmail()) {
-                		// Document mail change
-                		newHistoryList = documantaionController.documentOnReaderCard("113-2", historyList, ((Subscriber) receiveMsg.data).getEmail(), null);
-                	}
-                	// Case for only phone number change
-                	else if(subscriber.getPhone() != ((Subscriber) receiveMsg.data).getPhone()) {
-                		// Document phone number change
-                		newHistoryList = documantaionController.documentOnReaderCard("113-1", historyList, ((Subscriber) receiveMsg.data).getPhone(), null);
-                	}
-                	// Updating subscriber history file in DB
-                	dbController.handleUpdateHistoryFileBySubscriberId(subscriber.getId(), newHistoryList);
+                if ((boolean) responseMsg.getData())
+                {
+                    Subscriber subscriber = dbController.getSubscriberBySubscriberId(((Subscriber) receiveMsg.data).getId());
+                    // Getting history file of subscriber
+                    List<String[]> historyList = dbController.getHistoryFileBySubscriberId(subscriber.getId());
+                    // Setting the new list to the old list in-case there will be no changes
+                    List<String[]> newHistoryList = historyList;
+                    // Case for phone number and mail change
+                    if (subscriber.getEmail() != ((Subscriber) receiveMsg.data).getEmail() && subscriber.getPhone() != ((Subscriber) receiveMsg.data).getPhone())
+                    {
+                        // Document phone number and mail change
+                        newHistoryList = documantaionController.documentOnReaderCard("113-3", historyList, ((Subscriber) receiveMsg.data).getPhone(), ((Subscriber) receiveMsg.data).getEmail());
+                    }
+                    // Case for only mail change
+                    else if (subscriber.getEmail() != ((Subscriber) receiveMsg.data).getEmail())
+                    {
+                        // Document mail change
+                        newHistoryList = documantaionController.documentOnReaderCard("113-2", historyList, ((Subscriber) receiveMsg.data).getEmail(), null);
+                    }
+                    // Case for only phone number change
+                    else if (subscriber.getPhone() != ((Subscriber) receiveMsg.data).getPhone())
+                    {
+                        // Document phone number change
+                        newHistoryList = documantaionController.documentOnReaderCard("113-1", historyList, ((Subscriber) receiveMsg.data).getPhone(), null);
+                    }
+                    // Updating subscriber history file in DB
+                    dbController.handleUpdateHistoryFileBySubscriberId(subscriber.getId(), newHistoryList);
                 }
                 break;
 
             case "114":
                 // Request to update subscriber password
                 responseMsg = new MessageType("214", dbController.handleUpdateSubscriberPassword((List<String>) receiveMsg.data));
-                if((boolean) responseMsg.getData()) {
-                	// Getting the history file of the subscriber by his id
-                	List<String[]> historyList =  dbController.getHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0));
-                	// Document updated password
-                	List<String[]> newHistoryList = documantaionController.documentOnReaderCard("114", historyList, null, null);
-                	// Updating subscriber history file in DB
-                	dbController.handleUpdateHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0), newHistoryList);
+                if ((boolean) responseMsg.getData())
+                {
+                    // Getting the history file of the subscriber by his id
+                    List<String[]> historyList = dbController.getHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0));
+                    // Document updated password
+                    List<String[]> newHistoryList = documantaionController.documentOnReaderCard("114", historyList, null, null);
+                    // Updating subscriber history file in DB
+                    dbController.handleUpdateHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0), newHistoryList);
                 }
                 break;
 
@@ -266,18 +279,19 @@ public class ServerController extends AbstractServer
             case "117":
                 // Request by the librarian to manually extend book borrow
                 //ToDo: implement
-            	if((boolean) responseMsg.getData()) {
-            		// Getting subscriber ID using borrow ID
-            		String subscriberID = dbController.getSubscriberIdFromBorrowId(((List<String>)receiveMsg.getData()).get(0));
-            		// Getting book name by borrow ID
-            		String bookname = (dbController.getBookDetailsByBorrowId((String) receiveMsg.data)).getTitle();
-            		// Getting history file of subscriber
-                	List<String[]> historyList =  dbController.getHistoryFileBySubscriberId(subscriberID);
-                	// Document manual extension
-                	List<String[]> newHistoryList = documantaionController.documentOnReaderCard("117", historyList, bookname, null);
-                	// Updating subscriber history file in DB 
-                	dbController.handleUpdateHistoryFileBySubscriberId(subscriberID, newHistoryList);
-            	}
+                if ((boolean) responseMsg.getData())
+                {
+                    // Getting subscriber ID using borrow ID
+                    String subscriberID = dbController.getSubscriberIdFromBorrowId(((List<String>) receiveMsg.getData()).get(0));
+                    // Getting book name by borrow ID
+                    String bookname = (dbController.getBookDetailsByBorrowId((String) receiveMsg.data)).getTitle();
+                    // Getting history file of subscriber
+                    List<String[]> historyList = dbController.getHistoryFileBySubscriberId(subscriberID);
+                    // Document manual extension
+                    List<String[]> newHistoryList = documantaionController.documentOnReaderCard("117", historyList, bookname, null);
+                    // Updating subscriber history file in DB
+                    dbController.handleUpdateHistoryFileBySubscriberId(subscriberID, newHistoryList);
+                }
                 break;
 
             case "118":
@@ -306,18 +320,18 @@ public class ServerController extends AbstractServer
                 // Request to get book location in the library
                 responseMsg = new MessageType("223", dbController.handleGetBookLocation((String) receiveMsg.data));
                 break;
-                
+
             case "125":
-            	//Request to get the if of a report
-            	responseMsg = new MessageType("225",dbController.fetchReportId((List<String>) receiveMsg.data));
-            	
+                //Request to get the if of a report
+                responseMsg = new MessageType("225", dbController.fetchReportId((List<String>) receiveMsg.data));
+
             case "126":
-            	//Request to get blob data of a report
-            	responseMsg = new MessageType("226",dbController.fetchReportId((List<String>) receiveMsg.data));
+                //Request to get blob data of a report
+                responseMsg = new MessageType("226", dbController.fetchReportId((List<String>) receiveMsg.data));
 
             case "127":
-            	//request to create new empty report for next month
-            	dbController.insertEmptyMonthlyReport((List<String>) receiveMsg.data);
+                //request to create new empty report for next month
+                dbController.insertEmptyMonthlyReport((List<String>) receiveMsg.data);
 
             case "124":
                 // check if the book is available for order
@@ -331,7 +345,7 @@ public class ServerController extends AbstractServer
         // sent the message to the client
         sendMessageToClient(client, responseMsg);
     }
-    
+
 
     /**
      * The method sends a message to a specific client
@@ -506,6 +520,7 @@ public class ServerController extends AbstractServer
 
     /**
      * This method handles the sending of missed sms to the subscriber when he logs in
+     *
      * @param subscriberId - the subscriber id to send the sms to
      */
     private void handleSendingMissedSmsOnSubscriberLogIn(String subscriberId)

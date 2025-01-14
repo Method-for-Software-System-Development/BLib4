@@ -733,38 +733,6 @@ public class DbController
 
         if (validFlag)
         {
-            // check that all the copies of the book are borrowed
-            try
-            {
-                // count the number of copies of the book in the library
-                stmt = connection.prepareStatement("SELECT COUNT(*) from copy_of_the_book WHERE book_id = ? AND is_available = false;");
-                stmt.setString(1, orderDetails.get(1));
-
-                ResultSet rs = stmt.executeQuery();
-                rs.next();
-                int copyAvailableInLibrary = rs.getInt(1);
-
-                // check if we have enough copies of the book that are not borrowed
-                if (copyAvailableInLibrary < 1)
-                {
-                    returnValue.add(false);
-                    returnValue.add(false);
-
-                    validFlag = false;
-                }
-
-            }
-            catch (SQLException e)
-            {
-                System.out.println("Error! order book failed - cant check if we have enough copies of the book that are not borrowed");
-                returnValue.add(false);
-                returnValue.add(false);
-                validFlag = false;
-            }
-        }
-
-        if (validFlag)
-        {
             // add the order to the db to the subscriber_order table
             try
             {
