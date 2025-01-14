@@ -1,29 +1,26 @@
 package logic;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.*;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import entities.book.Book;
-import entities.logic.Borrow;
 import entities.user.Librarian;
 import entities.user.Subscriber;
 
-public class dbController
+public class DbController
 {
-    private static dbController instance = null;
+    private static DbController instance = null;
     private Connection connection;
 
     /**
      * private constructor for the dbController
      */
-    private dbController()
+    private DbController()
     {
         connect();
     }
@@ -33,11 +30,11 @@ public class dbController
      *
      * @return the instance of the dbController
      */
-    public static dbController getInstance()
+    public static DbController getInstance()
     {
         if (instance == null)
         {
-            instance = new dbController();
+            instance = new DbController();
         }
         return instance;
     }
@@ -728,38 +725,6 @@ public class dbController
             catch (SQLException e)
             {
                 System.out.println("Error! order book failed - cant check if we have enough copies of the book that are not ordered");
-                returnValue.add(false);
-                returnValue.add(false);
-                validFlag = false;
-            }
-        }
-
-        if (validFlag)
-        {
-            // check that all the copies of the book are borrowed
-            try
-            {
-                // count the number of copies of the book in the library
-                stmt = connection.prepareStatement("SELECT COUNT(*) from copy_of_the_book WHERE book_id = ? AND is_available = false;");
-                stmt.setString(1, orderDetails.get(1));
-
-                ResultSet rs = stmt.executeQuery();
-                rs.next();
-                int copyAvailableInLibrary = rs.getInt(1);
-
-                // check if we have enough copies of the book that are not borrowed
-                if (copyAvailableInLibrary < 1)
-                {
-                    returnValue.add(false);
-                    returnValue.add(false);
-
-                    validFlag = false;
-                }
-
-            }
-            catch (SQLException e)
-            {
-                System.out.println("Error! order book failed - cant check if we have enough copies of the book that are not borrowed");
                 returnValue.add(false);
                 returnValue.add(false);
                 validFlag = false;

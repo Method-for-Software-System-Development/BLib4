@@ -270,6 +270,12 @@ public class HomePage_Controller {
             viewBookButton.setMaxWidth(Double.MAX_VALUE); // Make the button span the width of the GridPane
             GridPane.setConstraints(viewBookButton, 1, 4); // Place button at (1, 4) in GridPane
 
+            // Add action to the button to open the ViewOrderBook scene
+            viewBookButton.setOnAction(event -> {
+                // Pass the current book to the ViewOrderBook scene
+                SceneManager.switchSceneWithData("/gui/common/viewOrderBook/ViewOrderBook_UI.fxml", "BLib.4 - Braude Library Management", book);
+            });
+
             // Add all elements to the GridPane
             bookGrid.getChildren().addAll(bookTitle, bookAuthor, bookSubject, spacer, viewBookButton);
 
@@ -370,7 +376,8 @@ public class HomePage_Controller {
             if (accountType.equals("Subscriber")) {
                 Subscriber subscriber = subscriberController.attemptLoginAsSubscriber(userID, password);
                 if (subscriber != null) {
-                    SceneManager.switchScene("/gui/user/subscriberUI/SubscriberUI_UI.fxml", "BLib.4 - Braude Library Management");
+//                    SceneManager.switchScene("/gui/user/subscriberUI/SubscriberUI_UI.fxml", "BLib.4 - Braude Library Management");
+                    SceneManager.switchScene("/gui/common/homePage/HomePage_UI.fxml", "BLib.4 - Braude Library Management"); // FOR TESTING
                 } else {
                     clearFields();
                     showErrorAlert("Login Failed", "The account was not found. Please verify that the details you entered are correct.");

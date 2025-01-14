@@ -1,0 +1,14 @@
+.book-title {
+    -fx-font-family: "Montserrat Bold";
+    -fx-font-size: 40px;
+    -fx-fill: #525FE1;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 5, 0.2, 0, 2);
+}
+.availabilityContainer {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 15;
+    -fx-padding: 15;
+    -fx-border-color: #454545;
+    -fx-border-width: 2px;
+    -fx-border-radius: 15px;
+}

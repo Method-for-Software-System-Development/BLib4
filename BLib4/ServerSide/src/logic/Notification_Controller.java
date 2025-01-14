@@ -1,19 +1,17 @@
 package logic;
 import io.github.cdimascio.dotenv.Dotenv;
-import entities.logic.MessageType;
 import entities.logic.Notification;
 import entities.user.Subscriber;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import javax.mail.internet.*;
 import java.util.Map;
 import java.util.Properties;
 
 public class Notification_Controller {
     private Notification notification;
-    private dbController dbController;
+    private DbController dbController;
 
     // Email credentials
     Dotenv dotenv = Dotenv.load();
@@ -22,7 +20,7 @@ public class Notification_Controller {
 
     public Notification_Controller(Notification notification) {
         this.notification = notification;
-        this.dbController = logic.dbController.getInstance();
+        this.dbController = DbController.getInstance();
     }
 
     /**

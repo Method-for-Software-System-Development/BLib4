@@ -116,6 +116,11 @@
     -fx-fill: #FFFFFF;
 }
 
+.medium-bold-grey-text {
+    -fx-font-family: "Roboto Bold";
+    -fx-font-size: 24px;
+    -fx-fill: #454545;
+}
 .small-grey-text {
     -fx-font-family: "Roboto";
     -fx-font-size: 20px;
@@ -125,6 +130,12 @@
     -fx-font-family: "Roboto Bold";
     -fx-font-size: 20px;
     -fx-fill: #454545;
+}
+
+.small-bold-purple-text {
+    -fx-font-family: "Roboto Bold";
+    -fx-font-size: 20px;
+    -fx-fill: #525FE1;
 }
 
 .medium-bold-purple-text {

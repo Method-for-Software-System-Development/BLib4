@@ -1,10 +1,12 @@
-package gui.common.search;
+package gui.common.viewOrderBook;
 
 import entities.book.Book;
 import entities.logic.MessageType;
 import entities.user.Librarian;
 import entities.user.Subscriber;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -15,8 +17,11 @@ import javafx.scene.text.TextAlignment;
 import logic.communication.ChatClient;
 import logic.communication.ClientUI;
 import logic.communication.SceneManager;
+import logic.communication.DataReceiver;
+import logic.user.BooksController;
 import logic.user.Subscriber_Controller;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +30,7 @@ import java.util.List;
  * This class is responsible for handling user interactions on the search page,
  * including scanning a reader card, login functionality, and searching for books by various parameters.
  */
-public class Search_Controller {
+public class ViewOrderBook_Controller implements DataReceiver {
 
     /**
      * A VBox that is shown if the user is not logged in (Subscriber/Librarian).
@@ -111,40 +116,18 @@ public class Search_Controller {
     @FXML
     private ImageView exitImageView;
 
-    /**
-     * A TextField for entering the title of the book to search for.
-     */
     @FXML
-    private TextField titleTextField;
+    private HBox viewBookHBox;
 
-    /**
-     * A TextField for entering the subject of the book to search for.
-     */
     @FXML
-    private TextField subjectTextField;
-
-    /**
-     * A TextField for entering any free text to search for.
-     */
-    @FXML
-    private TextField freeTextField;
-
-    /**
-     * A VBox that is shown if any books are found by the search query.
-     */
-    @FXML
-    private VBox seeIfFoundBooks;
-
-    /**
-     * An HBox that displays the results of the search query.
-     */
-    @FXML
-    private HBox searchResultsHBox;
+    private HBox availabilityHBox;
 
     /**
      * The singleton controller for handling subscriber-related logic.
      */
     private Subscriber_Controller subscriberController;
+
+    private BooksController booksController;
 
     /**
      * Indicates if a Subscriber is currently logged in.
@@ -156,10 +139,17 @@ public class Search_Controller {
      */
     private boolean isLibrarianLoggedIn;
 
-    /**
-     * A list of Book entities that match the user's search criteria.
-     */
-    private List<Book> searchResults;
+    private Book book;
+    private List<String> availability;
+    private boolean canOrder;
+
+    @Override
+    public void receiveData(Object data) {
+        if (data instanceof Book) {
+            this.book = (Book) data;
+            showBookDetails(book);
+        }
+    }
 
     /**
      * Initializes the Search_Controller.
@@ -170,6 +160,8 @@ public class Search_Controller {
     public void initialize() {
         // Get the singleton instance of Subscriber_Controller
         subscriberController = Subscriber_Controller.getInstance();
+        // Get the singleton instance of BooksController
+        booksController = BooksController.getInstance();
 
         isSubscriberLoggedIn = subscriberController.getLoggedSubscriber() != null;
         isLibrarianLoggedIn = subscriberController.getLoggedLibrarian() != null;
@@ -217,176 +209,195 @@ public class Search_Controller {
         });
     }
 
-    /**
-     * Validates the search form fields, ensuring only one field is filled out.
-     * If valid, sends a search request to the server and displays any matching books.
-     * If no results are found, shows an error alert.
-     */
-    @FXML
-    public void validate_search_form() {
-        // Store values in variables
-        String title = "";
-        if (titleTextField != null && titleTextField.getText() != null) {
-            title = titleTextField.getText().trim();
-        }
+    private void showBookDetails(Book book)
+    {
+        GridPane bookGrid = new GridPane();
+        bookGrid.getStyleClass().add("bookContainer"); // CSS class for book container
+        bookGrid.setHgap(20); // Horizontal gap between elements
+        bookGrid.setVgap(10); // Vertical gap between elements
 
-        String subject = "";
-        if (subjectTextField != null && subjectTextField.getText() != null) {
-            subject = subjectTextField.getText().trim();
-        }
+        // Set GridPane to fill the width of the HBox
+        bookGrid.setMaxWidth(Double.MAX_VALUE);
 
-        String freeText = "";
-        if (freeTextField != null && freeTextField.getText() != null) {
-            freeText = freeTextField.getText().trim();
-        }
+        // Ensure HBox children grow
+        HBox.setHgrow(bookGrid, Priority.ALWAYS);
 
-        // Count how many fields are filled
-        int filledFields = 0;
-        if (!title.isEmpty()) filledFields++;
-        if (!subject.isEmpty()) filledFields++;
-        if (!freeText.isEmpty()) filledFields++;
+        // Check if the book has an image
+        if (book.getImage() != null) {
+            // Create ImageView for the book cover
+            ImageView bookImageView = new ImageView(book.getImage());
+            bookImageView.setFitHeight(480);
+            bookImageView.setFitWidth(348);
 
-        // Validate the form
-        if (filledFields == 0) {
-            // No fields filled
-            showErrorAlert("Validation Error", "Please fill in at least one field for the search.");
-        } else if (filledFields > 1) {
-            // More than one field filled
-            showErrorAlert("Validation Error", "Please fill in only one field for the search.");
+            // Add rounded corners to the image
+            Rectangle clip = new Rectangle(348, 480);
+            clip.setArcWidth(15);
+            clip.setArcHeight(15);
+            bookImageView.setClip(clip);
+
+            GridPane.setConstraints(bookImageView, 0, 0);
+            GridPane.setRowSpan(bookImageView, 6);
+            bookGrid.getChildren().add(bookImageView);
+
         } else {
-            // Exactly one field filled - proceed with the search
-            List<String> toServer = new ArrayList<>();
-
-            if (!title.isEmpty()) {
-                toServer.add("name");
-                toServer.add(title);
-            } else if (!subject.isEmpty()) {
-                toServer.add("subject");
-                toServer.add(subject);
-            } else if (!freeText.isEmpty()) {
-                toServer.add("freeText");
-                toServer.add(freeText);
-            }
-
-            // Send the search request to the server
-            ClientUI.chat.accept(new MessageType("105", toServer));
-            searchResults = ChatClient.books;
-
-            // Check if any books were found
-            if (searchResults != null && !searchResults.isEmpty()) {
-                populateBooksHBox(searchResultsHBox, searchResults); // Populate the HBox with the search results
-                seeIfFoundBooks.setVisible(true); // Show the HBox
-            } else {
-                seeIfFoundBooks.setVisible(false); // Hide the HBox
-                showErrorAlert("No Results", "No books were found matching the search criteria."); // Show an error alert
-            }
+            // Create a placeholder rectangle styled with CSS
+            Rectangle placeholder = new Rectangle(348, 480);
+            placeholder.setArcWidth(15);
+            placeholder.setArcHeight(15);
+            placeholder.getStyleClass().add("book-placeholder");
+            Text placeholderText = new Text(book.getTitle());
+            placeholderText.getStyleClass().add("small-grey-text");
+            placeholderText.setWrappingWidth(308);
+            placeholderText.setTextAlignment(TextAlignment.CENTER);
+            GridPane.setConstraints(placeholder, 0, 0);
+            GridPane.setRowSpan(placeholder, 6);
+            bookGrid.getChildren().addAll(placeholder, placeholderText);
         }
-    }
 
-    /**
-     * Clears the search form by resetting the text fields (title, subject, free text).
-     */
-    @FXML
-    public void clear_form() {
-        titleTextField.clear();
-        subjectTextField.clear();
-        freeTextField.clear();
-    }
+        // Create Text for the book title with automatic wrapping
+        Text bookTitle = new Text(book.getTitle());
+        bookTitle.getStyleClass().add("book-title");
+        GridPane.setConstraints(bookTitle, 1, 0);
 
-    /**
-     * Populates the specified HBox with a list of books, each represented by a GridPane.
-     *
-     * @param targetHBox the HBox in which to place book displays
-     * @param books      the list of books to be displayed
-     */
-    public void populateBooksHBox(HBox targetHBox, List<Book> books) {
-        targetHBox.getChildren().clear(); // Clear previous content
+        // Create Text for the book author
+        Text bookAuthor = new Text("Author:  " + book.getAuthor());
+        bookAuthor.getStyleClass().add("medium-bold-grey-text");
+        GridPane.setConstraints(bookAuthor, 1, 1);
+        GridPane.setMargin(bookAuthor, new Insets(0, 0, 25, 0));
 
-        for (Book book : books) {
-            // Create a GridPane for each book
-            GridPane bookGrid = new GridPane();
-            bookGrid.getStyleClass().add("bookContainer"); // CSS class for book container
-            bookGrid.setHgap(10); // Horizontal gap between elements
-            bookGrid.setVgap(10); // Vertical gap between elements
+        // Create Text for the subject title
+        Text subjectTitle = new Text("Subject:  ");
+        subjectTitle.getStyleClass().add("small-bold-grey-text");
+        // Create Text for the book subject
+        Text bookSubject = new Text(book.getSubject());
+        bookSubject.getStyleClass().add("small-grey-text");
+        // Combine the title and subject into an HBox
+        HBox subjectHBox = new HBox();
+        subjectHBox.getChildren().addAll(subjectTitle, bookSubject);
+        // Add the HBox to the GridPane
+        GridPane.setConstraints(subjectHBox, 1, 2);
 
-            // Set a fixed width and height for the GridPane
-            bookGrid.setPrefWidth(438);
-            bookGrid.setPrefHeight(285);
+        // Create Text for the edition title
+        Text editionTitle = new Text("Edition Number:  ");
+        editionTitle.getStyleClass().add("small-bold-grey-text");
+        // Create Text for the book edition number
+        Text bookEdition = new Text(String.valueOf(book.getEditionNum()));
+        bookEdition.getStyleClass().add("small-grey-text");
+        // Combine the title and edition into an HBox
+        HBox editionHBox = new HBox();
+        editionHBox.getChildren().addAll(editionTitle, bookEdition);
+        // Add the HBox to the GridPane
+        GridPane.setConstraints(editionHBox, 1, 3);
 
-            // Check if the book has an image
-            if (book.getImage() != null) {
-                // Create ImageView for the book cover
-                ImageView bookImageView = new ImageView(book.getImage());
-                bookImageView.setFitHeight(255);
-                bookImageView.setFitWidth(185);
+        // Create Text for the print date title
+        Text printDateTitle = new Text("Print Date:  ");
+        printDateTitle.getStyleClass().add("small-bold-grey-text");
+        // Format the Date object to a String
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy"); // Adjust format as needed
+        String formattedDate = dateFormat.format(book.getPrintDate());
+        Text bookPrintDate = new Text(formattedDate);
+        bookPrintDate.getStyleClass().add("small-grey-text");
+        // Combine the title and date into an HBox
+        HBox printDateHBox = new HBox();
+        printDateHBox.getChildren().addAll(printDateTitle, bookPrintDate);
+        GridPane.setConstraints(printDateHBox, 1, 4);
 
-                // Add rounded corners to the image
-                Rectangle clip = new Rectangle(185, 255);
-                clip.setArcWidth(15);
-                clip.setArcHeight(15);
-                bookImageView.setClip(clip);
+        // Create Text for the description title
+        Text descriptionTitle = new Text("Description:");
+        descriptionTitle.getStyleClass().add("small-bold-grey-text");
+        // Create Text for the book description
+        Text bookDescription = new Text(book.getDescription());
+        bookDescription.getStyleClass().add("small-grey-text");
+        bookDescription.setWrappingWidth(950);
+        // Combine the title and description into an HBox
+        VBox descriptionVBox = new VBox();
+        descriptionVBox.getChildren().addAll(descriptionTitle, bookDescription);
+        // Add the HBox to the GridPane
+        GridPane.setConstraints(descriptionVBox, 1, 5);
 
-                GridPane.setConstraints(bookImageView, 0, 0);
-                GridPane.setRowSpan(bookImageView, 5);
-                bookGrid.getChildren().add(bookImageView);
+        Text availabilityTitle = new Text();
+        availabilityTitle.getStyleClass().add("small-bold-grey-text");
+        Text locationOrDateTitle = new Text();
+        locationOrDateTitle.getStyleClass().add("small-bold-purple-text");
 
-            } else {
-                // Create a placeholder rectangle styled with CSS
-                Rectangle placeholder = new Rectangle(185, 255);
-                placeholder.setArcWidth(15);
-                placeholder.setArcHeight(15);
-                placeholder.getStyleClass().add("book-placeholder");
-                Text placeholderText = new Text(book.getTitle());
-                placeholderText.getStyleClass().add("small-grey-text");
-                placeholderText.setWrappingWidth(165);
-                placeholderText.setTextAlignment(TextAlignment.CENTER);
-                GridPane.setConstraints(placeholder, 0, 0);
-                GridPane.setRowSpan(placeholder, 5);
-                bookGrid.getChildren().addAll(placeholder, placeholderText);
-            }
+        // *** TEMPORARY FOR GUI TESTING ***
+        availabilityTitle.setText("The book is currently not available for borrowing. It's expected to return on:  ");
+        locationOrDateTitle.setText("14/01/2025");
 
-            // Create Text for the book title with automatic wrapping
-            Text bookTitle = new Text(book.getTitle());
-            bookTitle.getStyleClass().add("medium-bold-purple-text");
-            bookTitle.setWrappingWidth(213);
-            GridPane.setConstraints(bookTitle, 1, 0);
+//        // *** NOT WORKING ***
+//
+//        // Get the availability of the book
+//        ClientUI.chat.accept(new MessageType("123", book.getBookId()));
+//        availability = ChatClient.availability;
+//        // Check if the book is available for borrowing
+//        if (availability.get(0).equals("0"))
+//        {
+//            availabilityTitle.setText("The book is available for borrowing in the library. It's shelf location is:  ");
+//            locationOrDateTitle.setText(availability.get(1));
+//        }
+//        else
+//        {
+//            availabilityTitle.setText("The book is currently not available for borrowing. It's expected to return on:  ");
+//            locationOrDateTitle.setText(availability.get(1));
+//        }
 
-            // Create Text for the book author
-            Text bookAuthor = new Text(book.getAuthor());
-            bookAuthor.getStyleClass().add("small-bold-grey-text");
-            bookAuthor.setWrappingWidth(213);
-            GridPane.setConstraints(bookAuthor, 1, 1);
+        availabilityHBox.getChildren().addAll(availabilityTitle, locationOrDateTitle);
 
-            // Create Text for the book subject
-            Text bookSubject = new Text(book.getSubject());
-            bookSubject.getStyleClass().add("small-grey-text");
-            bookSubject.setWrappingWidth(213);
-            GridPane.setConstraints(bookSubject, 1, 2);
+//        // *** NOT WORKING ***
+//
+//        // Check if the user can order the book
+//        ClientUI.chat.accept(new MessageType("124", book.getBookId()));
+//        canOrder = ChatClient.serverResponse;
 
-            // Add a spacer region above the button
-            Region spacer = new Region();
-            GridPane.setConstraints(spacer, 1, 3);
-            GridPane.setVgrow(spacer, Priority.ALWAYS);
+        // *** TEMPORARY FOR GUI TESTING ***
+        canOrder = true;
 
-            // Create the View Book button
-            Button viewBookButton = new Button("View Book");
-            viewBookButton.getStyleClass().add("purple-transparent-button");
-            viewBookButton.setPrefHeight(50.0);
-            viewBookButton.setMaxWidth(Double.MAX_VALUE);
-            GridPane.setConstraints(viewBookButton, 1, 4);
+        if (canOrder)
+        {
+            // Create a spacer to push the order button to the right
+            Region orderButtonSpacer = new Region();
+            HBox.setHgrow(orderButtonSpacer, Priority.ALWAYS);
+            // Create a Button to open the order dialog
+            Button openOrderButton = new Button("Order");
+            openOrderButton.getStyleClass().add("orange-orange-button");
+            openOrderButton.setPrefHeight(50.0);
+            openOrderButton.setPrefWidth(150.0);
+            availabilityHBox.getChildren().addAll(orderButtonSpacer, openOrderButton);
 
-            // Add action to the button to open the ViewOrderBook scene
-            viewBookButton.setOnAction(event -> {
-                // Pass the current book to the ViewOrderBook scene
-                SceneManager.switchSceneWithData("/gui/common/viewOrderBook/ViewOrderBook_UI.fxml", "BLib.4 - Braude Library Management", book);
+            openOrderButton.setOnAction(event -> {
+                if (isSubscriberLoggedIn)
+                {
+//                    // *** NOT WORKING ***
+//                    int result = booksController.addToWaitlist(book.getBookId(), subscriberController.getLoggedSubscriber().getId());
+
+                    // *** TEMPORARY FOR GUI TESTING ***
+                    int result = 1;
+
+                    if(result == 1)
+                    {
+                        showInformationAlert("Order Book", "The book has been successfully ordered.");
+                    }
+                    else if (result == 2)
+                    {
+                        showErrorAlert("Order Book", "The book is already in your order list.");
+                    }
+                    else if (result == 3)
+                    {
+                        showErrorAlert("Order Book", "The book cannot be ordered at this time due to a high number of reservations exceeding the number of the book copies in the library. Please try again later.");
+                    }
+                }
+                else
+                {
+                    showErrorAlert("Order Book", "You must be logged in to order a book.");
+                }
             });
-
-            // Add all elements to the GridPane
-            bookGrid.getChildren().addAll(bookTitle, bookAuthor, bookSubject, spacer, viewBookButton);
-
-            // Add the GridPane to the target HBox
-            targetHBox.getChildren().add(bookGrid);
         }
+
+        // Add all elements to the GridPane
+        bookGrid.getChildren().addAll(bookTitle, bookAuthor, subjectHBox, editionHBox, printDateHBox, descriptionVBox);
+
+        // Add the GridPane to the target HBox
+        viewBookHBox.getChildren().add(bookGrid);
     }
 
     /**
@@ -501,6 +512,15 @@ public class Search_Controller {
      */
     private void showErrorAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.initOwner(SceneManager.getStage());
+        alert.showAndWait();
+    }
+
+    private void showInformationAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
