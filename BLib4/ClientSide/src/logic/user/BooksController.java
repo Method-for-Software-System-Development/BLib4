@@ -72,7 +72,7 @@ public class BooksController {
      * @param subscriberID The ID of the subscriber requesting the book.
      * @param orderDateTime The date and time the order was placed.
      */
-    public void addToWaitlist(String bookID, String subscriberID) {
+    public int addToWaitlist(String bookID, String subscriberID) {
        try {
     	// Create a list to be sent in the message to the server
         ArrayList<String> detailsOfOrder = new ArrayList<>();
@@ -83,17 +83,18 @@ public class BooksController {
         ClientUI.chat.accept(new MessageType("108", detailsOfOrder));
         
         // Wait for server response
-        if (ChatClient.serverResponse) {
-        	Alert alert = new Alert(Alert.AlertType.INFORMATION, "Subscriber " + subscriberID + " has been added to the waitlist for book " + bookID);
-            alert.setHeaderText("Success");
-            alert.showAndWait();
-        } else {
-        	Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to add subscriber " + subscriberID + " to the waitlist for book " + bookID);
-            alert.setHeaderText("Error");
-            alert.showAndWait();
+        // if the book has successfully ordered - return 1
+        if (ChatClient.array.get(0)) {
+        	return 1;
+        } // if the book cannot be ordered due to a high number of reservations - return 2
+        else if (!ChatClient.array.get(0) && !ChatClient.array.get(1)) {
+        	return 2;
         }
+     // if the book cannot be ordered due to a frozen account - return 3
+        	return 3;
     } catch (Exception e) {
         e.printStackTrace();
+        return 0;
         }
     }
     
