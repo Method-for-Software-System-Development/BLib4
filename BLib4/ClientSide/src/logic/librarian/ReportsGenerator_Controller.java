@@ -1,10 +1,13 @@
 package logic.librarian;
 
+import entities.logic.MessageType;
 import entities.report.BorrowingReport;
 import entities.report.SubscriberStatusReport;
 import entities.report.Report;
 import logic.BlobUtil;
 import logic.dbController;
+import logic.communication.ChatClient;
+import logic.communication.ClientUI;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -163,7 +166,12 @@ public class ReportsGenerator_Controller {
 
         // Insert an empty report for the next month
         try {
-            dbController.insertEmptyMonthlyReport(reportType, nextMonth);
+            // Create a list of data of the requested report to send to the server
+            ArrayList<String> dataOfReport = new ArrayList<>();	
+            dataOfReport.add(reportType);
+            dataOfReport.add(nextMonth);
+            // send message to server to get report id
+            ClientUI.chat.accept(new MessageType("127",dataOfReport));   
             System.out.println("Empty subscribers status report created for the next month.");
         } catch (Exception e) {
             e.printStackTrace();
@@ -180,9 +188,24 @@ public class ReportsGenerator_Controller {
      */
     public BorrowingReport getBorrowingReport(String month, String year) {
         System.out.println("Fetching borrowing report for: " + month + " " + year);
-        int reportNum = dbController.fetchReportId("BorrowingReport", month, year);
-        byte[] blobData = dbController.fetchReportBlob("BorrowingReport", month, year);
-
+        // Create a list of data of the requested report to send to the server
+        ArrayList<String> dataOfReport = new ArrayList<>();	
+        dataOfReport.add("BorrowingReport");
+        dataOfReport.add(month);
+        dataOfReport.add(year);
+        // send message to server to get report id
+        ClientUI.chat.accept(new MessageType("125",dataOfReport));
+        int reportNum = ChatClient.reportID;
+        //if report id not found response is -1
+        if (reportNum == -1) {
+            System.out.println("No subscriber status report found for: " + month + " " + year);
+            return null;
+        }
+        
+     // send message to server to get report id
+        ClientUI.chat.accept(new MessageType("126",dataOfReport));
+        //get response from server for blob data
+        byte[] blobData = ChatClient.blobData;
         if (blobData == null) {
             System.out.println("No borrowing report found for: " + month + " " + year);
             return null;
@@ -201,8 +224,23 @@ public class ReportsGenerator_Controller {
      */
     public SubscriberStatusReport getSubscriberStatusReport(String month, String year) {
         System.out.println("Fetching subscriber status report for: " + month + " " + year);
-        int reportNum = dbController.fetchReportId("SubscribersStatus", month, year);
-        byte[] blobData = dbController.fetchReportBlob("SubscribersStatus", month, year);
+        // Create a list of data of the requested report to send to the server
+        ArrayList<String> dataOfReport = new ArrayList<>();	
+        dataOfReport.add("SubscribersStatus");
+        dataOfReport.add(month);
+        dataOfReport.add(year);
+        // send message to server to get report id
+        ClientUI.chat.accept(new MessageType("125",dataOfReport));
+        int reportNum = ChatClient.reportID;
+        //if report id not found response is -1
+        if (reportNum == -1) {
+            System.out.println("No subscriber status report found for: " + month + " " + year);
+            return null;
+        }
+        // send message to server to get report id
+        ClientUI.chat.accept(new MessageType("126",dataOfReport));
+        //get response from server for blob data
+        byte[] blobData = ChatClient.blobData;
 
         if (blobData == null) {
             System.out.println("No subscriber status report found for: " + month + " " + year);

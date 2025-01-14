@@ -310,6 +310,18 @@ public class ServerController extends AbstractServer
                 // Request to get book location in the library
                 responseMsg = new MessageType("223", dbController.handleGetBookLocation((String) receiveMsg.data));
                 break;
+                
+            case "125":
+            	//Request to get the if of a report
+            	responseMsg = new MessageType("225",dbController.fetchReportId((List<String>) receiveMsg.data));
+            	
+            case "126":
+            	//Request to get blob data of a report
+            	responseMsg = new MessageType("226",dbController.fetchReportId((List<String>) receiveMsg.data));
+
+            case "127":
+            	//request to create new empty report for next month
+            	dbController.insertEmptyMonthlyReport((List<String>) receiveMsg.data);
 
             case "124":
                 // check if the book is available for order
