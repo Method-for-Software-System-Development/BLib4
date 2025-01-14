@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<GridPane alignment="CENTER" hgap="15.0" prefHeight="1080.0" prefWidth="1920.0" styleClass="gridPane"
+          stylesheets="@../../GlobalBLib_Styles.css, @ViewOrderBook_Styles.css" vgap="15.0"
+          xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1"
+          fx:controller="gui.common.viewOrderBook.ViewOrderBook_Controller">
+
+    <!-- Row Constraints -->
+    <rowConstraints>
+        <RowConstraints maxHeight="200.0" minHeight="200.0" prefHeight="200.0"/>
+        <RowConstraints vgrow="ALWAYS"/>
+    </rowConstraints>
+
+    <!-- Column Constraints -->
+    <columnConstraints>
+        <ColumnConstraints maxWidth="500.0" minWidth="500.0" prefWidth="500.0"/>
+        <ColumnConstraints hgrow="ALWAYS"/>
+    </columnConstraints>
+
+    <!-- Padding -->
+    <padding>
+        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0"/>
+    </padding>
+
+    <!-- Menu (Left Panel) -->
+    <VBox alignment="TOP_CENTER" maxWidth="500.0" minWidth="500.0" prefWidth="500.0" styleClass="menu"
+          GridPane.hgrow="NEVER" GridPane.rowSpan="2" GridPane.vgrow="ALWAYS">
+
+        <!-- Logo Image -->
+        <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@../../assets/images/logo.png"/>
+            </image>
+            <VBox.margin>
+                <Insets bottom="25.0" top="15.0"/>
+            </VBox.margin>
+        </ImageView>
+
+        <!-- White Separator -->
+        <Separator prefHeight="5.0" styleClass="menu-separator"/>
+
+        <VBox fx:id="seeIfNotLoggedIn">
+
+            <VBox alignment="TOP_LEFT" spacing="20.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                <VBox.margin>
+                    <Insets bottom="25.0" top="25.0"/>
+                </VBox.margin>
+
+                <!-- Title -->
+                <Text styleClass="menu-title" text="Login:"/>
+
+                <!-- Radio Buttons for Account Selection -->
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                    <Text text="Select Account Type:"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <RadioButton fx:id="subscriberRadioButton" styleClass="custom-radio-button" text="Subscriber">
+                        <toggleGroup>
+                            <ToggleGroup fx:id="accountTypeGroup"/>
+                        </toggleGroup>
+                    </RadioButton>
+                    <RadioButton fx:id="librarianRadioButton" styleClass="custom-radio-button" text="Librarian"
+                                 toggleGroup="$accountTypeGroup"/>
+                </HBox>
+
+                <!-- User's ID Field -->
+                <HBox alignment="CENTER_LEFT">
+                    <Text text="User's ID:"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <TextField fx:id="idTextField" prefHeight="50.0" prefWidth="350.0" promptText="Enter your ID"
+                               styleClass="custom-text-field"/>
+                </HBox>
+
+                <!-- Password Field -->
+                <HBox alignment="CENTER_LEFT">
+                    <Text text="Password:"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <PasswordField fx:id="passwordTextField" prefHeight="50.0" prefWidth="350.0"
+                                   promptText="Enter your Password" styleClass="custom-text-field"/>
+                </HBox>
+
+                <!-- Scan Reader Card and Login Buttons -->
+                <HBox>
+                    <Button fx:id="scanReaderCardButton" onAction="#validate_scanReaderCard_login" prefHeight="50.0"
+                            styleClass="transparent-button" text="Scan Reader Card">
+                        <graphic>
+                            <ImageView fx:id="scanReaderCardImageView" fitHeight="24.0" fitWidth="24.0"
+                                       preserveRatio="true">
+                                <image>
+                                    <Image url="@../../assets/icons/qr_code_scanner_24dp_FFFFFF.png"/>
+                                </image>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+
+                    <!-- Spacer Region -->
+                    <Region HBox.hgrow="ALWAYS"/>
+
+                    <Button fx:id="loginButton" onAction="#validate_login_form" prefHeight="50.0" prefWidth="150.0"
+                            styleClass="orange-button" text="Login">
+                        <graphic>
+                            <ImageView fx:id="loginImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                                <image>
+                                    <Image url="@../../assets/icons/login_24dp_FFFFFF.png"/>
+                                </image>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+
+                </HBox>
+            </VBox>
+
+            <!-- White Separator -->
+            <Separator prefHeight="5.0" styleClass="menu-separator"/>
+
+            <!-- TextFlow for Account Creation -->
+            <TextFlow>
+                <Text styleClass="medium-bold-white-text" text="Don't have an account?&#10;"/> <!-- new line -->
+                <Text styleClass="small-white-text"
+                      text="Please contact the librarian at the library for a quick identification process and account creation."/>
+                <VBox.margin>
+                    <Insets bottom="25.0" top="25.0"/>
+                </VBox.margin>
+            </TextFlow>
+
+            <!-- White Separator -->
+            <Separator prefHeight="5.0" styleClass="menu-separator"/>
+
+        </VBox>
+
+        <!-- Spacer Region -->
+        <Region VBox.vgrow="ALWAYS"/>
+
+        <!-- Menu Buttons -->
+        <Button fx:id="backButton" maxWidth="Infinity" onAction="#goBack" prefHeight="50.0"
+                styleClass="transparent-button" text="Back to Home Page">
+            <graphic>
+                <ImageView fx:id="backImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                    <image>
+                        <Image url="@../../assets/icons/back_24dp_FFFFFF.png"/>
+                    </image>
+                </ImageView>
+            </graphic>
+            <VBox.margin>
+                <Insets top="25.0"/>
+            </VBox.margin>
+        </Button>
+
+        <Button fx:id="exitButton" maxWidth="Infinity" onAction="#exitApp" prefHeight="50.0"
+                styleClass="transparent-button" text="Exit Application">
+            <graphic>
+                <ImageView fx:id="exitImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                    <image>
+                        <Image url="@../../assets/icons/close_24dp_FFFFFF.png"/>
+                    </image>
+                </ImageView>
+            </graphic>
+            <VBox.margin>
+                <Insets top="25.0"/>
+            </VBox.margin>
+        </Button>
+
+        <!-- TextFlow for Credits -->
+        <TextFlow textAlignment="CENTER">
+            <Text styleClass="verySmall-white-text"
+                  text="Engineering Methods For Software Systems Development Semester Project by Group 4"/>
+            <VBox.margin>
+                <Insets top="25.0"/>
+            </VBox.margin>
+        </TextFlow>
+
+    </VBox>
+
+    <!-- Header (Top Panel) -->
+    <VBox alignment="BOTTOM_LEFT" maxHeight="200.0" minHeight="200.0" prefHeight="200.0" styleClass="header"
+          GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
+        <Text styleClass="header-title" text="Braude College Library Management Application">
+            <VBox.margin>
+                <Insets bottom="10.0" left="15.0"/>
+            </VBox.margin>
+        </Text>
+    </VBox>
+
+    <!-- Main (Main Content Panel) -->
+    <VBox spacing="20" styleClass="main" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1"
+          GridPane.vgrow="ALWAYS">
+
+        <HBox fx:id="viewBookHBox">
+            <!-- The relevant book data will be displayed here -->
+        </HBox>
+
+        <HBox fx:id="availabilityHBox" styleClass="availabilityContainer" alignment="CENTER_LEFT">
+            <!-- The availability of the book will be displayed here -->
+        </HBox>
+
+    </VBox>
+</GridPane>

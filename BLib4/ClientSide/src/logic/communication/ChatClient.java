@@ -38,6 +38,7 @@ public class ChatClient extends AbstractClient
     private EditSubscriberFrameController editSubscriberFrameController;
     public static List<Subscriber> subscribers = new ArrayList<Subscriber>();
     public static List<Book> books = new ArrayList<>();
+    public static List<String> availability = new ArrayList<>();
     public static boolean serverResponse = false;
     public static boolean awaitResponse = false;
     public static Date todayDate;
@@ -176,6 +177,12 @@ public class ChatClient extends AbstractClient
                 break;
             case "222":
                 //ToDo: implement
+                break;
+            case "223":
+                availability = (List<String>)receiveMsg.data;
+                break;
+            case "224":
+                serverResponse = (boolean) receiveMsg.getData();
                 break;
             case "225":
             	//response for report id request
