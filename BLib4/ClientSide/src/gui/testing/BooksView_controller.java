@@ -41,7 +41,7 @@ public class BooksView_controller {
 		
 		//Add to Waitlist Section
 	    @FXML
-	    private void handleAddToWaitlist() {
+	    private int handleAddToWaitlist() {
 	        String bookID = txtBookID.getText();
 	        String subscriberID = txtSubscriberID.getText();
 	        
@@ -49,11 +49,10 @@ public class BooksView_controller {
 	            Alert alert = new Alert(Alert.AlertType.ERROR, "Please fill in both Book ID and Subscriber ID");
 	            alert.setHeaderText("Input Error");
 	            alert.showAndWait();
-	            return;
 	        }
 	        
 	        // Call the addToWaitlist method
-	        bk.addToWaitlist(bookID, subscriberID);
+	        return bk.addToWaitlist(bookID, subscriberID);
 	    }
 	   
 }
