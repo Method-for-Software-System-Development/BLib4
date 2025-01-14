@@ -1844,7 +1844,6 @@ public class DbController
                 ResultSet rs = stmt.executeQuery();
                 rs.next();
                 int copies = rs.getInt(1);
-                returnValue.add(String.valueOf(copies));
 
                 if (copies == ordered)
                 {
