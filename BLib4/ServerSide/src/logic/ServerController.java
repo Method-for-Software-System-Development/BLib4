@@ -88,9 +88,13 @@ public class ServerController extends AbstractServer
                 break;
 
             case "101":
+            	//subscriber wants to log in by card
+            	responseMsg = new MessageType("201",dbController.handleLogInSubscriberByCard((String) receiveMsg.data));
+            	
+            case "102":
                 // Client wants to log out
                 handleLogoutRequest((List<String>) receiveMsg.data, client);
-                responseMsg = new MessageType("2011", null);
+                responseMsg = new MessageType("202", null);
                 break;
 
             case "104":

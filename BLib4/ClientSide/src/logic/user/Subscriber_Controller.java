@@ -106,7 +106,7 @@ public class Subscriber_Controller {
     }
     
     /**
-     * This method send a request to the server to log in a user of the given type.
+     * This method sends a request to the server to log in a user of the given type.
      *
      * @param userID ID of the user.
      * @param password	password of the user.
@@ -119,6 +119,22 @@ public class Subscriber_Controller {
         dataOfLogIn.add(password);
         dataOfLogIn.add(type);
         ClientUI.chat.accept(new MessageType("100",dataOfLogIn));
+    }
+    
+    /**
+     * This method sends a request to the server to log in a subscriber by his reader card
+     * @param userCode the code of the subscriber card
+     * @return the subscriber if log in succeed and null if not
+     */
+    public Subscriber attemptSubscriberLogInByCard(String userCode) {
+    	//send a request to the server to log in the subscriber
+        ClientUI.chat.accept(new MessageType("101",userCode));
+        // check server response
+        if(ChatClient.serverResponse) {
+    		loggedSubscriber=ChatClient.subscribers.get(0);
+    		return ChatClient.subscribers.get(0);
+    	}
+    	return null;    
     }
     
     /**
