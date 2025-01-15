@@ -327,7 +327,8 @@ public class ServerController extends AbstractServer
 
             case "126":
                 //Request to get blob data of a report
-                responseMsg = new MessageType("226", dbController.fetchReportId((List<String>) receiveMsg.data));
+            	byte[] blobData =dbController.fetchReportBlob((List<String>) receiveMsg.data);
+                responseMsg = new MessageType("226", BlobUtil.convertBlobToList(blobData));
 
             case "127":
                 //request to create new empty report for next month

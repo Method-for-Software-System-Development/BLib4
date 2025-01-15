@@ -3,7 +3,6 @@ package logic.librarian;
 import entities.logic.MessageType;
 import entities.report.BorrowingReport;
 import entities.report.SubscriberStatusReport;
-import logic.BlobUtil;
 import logic.communication.ChatClient;
 import logic.communication.ClientUI;
 
@@ -23,7 +22,6 @@ public class ReportsGenerator_Controller {
         }
         return instance;
     }
-
 
     /**
      * Retrieves a BorrowingReport for a given month and year.
@@ -51,14 +49,12 @@ public class ReportsGenerator_Controller {
      // send message to server to get blob data of a report
         ClientUI.chat.accept(new MessageType("126",dataOfReport));
         //get response from server for blob data
-        byte[] blobData = ChatClient.blobData;
+        List<String[]> blobData = ChatClient.blobData;
         if (blobData == null) {
             System.out.println("No borrowing report found for: " + month + " " + year);
             return null;
         }
-
-        List<String[]> reportData = BlobUtil.convertBlobToList(blobData);
-        return new BorrowingReport(reportNum, month, year, new Date(), mapReportData(reportData));
+        return new BorrowingReport(reportNum, month, year, new Date(), mapReportData(blobData));
     }
 
     /**
@@ -86,22 +82,23 @@ public class ReportsGenerator_Controller {
         // send message to server to get blob data of a report
         ClientUI.chat.accept(new MessageType("126",dataOfReport));
         //get response from server for blob data
-        byte[] blobData = ChatClient.blobData;
+        List<String[]> blobData = ChatClient.blobData;
 
         if (blobData == null) {
             System.out.println("No subscriber status report found for: " + month + " " + year);
             return null;
         }
-
-        List<String[]> reportData = BlobUtil.convertBlobToList(blobData);
-        int[] dailyActive = extractDailyValues(reportData, 0);
-        int[] dailyFreeze = extractDailyValues(reportData, 1);
+        int[] dailyActive = extractDailyValues(blobData, 0);
+        int[] dailyFreeze = extractDailyValues(blobData, 1);
 
         return new SubscriberStatusReport(reportNum, month, year, new Date(), dailyActive, dailyFreeze);
     }
 
     /**
-     * Maps report data from List<String[]> to a Map<String, List<String>>.
+     *  Maps report data from List<String[]> to a Map<String, List<String>>.
+     *  
+     * @param reportData report data as a List<String[]>
+     * @return report data as Map<String, List<String>>
      */
     private Map<String, List<String>> mapReportData(List<String[]> reportData) {
         Map<String, List<String>> mappedData = new HashMap<>();
@@ -133,8 +130,4 @@ public class ReportsGenerator_Controller {
         }
         return dailyValues;
     }
-
-
-
-
 }
