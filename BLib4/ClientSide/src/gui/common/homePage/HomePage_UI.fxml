@@ -44,107 +44,198 @@
         <!-- White Separator -->
         <Separator prefHeight="5.0" styleClass="menu-separator"/>
 
-        <VBox alignment="TOP_LEFT" spacing="20.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
-            <VBox.margin>
-                <Insets bottom="25.0" top="25.0"/>
-            </VBox.margin>
+        <!-- ***************** This VBox will be shown if the user is not logged in ***************** -->
+        <VBox fx:id="seeIfNotLoggedIn">
 
-            <!-- Title -->
-            <Text styleClass="menu-title" text="Login:"/>
+            <VBox alignment="TOP_LEFT" spacing="20.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                <VBox.margin>
+                    <Insets bottom="25.0" top="25.0"/>
+                </VBox.margin>
 
-            <!-- Radio Buttons for Account Selection -->
-            <HBox alignment="CENTER_LEFT" spacing="10.0">
-                <Text text="Select Account Type:"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <RadioButton fx:id="subscriberRadioButton" styleClass="custom-radio-button" text="Subscriber">
-                    <toggleGroup>
-                        <ToggleGroup fx:id="accountTypeGroup"/>
-                    </toggleGroup>
-                </RadioButton>
-                <RadioButton fx:id="librarianRadioButton" styleClass="custom-radio-button" text="Librarian"
-                             toggleGroup="$accountTypeGroup"/>
-            </HBox>
+                <!-- Title -->
+                <Text styleClass="menu-title" text="Login:"/>
 
-            <!-- User's ID Field -->
-            <HBox alignment="CENTER_LEFT">
-                <Text text="User's ID:"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <TextField fx:id="idTextField" prefHeight="50.0" prefWidth="350.0" promptText="Enter your ID"
-                           styleClass="custom-text-field"/>
-            </HBox>
+                <!-- Radio Buttons for Account Selection -->
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                    <Text text="Select Account Type:"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <RadioButton fx:id="subscriberRadioButton" styleClass="custom-radio-button" text="Subscriber">
+                        <toggleGroup>
+                            <ToggleGroup fx:id="accountTypeGroup"/>
+                        </toggleGroup>
+                    </RadioButton>
+                    <RadioButton fx:id="librarianRadioButton" styleClass="custom-radio-button" text="Librarian"
+                                 toggleGroup="$accountTypeGroup"/>
+                </HBox>
 
-            <!-- Password Field -->
-            <HBox alignment="CENTER_LEFT">
-                <Text text="Password:"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <PasswordField fx:id="passwordTextField" prefHeight="50.0" prefWidth="350.0"
-                               promptText="Enter your Password" styleClass="custom-text-field"/>
-            </HBox>
+                <!-- User's ID Field -->
+                <HBox alignment="CENTER_LEFT">
+                    <Text text="User's ID:"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <TextField fx:id="idTextField" prefHeight="50.0" prefWidth="350.0" promptText="Enter your ID"
+                               styleClass="custom-text-field"/>
+                </HBox>
 
-            <!-- Scan Reader Card and Login Buttons -->
-            <HBox>
-                <Button fx:id="scanReaderCardButton" prefHeight="50.0" styleClass="transparent-button"
-                        text="Scan Reader Card" onAction="#validate_scanReaderCard_login">
-                    <graphic>
-                        <ImageView fx:id="scanReaderCardImageView" fitHeight="24.0" fitWidth="24.0"
-                                   preserveRatio="true">
-                            <image>
-                                <Image url="@../../assets/icons/qr_code_scanner_24dp_FFFFFF.png"/>
-                            </image>
-                        </ImageView>
-                    </graphic>
-                </Button>
+                <!-- Password Field -->
+                <HBox alignment="CENTER_LEFT">
+                    <Text text="Password:"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <PasswordField fx:id="passwordTextField" prefHeight="50.0" prefWidth="350.0"
+                                   promptText="Enter your Password" styleClass="custom-text-field"/>
+                </HBox>
 
-                <!-- Spacer Region -->
-                <Region HBox.hgrow="ALWAYS"/>
+                <!-- Scan Reader Card and Login Buttons -->
+                <HBox>
+                    <Button fx:id="scanReaderCardButton" prefHeight="50.0" styleClass="transparent-button"
+                            text="Scan Reader Card" onAction="#validate_scanReaderCard_login">
+                        <graphic>
+                            <ImageView fx:id="scanReaderCardImageView" fitHeight="24.0" fitWidth="24.0"
+                                       preserveRatio="true">
+                                <image>
+                                    <Image url="@../../assets/icons/qr_code_scanner_24dp_FFFFFF.png"/>
+                                </image>
+                            </ImageView>
+                        </graphic>
+                    </Button>
 
-                <Button fx:id="loginButton" prefHeight="50.0" prefWidth="150.0" styleClass="orange-button"
-                        text="Login" onAction="#validate_login_form">
-                    <graphic>
-                        <ImageView fx:id="loginImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
-                            <image>
-                                <Image url="@../../assets/icons/login_24dp_FFFFFF.png"/>
-                            </image>
-                        </ImageView>
-                    </graphic>
-                </Button>
+                    <!-- Spacer Region -->
+                    <Region HBox.hgrow="ALWAYS"/>
 
-            </HBox>
+                    <Button fx:id="loginButton" prefHeight="50.0" prefWidth="150.0" styleClass="orange-button"
+                            text="Login" onAction="#validate_login_form">
+                        <graphic>
+                            <ImageView fx:id="loginImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                                <image>
+                                    <Image url="@../../assets/icons/login_24dp_FFFFFF.png"/>
+                                </image>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+
+                </HBox>
+            </VBox>
+
+            <!-- White Separator -->
+            <Separator prefHeight="5.0" styleClass="menu-separator"/>
+
+            <!-- TextFlow for Account Creation -->
+            <TextFlow>
+                <Text styleClass="medium-bold-white-text" text="Don't have an account?&#10;"/> <!-- new line -->
+                <Text styleClass="small-white-text"
+                      text="Please contact the librarian at the library for a quick identification process and account creation."/>
+                <VBox.margin>
+                    <Insets bottom="25.0" top="25.0"/>
+                </VBox.margin>
+            </TextFlow>
+
+            <!-- White Separator -->
+            <Separator prefHeight="5.0" styleClass="menu-separator"/>
+
+            <!-- Menu Buttons -->
+            <Button fx:id="searchBooksButton" maxWidth="Infinity" onAction="#goToSearch" prefHeight="50.0"
+                    styleClass="transparent-button" text="Search For Books">
+                <graphic>
+                    <ImageView fx:id="searchBooksImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                        <image>
+                            <Image url="@../../assets/icons/search_24dp_FFFFFF.png"/>
+                        </image>
+                    </ImageView>
+                </graphic>
+                <VBox.margin>
+                    <Insets top="25.0"/>
+                </VBox.margin>
+            </Button>
+
         </VBox>
+        <!-- ***************** End of VBox for not logged in ***************** -->
 
-        <!-- White Separator -->
-        <Separator prefHeight="5.0" styleClass="menu-separator"/>
+        <!-- ***************** This VBox will be shown if the user is logged in ***************** -->
+        <VBox fx:id="seeIfLoggedIn" alignment="TOP_CENTER">
 
-        <!-- TextFlow for Account Creation -->
-        <TextFlow>
-            <Text styleClass="medium-bold-white-text" text="Don't have an account?&#10;"/> <!-- new line -->
-            <Text styleClass="small-white-text"
-                  text="Please contact the librarian at the library for a quick identification process and account creation."/>
-            <VBox.margin>
-                <Insets bottom="25.0" top="25.0"/>
-            </VBox.margin>
-        </TextFlow>
+            <Text fx:id="userGreeting" styleClass="menu-title">
+                <VBox.margin>
+                    <Insets bottom="25.0" top="25.0"/>
+                </VBox.margin>
+            </Text>
 
-        <!-- White Separator -->
-        <Separator prefHeight="5.0" styleClass="menu-separator"/>
+            <!-- White Separator -->
+            <Separator prefHeight="5.0" styleClass="menu-separator"/>
 
-        <!-- Menu Buttons -->
-        <Button fx:id="searchBooksButton" maxWidth="Infinity" onAction="#goToSearch" prefHeight="50.0"
-                styleClass="transparent-button" text="Search For Books">
-            <graphic>
-                <ImageView fx:id="searchBooksImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
-                    <image>
-                        <Image url="@../../assets/icons/search_24dp_FFFFFF.png"/>
-                    </image>
-                </ImageView>
-            </graphic>
-            <VBox.margin>
-                <Insets top="25.0"/>
-            </VBox.margin>
-        </Button>
+            <Button fx:id="dashboardButton" maxWidth="Infinity" onAction="#goToDashboard" prefHeight="50.0"
+                    styleClass="orange-button" text="My Dashboard">
+                <graphic>
+                    <ImageView fx:id="dashboardImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                        <image>
+                            <Image url="@../../assets/icons/person_24dp_FFFFFF.png"/>
+                        </image>
+                    </ImageView>
+                </graphic>
+                <VBox.margin>
+                    <Insets top="25.0"/>
+                </VBox.margin>
+            </Button>
+
+            <Button fx:id="searchBooksButton2" maxWidth="Infinity" onAction="#goToSearch" prefHeight="50.0"
+                    styleClass="transparent-button" text="Search For Books">
+                <graphic>
+                    <ImageView fx:id="searchBooksImageView2" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                        <image>
+                            <Image url="@../../assets/icons/search_24dp_FFFFFF.png"/>
+                        </image>
+                    </ImageView>
+                </graphic>
+                <VBox.margin>
+                    <Insets top="25.0"/>
+                </VBox.margin>
+            </Button>
+
+            <Button fx:id="viewHistoryButton" maxWidth="Infinity" prefHeight="50.0" styleClass="transparent-button"
+                    text="View Activity History">
+                <graphic>
+                    <ImageView fx:id="viewHistoryImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                        <image>
+                            <Image url="@../../assets/icons/history_24dp_FFFFFF.png"/>
+                        </image>
+                    </ImageView>
+                </graphic>
+                <VBox.margin>
+                    <Insets top="25.0"/>
+                </VBox.margin>
+            </Button>
+
+            <Button fx:id="editProfileButton" maxWidth="Infinity" prefHeight="50.0" styleClass="transparent-button"
+                    text="Edit Profile">
+                <graphic>
+                    <ImageView fx:id="editProfileImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                        <image>
+                            <Image url="@../../assets/icons/edit_24dp_FFFFFF.png"/>
+                        </image>
+                    </ImageView>
+                </graphic>
+                <VBox.margin>
+                    <Insets top="25.0"/>
+                </VBox.margin>
+            </Button>
+
+            <Button fx:id="logoutButton" maxWidth="Infinity" onAction="#logout" prefHeight="50.0" styleClass="transparent-button"
+                    text="Logout">
+                <graphic>
+                    <ImageView fx:id="logoutImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                        <image>
+                            <Image url="@../../assets/icons/logout_24dp_FFFFFF.png"/>
+                        </image>
+                    </ImageView>
+                </graphic>
+                <VBox.margin>
+                    <Insets top="25.0"/>
+                </VBox.margin>
+            </Button>
+
+        </VBox>
+        <!-- ***************** End of VBox for logged in ***************** -->
 
         <!-- Spacer Region -->
-        <Region VBox.vgrow="ALWAYS"/>
+        <Region fx:id="menuButtonsSpacer" VBox.vgrow="ALWAYS"/>
 
         <Button fx:id="exitButton" maxWidth="Infinity" onAction="#exitApp" prefHeight="50.0"
                 styleClass="transparent-button" text="Exit Application">
@@ -169,7 +260,7 @@
             </VBox.margin>
         </TextFlow>
 
-    </VBox>
+    </VBox> <!-- End of Menu VBox -->
 
     <!-- Header (Top Panel) -->
     <VBox alignment="BOTTOM_LEFT" maxHeight="200.0" minHeight="200.0" prefHeight="200.0" styleClass="header"
