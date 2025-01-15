@@ -128,6 +128,7 @@ public class Subscriber_Controller {
     public void attemptLogOutAsSubscriber(String userID) {
     	//send a request to the server to log out the subscriber
     	attemptLogOut("subscriber",userID);
+    	loggedSubscriber=null;
     }
     
     /**
@@ -138,6 +139,7 @@ public class Subscriber_Controller {
     public void attemptLogOutAsLibrarian(String userID) {
     	//send a request to the server to log out the librarian
     	attemptLogOut("librarian",userID);
+    	loggedLibrarian=null;
     }
     
     /**
