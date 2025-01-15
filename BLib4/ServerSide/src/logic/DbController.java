@@ -140,6 +140,39 @@ public class DbController
 
         return librarian;
     }
+    
+    /**
+     * The method run SQL query to get the subscriber from the db by id 
+
+     * @param subscriberID subscriber reader code - the ID of subscriber
+     * @return the subscriber if log in succeed and null if not
+     */
+    public Subscriber handleLogInSubscriberByCard(String subscriberID) {
+        Subscriber subscriber = null;
+    	PreparedStatement stmt;
+
+        try
+        {
+            stmt = connection.prepareStatement("SELECT * from subscriber where subscriber_id = ?;");
+            stmt.setString(1, subscriberID);
+            ResultSet rs = stmt.executeQuery();
+
+            // we have only on a result if existed, else zero.
+            if (rs.next())
+            {
+            	 subscriber = new Subscriber(rs.getString("subscriber_id"),
+                         rs.getString("subscriber_first_name"), rs.getString("subscriber_last_name"),
+                         rs.getString("subscriber_phone_number"),
+                         rs.getString("subscriber_email"), rs.getBoolean("is_active"));
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! subscriber login failed");
+        }
+
+        return subscriber;
+    }
 
     /**
      * The method run SQL query to create a new subscriber in the db
