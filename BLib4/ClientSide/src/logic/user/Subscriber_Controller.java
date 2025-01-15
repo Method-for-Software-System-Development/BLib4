@@ -112,12 +112,46 @@ public class Subscriber_Controller {
      * @param type	type of the user (librarian/subscriber).
      */
     private void attemptLogin(String userID, String password, String type){
-    	// Create a list of data of the new user to send to the server
+    	// Create a list of data of the user to send to the server
         ArrayList<String> dataOfLogIn = new ArrayList<>();
         dataOfLogIn.add(userID);
         dataOfLogIn.add(password);
         dataOfLogIn.add(type);
         ClientUI.chat.accept(new MessageType("100",dataOfLogIn));
+    }
+    
+    /**
+     * The method sends a log out request from a subscriber
+     * 
+     * @param userID ID of subscriber
+     */
+    public void attemptLogOutAsSubscriber(String userID) {
+    	//send a request to the server to log out the subscriber
+    	attemptLogOut("subscriber",userID);
+    }
+    
+    /**
+     * The method sends a log out request from a librarian
+     * 
+     * @param userID ID of librarian
+     */
+    public void attemptLogOutAsLibrarian(String userID) {
+    	//send a request to the server to log out the librarian
+    	attemptLogOut("librarian",userID);
+    }
+    
+    /**
+     * The method sends a log out request from a user
+     * 
+     * @param userType type of the user
+     * @param userID ID of the user
+     */
+    private void attemptLogOut(String userType, String userID) {
+    	// Create a list of data of the user to send to the server
+    	ArrayList<String> dataOfLogOut = new ArrayList<>();
+        dataOfLogOut.add(userType);
+        dataOfLogOut.add(userID);
+        ClientUI.chat.accept(new MessageType("101",dataOfLogOut));
     }
     
     /**
@@ -148,6 +182,7 @@ public class Subscriber_Controller {
         alert.showAndWait();
 		return null;    	
     }
+    
     /**
      * This method send a request to server to extend a borrow by subscriber
      * 
