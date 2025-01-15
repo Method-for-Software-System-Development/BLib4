@@ -121,34 +121,22 @@ public class Subscriber_Controller {
     }
     
     /**
-     * The method sends a log out request from a subscriber
-     * 
-     * @param userID ID of subscriber
-     */
-    public void attemptLogOutAsSubscriber(String userID) {
-    	//send a request to the server to log out the subscriber
-    	attemptLogOut("subscriber",userID);
-    	loggedSubscriber=null;
-    }
-    
-    /**
-     * The method sends a log out request from a librarian
-     * 
-     * @param userID ID of librarian
-     */
-    public void attemptLogOutAsLibrarian(String userID) {
-    	//send a request to the server to log out the librarian
-    	attemptLogOut("librarian",userID);
-    	loggedLibrarian=null;
-    }
-    
-    /**
      * The method sends a log out request from a user
-     * 
-     * @param userType type of the user
-     * @param userID ID of the user
      */
-    private void attemptLogOut(String userType, String userID) {
+    public void attemptLogOut() {
+    	String userType;
+    	String userID;
+    	//check user type, save the id and delete logged user
+    	if (loggedSubscriber!=null) {
+    		userType="subscriber";
+    		userID=loggedSubscriber.getId();
+    		loggedSubscriber=null;
+    	}
+    	else {
+    		userType="librarian";
+    		userID=loggedLibrarian.getId();
+    		loggedLibrarian=null;
+    	}
     	// Create a list of data of the user to send to the server
     	ArrayList<String> dataOfLogOut = new ArrayList<>();
         dataOfLogOut.add(userType);
