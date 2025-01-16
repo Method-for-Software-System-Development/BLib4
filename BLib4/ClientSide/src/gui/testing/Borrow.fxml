@@ -5,7 +5,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane prefHeight="372.0" prefWidth="318.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="372.0" prefWidth="318.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"> fx:controller="gui.testing.BorrowViewController">
    <children>
       <Button fx:id="btnBorrow" layoutX="132.0" layoutY="294.0" mnemonicParsing="false" onAction="#createNewBorrow" text="borrow" />
       <Label layoutX="34.0" layoutY="70.0" prefHeight="26.0" prefWidth="54.0" text="Copy ID:" />
