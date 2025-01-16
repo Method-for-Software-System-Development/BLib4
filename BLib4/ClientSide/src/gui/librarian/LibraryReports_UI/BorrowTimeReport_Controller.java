@@ -7,7 +7,7 @@ import javafx.scene.chart.XYChart;
 import logic.communication.SceneManager;
 import logic.librarian.ReportsGenerator_Controller;
 
-import java.awt.Button;
+import javafx.scene.control.Button;
 import java.util.List;
 import java.util.Map;
 
