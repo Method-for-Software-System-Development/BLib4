@@ -8,6 +8,7 @@ import entities.user.Subscriber;
 import javafx.scene.control.Alert;
 import logic.communication.ChatClient;
 import logic.communication.ClientUI;
+import logic.communication.SceneManager;
 
 public class Subscriber_Controller {   
 
@@ -157,7 +158,9 @@ public class Subscriber_Controller {
     	ArrayList<String> dataOfLogOut = new ArrayList<>();
         dataOfLogOut.add(userType);
         dataOfLogOut.add(userID);
-        ClientUI.chat.accept(new MessageType("101",dataOfLogOut));
+        ClientUI.chat.accept(new MessageType("1002",dataOfLogOut));
+        //switch to home page
+        SceneManager.switchScene("/gui/common/homePage/HomePage_UI.fxml", "BLib.4 - Braude Library Management");
     }
     
     /**

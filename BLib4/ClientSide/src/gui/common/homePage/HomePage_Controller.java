@@ -26,109 +26,73 @@ import java.util.List;
  */
 public class HomePage_Controller {
 
-    /**
-     * A RadioButton used to indicate a Subscriber account type.
-     */
+    // FXML fields for seeIfNotLoggedIn
+    @FXML
+    private VBox seeIfNotLoggedIn;
     @FXML
     private RadioButton subscriberRadioButton;
-
-    /**
-     * A RadioButton used to indicate a Librarian account type.
-     */
     @FXML
     private RadioButton librarianRadioButton;
-
-    /**
-     * The ToggleGroup that holds the account type radio buttons (Subscriber or Librarian).
-     */
     @FXML
     private ToggleGroup accountTypeGroup;
-
-    /**
-     * A TextField for entering the user ID.
-     */
     @FXML
     private TextField idTextField;
-
-    /**
-     * A TextField for entering the user password.
-     */
     @FXML
     private TextField passwordTextField;
-
-    /**
-     * A Button that triggers scanning of a reader card.
-     */
     @FXML
     private Button scanReaderCardButton;
-
-    /**
-     * The ImageView associated with the scanReaderCardButton.
-     */
     @FXML
     private ImageView scanReaderCardImageView;
-
-    /**
-     * The Button used to submit the login form.
-     */
     @FXML
     private Button loginButton;
-
-    /**
-     * The ImageView associated with the loginButton.
-     */
     @FXML
     private ImageView loginImageView;
-
-    /**
-     * A Button that directs the user to the search screen.
-     */
     @FXML
     private Button searchBooksButton;
-
-    /**
-     * The ImageView associated with the searchBooksButton.
-     */
     @FXML
     private ImageView searchBooksImageView;
 
-    /**
-     * A Button used to exit the application.
-     */
+    // FXML fields for seeIfLoggedIn
+    @FXML
+    private VBox seeIfLoggedIn;
+    @FXML
+    private Text userGreeting;
+    @FXML
+    private Button dashboardButton;
+    @FXML
+    private ImageView dashboardImageView;
+    @FXML
+    private Button searchBooksButton2;
+    @FXML
+    private ImageView searchBooksImageView2;
+    @FXML
+    private Button viewHistoryButton;
+    @FXML
+    private ImageView viewHistoryImageView;
+    @FXML
+    private Button editProfileButton;
+    @FXML
+    private ImageView editProfileImageView;
+    @FXML
+    private Button logoutButton;
+    @FXML
+    private ImageView logoutImageView;
+
+    // FXML fields for both
     @FXML
     private Button exitButton;
-
-    /**
-     * The ImageView associated with the exitButton.
-     */
     @FXML
     private ImageView exitImageView;
-
-    /**
-     * An HBox that displays newly arrived books.
-     */
     @FXML
     private HBox newArrivalsHBox;
-
-    /**
-     * An HBox that displays the most borrowed books.
-     */
     @FXML
     private HBox mostBorrowedHBox;
 
-    /**
-     * The singleton controller for handling subscriber-related logic.
-     */
+    // Fields
     private Subscriber_Controller subscriberController;
-
-    /**
-     * A list of Book entities representing new arrivals.
-     */
+    private boolean isSubscriberLoggedIn;
+    private boolean isLibrarianLoggedIn;
     private List<Book> newArrivalBooks;
-
-    /**
-     * A list of Book entities representing the most borrowed books.
-     */
     private List<Book> mostBorrowedBooks;
 
     /**
@@ -141,15 +105,34 @@ public class HomePage_Controller {
         // Get the singleton instance of Subscriber_Controller
         subscriberController = Subscriber_Controller.getInstance();
 
+        // Check if a Subscriber or Librarian is logged in
+        isSubscriberLoggedIn = subscriberController.getLoggedSubscriber() != null;
+        isLibrarianLoggedIn = subscriberController.getLoggedLibrarian() != null;
+
+        // Show the appropriate VBox based on login status
+        if (isSubscriberLoggedIn || isLibrarianLoggedIn) {
+            seeIfNotLoggedIn.setVisible(false);
+            seeIfNotLoggedIn.setManaged(false);
+            seeIfLoggedIn.setVisible(true);
+            seeIfLoggedIn.setManaged(true);
+            userGreeting.setText(getGreetingMessage() + " " + subscriberController.getLoggedSubscriber().getFirstName() + " !");
+        } else {
+            seeIfNotLoggedIn.setVisible(true);
+            seeIfNotLoggedIn.setManaged(true);
+            seeIfLoggedIn.setVisible(false);
+            seeIfLoggedIn.setManaged(false);
+        }
+
+        // Set up radio buttons for account type selection
         accountTypeGroup = new ToggleGroup();
         subscriberRadioButton.setToggleGroup(accountTypeGroup);
         librarianRadioButton.setToggleGroup(accountTypeGroup);
         subscriberRadioButton.setSelected(true);
 
+        // Set up hover effects for buttons
         scanReaderCardButton.setOnMouseEntered(event -> {
             scanReaderCardImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/qr_code_scanner_24dp_525FE1.png")));
         });
-
         scanReaderCardButton.setOnMouseExited(event -> {
             scanReaderCardImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/qr_code_scanner_24dp_FFFFFF.png")));
         });
@@ -157,7 +140,6 @@ public class HomePage_Controller {
         loginButton.setOnMouseEntered(event -> {
             loginImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/login_24dp_F86F03.png")));
         });
-
         loginButton.setOnMouseExited(event -> {
             loginImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/login_24dp_FFFFFF.png")));
         });
@@ -165,19 +147,53 @@ public class HomePage_Controller {
         searchBooksButton.setOnMouseEntered(event -> {
             searchBooksImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/search_24dp_525FE1.png")));
         });
-
         searchBooksButton.setOnMouseExited(event -> {
             searchBooksImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/search_24dp_FFFFFF.png")));
+        });
+
+        dashboardButton.setOnMouseEntered(event -> {
+            dashboardImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/person_24dp_F86F03.png")));
+        });
+        dashboardButton.setOnMouseExited(event -> {
+            dashboardImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/person_24dp_FFFFFF.png")));
+        });
+
+        searchBooksButton2.setOnMouseEntered(event -> {
+            searchBooksImageView2.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/search_24dp_525FE1.png")));
+        });
+        searchBooksButton2.setOnMouseExited(event -> {
+            searchBooksImageView2.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/search_24dp_FFFFFF.png")));
+        });
+
+        viewHistoryButton.setOnMouseEntered(event -> {
+            viewHistoryImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/history_24dp_525FE1.png")));
+        });
+        viewHistoryButton.setOnMouseExited(event -> {
+            viewHistoryImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/history_24dp_FFFFFF.png")));
+        });
+
+        editProfileButton.setOnMouseEntered(event -> {
+            editProfileImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/edit_24dp_525FE1.png")));
+        });
+        editProfileButton.setOnMouseExited(event -> {
+            editProfileImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/edit_24dp_FFFFFF.png")));
+        });
+
+        logoutButton.setOnMouseEntered(event -> {
+            logoutImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/logout_24dp_525FE1.png")));
+        });
+        logoutButton.setOnMouseExited(event -> {
+            logoutImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/logout_24dp_FFFFFF.png")));
         });
 
         exitButton.setOnMouseEntered(event -> {
             exitImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/close_24dp_525FE1.png")));
         });
-
         exitButton.setOnMouseExited(event -> {
             exitImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/close_24dp_FFFFFF.png")));
         });
 
+        // Retrieve data for new arrivals and most borrowed books
         ClientUI.chat.accept(new MessageType("120", null));
         newArrivalBooks = ChatClient.books;
         populateBooksHBox(newArrivalsHBox, newArrivalBooks);
@@ -185,6 +201,25 @@ public class HomePage_Controller {
         ClientUI.chat.accept(new MessageType("121", null));
         mostBorrowedBooks = ChatClient.books;
         populateBooksHBox(mostBorrowedHBox, mostBorrowedBooks);
+    }
+
+    /**
+     * Returns a greeting message based on the current time of day.
+     *
+     * @return the greeting message
+     */
+    private String getGreetingMessage() {
+        int hour = java.time.LocalTime.now().getHour();
+
+        if (hour >= 5 && hour < 12) {
+            return "Good Morning";
+        } else if (hour >= 12 && hour < 17) {
+            return "Good Afternoon";
+        } else if (hour >= 17 && hour < 21) {
+            return "Good Evening";
+        } else {
+            return "Good Night";
+        }
     }
 
     /**
@@ -376,8 +411,7 @@ public class HomePage_Controller {
             if (accountType.equals("Subscriber")) {
                 Subscriber subscriber = subscriberController.attemptLoginAsSubscriber(userID, password);
                 if (subscriber != null) {
-//                    SceneManager.switchScene("/gui/user/subscriberUI/SubscriberUI_UI.fxml", "BLib.4 - Braude Library Management");
-                    SceneManager.switchScene("/gui/common/homePage/HomePage_UI.fxml", "BLib.4 - Braude Library Management"); // FOR TESTING
+                    SceneManager.switchScene("/gui/user/subscriberUI/SubscriberUI_UI.fxml", "BLib.4 - Braude Library Management");
                 } else {
                     clearFields();
                     showErrorAlert("Login Failed", "The account was not found. Please verify that the details you entered are correct.");
@@ -415,6 +449,19 @@ public class HomePage_Controller {
         alert.setContentText(message);
         alert.initOwner(SceneManager.getStage());
         alert.showAndWait();
+    }
+
+    /**
+     * Logs out the current user and navigates to the Home Page.
+     */
+    @FXML
+    private void logout() {
+        subscriberController.attemptLogOut();
+    }
+
+    @FXML
+    private void goToDashboard() {
+        SceneManager.switchScene("/gui/user/subscriberUI/SubscriberUI_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
     /**

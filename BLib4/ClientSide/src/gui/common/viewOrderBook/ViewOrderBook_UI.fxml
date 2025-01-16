@@ -44,6 +44,7 @@
         <!-- White Separator -->
         <Separator prefHeight="5.0" styleClass="menu-separator"/>
 
+        <!-- ***************** This VBox will be shown if the user is not logged in ***************** -->
         <VBox fx:id="seeIfNotLoggedIn">
 
             <VBox alignment="TOP_LEFT" spacing="20.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
@@ -85,8 +86,8 @@
 
                 <!-- Scan Reader Card and Login Buttons -->
                 <HBox>
-                    <Button fx:id="scanReaderCardButton" onAction="#validate_scanReaderCard_login" prefHeight="50.0"
-                            styleClass="transparent-button" text="Scan Reader Card">
+                    <Button fx:id="scanReaderCardButton" prefHeight="50.0" styleClass="transparent-button"
+                            text="Scan Reader Card" onAction="#validate_scanReaderCard_login">
                         <graphic>
                             <ImageView fx:id="scanReaderCardImageView" fitHeight="24.0" fitWidth="24.0"
                                        preserveRatio="true">
@@ -100,8 +101,8 @@
                     <!-- Spacer Region -->
                     <Region HBox.hgrow="ALWAYS"/>
 
-                    <Button fx:id="loginButton" onAction="#validate_login_form" prefHeight="50.0" prefWidth="150.0"
-                            styleClass="orange-button" text="Login">
+                    <Button fx:id="loginButton" prefHeight="50.0" prefWidth="150.0" styleClass="orange-button"
+                            text="Login" onAction="#validate_login_form">
                         <graphic>
                             <ImageView fx:id="loginImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
                                 <image>
@@ -130,23 +131,122 @@
             <!-- White Separator -->
             <Separator prefHeight="5.0" styleClass="menu-separator"/>
 
+            <!-- Menu Buttons -->
+            <Button fx:id="searchBooksButton" maxWidth="Infinity" onAction="#goToSearch" prefHeight="50.0"
+                    styleClass="transparent-button" text="Search For Books">
+                <graphic>
+                    <ImageView fx:id="searchBooksImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                        <image>
+                            <Image url="@../../assets/icons/search_24dp_FFFFFF.png"/>
+                        </image>
+                    </ImageView>
+                </graphic>
+                <VBox.margin>
+                    <Insets top="25.0"/>
+                </VBox.margin>
+            </Button>
+
         </VBox>
+        <!-- ***************** End of VBox for not logged in ***************** -->
+
+        <!-- ***************** This VBox will be shown if the user is logged in ***************** -->
+        <VBox fx:id="seeIfLoggedIn" alignment="TOP_CENTER">
+
+            <Text fx:id="userGreeting" styleClass="menu-title">
+                <VBox.margin>
+                    <Insets bottom="25.0" top="25.0"/>
+                </VBox.margin>
+            </Text>
+
+            <!-- White Separator -->
+            <Separator prefHeight="5.0" styleClass="menu-separator"/>
+
+            <Button fx:id="dashboardButton" maxWidth="Infinity" onAction="#goToDashboard" prefHeight="50.0"
+                    styleClass="orange-button" text="My Dashboard">
+                <graphic>
+                    <ImageView fx:id="dashboardImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                        <image>
+                            <Image url="@../../assets/icons/person_24dp_FFFFFF.png"/>
+                        </image>
+                    </ImageView>
+                </graphic>
+                <VBox.margin>
+                    <Insets top="25.0"/>
+                </VBox.margin>
+            </Button>
+
+            <Button fx:id="searchBooksButton2" maxWidth="Infinity" onAction="#goToSearch" prefHeight="50.0"
+                    styleClass="transparent-button" text="Search For Books">
+                <graphic>
+                    <ImageView fx:id="searchBooksImageView2" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                        <image>
+                            <Image url="@../../assets/icons/search_24dp_FFFFFF.png"/>
+                        </image>
+                    </ImageView>
+                </graphic>
+                <VBox.margin>
+                    <Insets top="25.0"/>
+                </VBox.margin>
+            </Button>
+
+            <Button fx:id="viewHistoryButton" maxWidth="Infinity" prefHeight="50.0" styleClass="transparent-button"
+                    text="View Activity History">
+                <graphic>
+                    <ImageView fx:id="viewHistoryImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                        <image>
+                            <Image url="@../../assets/icons/history_24dp_FFFFFF.png"/>
+                        </image>
+                    </ImageView>
+                </graphic>
+                <VBox.margin>
+                    <Insets top="25.0"/>
+                </VBox.margin>
+            </Button>
+
+            <Button fx:id="editProfileButton" maxWidth="Infinity" prefHeight="50.0" styleClass="transparent-button"
+                    text="Edit Profile">
+                <graphic>
+                    <ImageView fx:id="editProfileImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                        <image>
+                            <Image url="@../../assets/icons/edit_24dp_FFFFFF.png"/>
+                        </image>
+                    </ImageView>
+                </graphic>
+                <VBox.margin>
+                    <Insets top="25.0"/>
+                </VBox.margin>
+            </Button>
+
+            <Button fx:id="logoutButton" maxWidth="Infinity" onAction="#logout" prefHeight="50.0" styleClass="transparent-button"
+                    text="Logout">
+                <graphic>
+                    <ImageView fx:id="logoutImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                        <image>
+                            <Image url="@../../assets/icons/logout_24dp_FFFFFF.png"/>
+                        </image>
+                    </ImageView>
+                </graphic>
+                <VBox.margin>
+                    <Insets top="25.0"/>
+                </VBox.margin>
+            </Button>
+
+        </VBox>
+        <!-- ***************** End of VBox for logged in ***************** -->
 
         <!-- Spacer Region -->
-        <Region VBox.vgrow="ALWAYS"/>
+        <Region fx:id="menuButtonsSpacer" VBox.vgrow="ALWAYS"/>
 
-        <!-- Menu Buttons -->
-        <Button fx:id="backButton" maxWidth="Infinity" onAction="#goBack" prefHeight="50.0"
-                styleClass="transparent-button" text="Back to Home Page">
+        <Button fx:id="homePageButton" maxWidth="Infinity" onAction="#goToHomePage" prefHeight="50.0" styleClass="transparent-button" text="Home Page">
             <graphic>
-                <ImageView fx:id="backImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                <ImageView fx:id="homePageImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
                     <image>
-                        <Image url="@../../assets/icons/back_24dp_FFFFFF.png"/>
+                        <Image url="@../../assets/icons/home_24dp_FFFFFF.png" />
                     </image>
                 </ImageView>
             </graphic>
             <VBox.margin>
-                <Insets top="25.0"/>
+                <Insets top="25.0" />
             </VBox.margin>
         </Button>
 
@@ -173,7 +273,7 @@
             </VBox.margin>
         </TextFlow>
 
-    </VBox>
+    </VBox> <!-- End of Menu VBox -->
 
     <!-- Header (Top Panel) -->
     <VBox alignment="BOTTOM_LEFT" maxHeight="200.0" minHeight="200.0" prefHeight="200.0" styleClass="header"
