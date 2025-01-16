@@ -30,13 +30,13 @@ public class BorrowController {
      * Sends subscriber ID and book ID to the server for validation (Message Type 107).
      * Waits for server response (Message Type 207).
      */
-    public void createNewBorrow(String enteredSubscriberID, String enteredBookID ) {
+    public void createNewBorrow(String enteredSubscriberID, String enteredCopyBookID ) {
         try {
-            if(BooksController.getInstance().checkAvailability(enteredBookID)) {
+            if(BooksController.getInstance().checkAvailability(enteredCopyBookID)) {
                 // Create a list to be sent in the message to the server
                 ArrayList<String> detailsOfBorrow = new ArrayList<>();
                 detailsOfBorrow.add(enteredSubscriberID);
-                detailsOfBorrow.add(enteredBookID);
+                detailsOfBorrow.add(enteredCopyBookID);
                 
                 // Sending the server subscriberID and bookID
                 ClientUI.chat.accept(new MessageType("107", detailsOfBorrow)); 
