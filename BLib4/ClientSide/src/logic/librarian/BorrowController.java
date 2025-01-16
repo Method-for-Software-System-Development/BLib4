@@ -3,10 +3,11 @@ package logic.librarian;
 import logic.communication.*;
 import entities.logic.MessageType;
 import java.util.ArrayList;
+
 import logic.user.*;
 
 public class BorrowController {
-	    private static BorrowController instance = null;
+	private static BorrowController instance = null;
 
     /*
      * Private constructor 
@@ -82,5 +83,4 @@ public class BorrowController {
     		System.out.println(e.toString());
     	}
     }
-    
 }
