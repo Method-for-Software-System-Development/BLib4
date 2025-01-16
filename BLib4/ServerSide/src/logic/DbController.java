@@ -1063,6 +1063,129 @@ public class DbController
 
         return returnValue;
     }
+    
+    /**
+     * The method run SQL query to extend the borrow period of a book by the librarian
+     *
+     * @param extensionRequest - [0] the borrow id
+     *                         [1] the new due date
+     *                         [2] the librarian id
+     * @return - true if the extension succeeds, else false
+     */
+    public boolean handleLibrarianExtendBorrow(List<String> extensionRequest)
+    {
+        PreparedStatement stmt;
+        String borrowId = extensionRequest.get(0);
+        Date newDueDate = Date.valueOf(extensionRequest.get(1));
+        String librarianId = extensionRequest.get(2); // librarian ID passed in the request
+        boolean returnValue = true;
+
+        // check if the borrow is active
+        try
+        {
+            stmt = connection.prepareStatement("SELECT * FROM borrow_book WHERE borrow_id = ?;");
+            stmt.setString(1, borrowId);
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next())
+            {
+                if (!rs.getBoolean("is_active"))
+                {
+                    returnValue = false;
+                }
+            }
+            else
+            {
+                // the borrow not found
+                returnValue = false;
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! extend borrow failed - can't check if the borrow is active");
+            returnValue = false;
+        }
+
+        // check if there is an order for that book
+        try
+        {
+            // get the book id
+            stmt = connection.prepareStatement("SELECT book_id FROM copy_of_the_book WHERE copy_id = (SELECT copy_id FROM borrow_book WHERE borrow_id = ?);");
+            stmt.setString(1, borrowId);
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next())
+            {
+                String bookId = rs.getString(1);
+
+                // check if there is an order for the book that waits for the return of the book
+                stmt = connection.prepareStatement("SELECT * FROM subscriber_order WHERE book_id = ? AND is_active = true AND is_his_turn = false;");
+                stmt.setString(1, bookId);
+
+                rs = stmt.executeQuery();
+                if (rs.next())
+                {
+                    // we can't extend the borrow
+                    returnValue = false;
+                }
+            }
+            else
+            {
+                // the book not found
+                returnValue = false;
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! extend borrow failed - can't check if there is an order for the book");
+            returnValue = false;
+        }
+
+        if (returnValue)
+        {
+            // we can extend the borrow - update the borrow due date to the new due date and add to extend history
+            try
+            {
+                // get the last extension id
+                stmt = connection.prepareStatement("SELECT MAX(extention_id) FROM extension_book;");
+                ResultSet rs = stmt.executeQuery();
+                rs.next();
+                int extendId = rs.getInt(1) + 1;
+
+                // get the current due date
+                stmt = connection.prepareStatement("SELECT borrow_due_date FROM borrow_book WHERE borrow_id = ?;");
+                stmt.setString(1, borrowId);
+                rs = stmt.executeQuery();
+                rs.next();
+                Date currentDueDate = rs.getDate(1);
+
+                // create a new row in the extension_book table with librarian details
+                stmt = connection.prepareStatement(
+                    "INSERT INTO extension_book (extention_id, borrow_id, original_due_date, new_due_date, extention_type, extention_operator, extention_date) " +
+                    "VALUES (?, ?, ?, ?, true, ?, CURRENT_DATE);"
+                );
+                stmt.setString(1, String.valueOf(extendId));
+                stmt.setString(2, borrowId);
+                stmt.setDate(3, currentDueDate);
+                stmt.setDate(4, newDueDate);
+                stmt.setString(5, librarianId);
+                stmt.executeUpdate();
+
+                // update the borrow due date
+                stmt = connection.prepareStatement("UPDATE borrow_book SET borrow_due_date = ? WHERE borrow_id = ?;");
+                stmt.setDate(1, newDueDate);
+                stmt.setString(2, borrowId);
+                stmt.executeUpdate();
+            }
+            catch (SQLException e)
+            {
+                System.out.println("Error! extend borrow failed - can't update the borrow in the db");
+                returnValue = false;
+            }
+        }
+
+        return returnValue;
+    }
 
 
     /**
