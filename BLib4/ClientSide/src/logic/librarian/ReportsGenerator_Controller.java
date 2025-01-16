@@ -14,6 +14,8 @@ import java.util.*;
 public class ReportsGenerator_Controller {
 
     private static ReportsGenerator_Controller instance = null;
+    private String month;
+	private String year;
     public static ReportsGenerator_Controller getInstance()
     {
         if (instance == null)
@@ -130,4 +132,20 @@ public class ReportsGenerator_Controller {
         }
         return dailyValues;
     }
+
+	public String getMonth() {
+		return month;
+	}
+
+	public void setMonth(String month) {
+		this.month = month;
+	}
+
+	public String getYear() {
+		return year;
+	}
+
+	public void setYear(String year) {
+		this.year = year;
+	}
 }
