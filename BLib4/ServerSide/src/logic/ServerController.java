@@ -87,9 +87,10 @@ public class ServerController extends AbstractServer
                 break;
 
             case "101":
-            	//subscriber wants to log in by card
-            	responseMsg = new MessageType("201",dbController.handleLogInSubscriberByCard((String) receiveMsg.data));
-            	
+                //subscriber wants to log in by card
+                responseMsg = new MessageType("201", dbController.handleLogInSubscriberByCard((String) receiveMsg.data));
+                break;
+
             case "1002":
                 // Client wants to log out
                 handleLogoutRequest((List<String>) receiveMsg.data, client);
@@ -99,14 +100,14 @@ public class ServerController extends AbstractServer
             case "104":
                 // Sign up request to add new subscriber
                 responseMsg = new MessageType("204", dbController.handleSubscriberSignUp((List<String>) receiveMsg.data));
-                // If query to sign a new subscriber returns true - document on reader card
+                // If a query to sign a new subscriber returns true - document on reader card
                 if ((boolean) responseMsg.getData())
                 {
                     // Getting the history file of the subscriber by his id
                     List<String[]> historyList = dbController.getHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0));
                     // Document sign up on subscriber card
                     List<String[]> newHistoryList = documantaionController.documentOnReaderCard("104", historyList, null, null);
-                    // Updating subscriber history file in DB
+                    // Updating a subscriber history file in DB
                     dbController.handleUpdateHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0), newHistoryList);
                 }
                 break;
@@ -281,7 +282,8 @@ public class ServerController extends AbstractServer
 
             case "117":
                 // Request by the librarian to manually extend book borrow
-                //ToDo: implement
+                responseMsg = new MessageType("217", dbController.handleLibrarianExtendBorrow((List<String>) receiveMsg.data));
+
                 if ((boolean) responseMsg.getData())
                 {
                     // Getting subscriber ID using borrow ID
@@ -319,28 +321,47 @@ public class ServerController extends AbstractServer
                 responseMsg = new MessageType("221", dbController.handleGetFiveMostPopularBooks());
                 break;
 
+            case "122":
+                // Request from the client to get all the missed sms of the subscriber
+                responseMsg = new MessageType("222", dbController.handleGetSubscriberMissedSms((String) receiveMsg.data));
+                break;
+
             case "123":
                 // Request to get book location in the library
                 responseMsg = new MessageType("223", dbController.handleGetBookLocation((String) receiveMsg.data));
                 break;
 
-            case "125":
-                //Request to get the if of a report
-                responseMsg = new MessageType("225", dbController.fetchReportId((List<String>) receiveMsg.data));
-
-            case "126":
-                //Request to get blob data of a report
-            	byte[] blobData =dbController.fetchReportBlob((List<String>) receiveMsg.data);
-                responseMsg = new MessageType("226", BlobUtil.convertBlobToList(blobData));
-
-            case "127":
-                //request to create new empty report for next month
-                dbController.insertEmptyMonthlyReport((List<String>) receiveMsg.data);
-
             case "124":
                 // check if the book is available for order
                 responseMsg = new MessageType("224", dbController.handleCheckIfBookIsAvailableForOrder((String) receiveMsg.data));
                 break;
+
+            case "125":
+                //Request to get the if of a report
+                responseMsg = new MessageType("225", dbController.fetchReportId((List<String>) receiveMsg.data));
+                break;
+
+            case "126":
+                //Request to get blob data of a report
+                byte[] blobData = dbController.fetchReportBlob((List<String>) receiveMsg.data);
+                responseMsg = new MessageType("226", BlobUtil.convertBlobToList(blobData));
+                break;
+
+            case "127":
+                //request to create new empty report for next month
+                dbController.insertEmptyMonthlyReport((List<String>) receiveMsg.data);
+                break;
+
+            case "128":
+                // Response to get all librarian unread messages
+                responseMsg = new MessageType("228", dbController.handleGetUnreadLibrarianMessages());
+                break;
+
+            case "129":
+                // Response to update mark librarian message as read
+                responseMsg = new MessageType("229", dbController.handleMarkLibrarianNotificationAsRead((String) receiveMsg.data));
+                break;
+
             default:
                 System.out.println("Invalid message type");
                 return;
@@ -438,7 +459,6 @@ public class ServerController extends AbstractServer
                     activeSubscribers.put(data.get(0), client);
                 }
 
-                handleSendingMissedSmsOnSubscriberLogIn(data.get(0));
                 break;
 
             case "librarian":
@@ -467,7 +487,7 @@ public class ServerController extends AbstractServer
     }
 
     /**
-     * This method handles the received "101" message and update the active subscribers/librarians list
+     * This method handles the received "101" message and updates the active subscribers/librarians list
      *
      * @param receiveMsg - received message from the client
      * @param client     - the client connection
@@ -515,32 +535,12 @@ public class ServerController extends AbstractServer
                 break;
 
             default:
-                System.out.println("Error! invalid search type"); // ToDo: check if we need to send MessageType with null
+                System.out.println("Error! invalid search type");
+                responseMsg = new MessageType("205", null);
                 break;
         }
 
         return responseMsg;
     }
 
-    /**
-     * This method handles the sending of missed sms to the subscriber when he logs in
-     *
-     * @param subscriberId - the subscriber id to send the sms to
-     */
-    private void handleSendingMissedSmsOnSubscriberLogIn(String subscriberId)
-    {
-        List<String> missedSms = null;//ToDO: implement = dbController.handleGetSubscriberMissedSms(subscriberId);
-        if (missedSms != null)
-        {
-            ConnectionToClient client = activeSubscribers.get(subscriberId);
-            if (client != null)
-            {
-                for (String sms : missedSms)
-                {
-                    MessageType responseMsg = new MessageType("222", missedSms);
-                    sendMessageToClient(client, responseMsg);
-                }
-            }
-        }
-    }
 }

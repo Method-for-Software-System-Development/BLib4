@@ -2356,6 +2356,98 @@ public class DbController
         }
         return null; // Return null if no report is found or an error occurs
     }
-   
+
+    /**
+     * The method run SQL query to get all the librarian unread messages
+     * @return - list of all the unread messages
+     */
+    public List<List<String>> handleGetUnreadLibrarianMessages()
+    {
+        PreparedStatement stmt;
+        List<List<String>> returnList = new ArrayList<>();
+
+        try
+        {
+            stmt = connection.prepareStatement("SELECT * FROM notification WHERE is_confirmed = 0 AND notification_type = 'Librarian';");
+
+            ResultSet rs = stmt.executeQuery();
+
+            // add all the messages to the list
+            while (rs.next())
+            {
+                List<String> message = new ArrayList<>();
+                message.add(rs.getString("notification_id"));
+                message.add(rs.getString("notification_date"));
+                message.add(rs.getString("notification_text"));
+                returnList.add(message);
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! get unread librarian messages failed");
+        }
+
+
+        return returnList;
+    }
+
+    /**
+     * The method run SQL query to update the librarian message to read
+     * @param notificationId - the id of the message to update
+     * @return - true if the update was successful, false otherwise
+     */
+    public boolean handleMarkLibrarianNotificationAsRead(String notificationId)
+    {
+        PreparedStatement stmt;
+
+        try
+        {
+            stmt = connection.prepareStatement("UPDATE notification SET is_confirmed = 1 WHERE notification_id = ?;");
+            stmt.setString(1, notificationId);
+            stmt.executeUpdate();
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! mark librarian notification as read failed");
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * The method run SQL query to get all the subscriber unread messages and then update them to read
+     * @param subscriberId - the id of the subscriber
+     * @return - list of all the unread messages
+     */
+    public List<String> handleGetSubscriberMissedSms(String subscriberId)
+    {
+        PreparedStatement stmt;
+        List<String> messages = new ArrayList<>();
+
+        try
+        {
+            stmt = connection.prepareStatement("SELECT * FROM notification WHERE notification_type = 'Subscriber'  AND user_id = ?;");
+            stmt.setString(1, subscriberId);
+            ResultSet rs = stmt.executeQuery();
+
+            // add all the messages to the list
+            while (rs.next())
+            {
+                messages.add(rs.getString("notification_text"));
+            }
+
+            // update the messages to read
+            stmt = connection.prepareStatement("UPDATE notification SET is_confirmed = 1 WHERE notification_type = 'Subscriber' AND  user_id = ?;");
+            stmt.setString(1, subscriberId);
+            stmt.executeUpdate();
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! get unread librarian messages failed");
+        }
+
+        return messages;
+    }
 }
 
