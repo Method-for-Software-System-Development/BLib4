@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="300.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.testing.BorrowViewController">
+   <children>
+      <Button fx:id="btnBorrow" layoutX="157.0" layoutY="99.0" mnemonicParsing="false" onAction="#handlecreateNewBorrow" text="borrow" />
+      <Label layoutX="40.0" layoutY="29.0" prefHeight="26.0" prefWidth="54.0" text="Book ID:" />
+      <Label layoutX="40.0" layoutY="63.0" prefHeight="26.0" prefWidth="85.0" text="Subscriber ID:" />
+       <Label layoutX="30.0" layoutY="150.0" prefHeight="26.0" prefWidth="85.0" text="Borrow ID:" />
+      <TextField fx:id="txtBookID" layoutX="126.0" layoutY="29.0" />
+      <TextField fx:id="txtBorrowID" layoutX="126.0" layoutY="29.0" />
+      <TextField fx:id="txtSubscriberID" layoutX="126.0" layoutY="63.0" />
+      <Button fx:id="btnReturn" layoutX="196.0" layoutY="189.0" mnemonicParsing="false" onAction="#handlereturnBorrow" text="return book" />
+      <Button fx:id="btnExtend" layoutX="83.0" layoutY="189.0" mnemonicParsing="false" onAction="#handleManualextendBorrow" text="manual extend" />
+   </children>
+</AnchorPane>
