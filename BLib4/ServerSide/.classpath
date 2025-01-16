@@ -16,5 +16,7 @@
 	<classpathentry kind="lib" path="C:/OOP/javafx-sdk-22.0.1/lib/javafx-swt.jar"/>
 	<classpathentry kind="lib" path="C:/OOP/javafx-sdk-22.0.1/lib/javafx.base.jar"/>
 	<classpathentry exported="true" kind="src" path="/OCSF"/>
+	<classpathentry kind="lib" path="lib/dotenv-java-2.2.0.jar"/>
+	<classpathentry kind="lib" path="lib/javax.mail.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

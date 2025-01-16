@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.sun.jmx.snmp.SnmpStatusException;
 import gui.ServerMonitorFrameController;
 import entities.book.Book;
 import entities.logic.MessageType;
