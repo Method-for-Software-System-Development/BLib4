@@ -35,7 +35,11 @@ public class BorrowingReport extends Report{
 	 * @return A list of strings containing the borrow data for the book.
 	 */
 	public List<String> getBorrowingDataForBook(String bookTitle) {
-		return borrowingData.getOrDefault(bookTitle, new ArrayList<>());
+		return borrowingData.get(bookTitle);
+	}
+	
+	public Map<String, List<String>> getBorrowingData() {
+		return borrowingData;
 	}
 
 	
