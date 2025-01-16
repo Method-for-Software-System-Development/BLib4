@@ -7,10 +7,10 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.Map;
 
 public class SubscriberStatusReport extends Report {
-	private int[] dailyActive;
-	private int[] dailyFreeze;
+	private Map<String, int[]> usersActivityStatus;
 
 
 	/**
@@ -23,22 +23,14 @@ public class SubscriberStatusReport extends Report {
 	 * @param dailyActive Array of daily active subscribers
 	 * @param dailyFreeze Array of daily frozen subscribers
 	 */
-	public SubscriberStatusReport(int reportNum, String month, String year, Date issueDate,int[] dailyActive, int[] dailyFreeze)
+	public SubscriberStatusReport(int reportNum, String month, String year, Date issueDate,Map<String, int[]> usersActivityStatus)
 	{
 		super(reportNum, month, year, issueDate);
-		this.dailyActive = dailyActive;
-		this.dailyFreeze = dailyFreeze;
+		this.usersActivityStatus = usersActivityStatus;
 	}
 
 
-	public int[] getDailyActive() {
-		return dailyActive;
+	public Map<String, int[]> getUsersActivityStatus() {
+		return usersActivityStatus;
 	}
-
-	public int[] getDailyFreeze() {
-		return dailyFreeze;
-	}
-
-
-
 }

@@ -56,7 +56,7 @@ public class ReportsGenerator_Controller {
             System.out.println("No borrowing report found for: " + month + " " + year);
             return null;
         }
-        return new BorrowingReport(reportNum, month, year, new Date(), mapReportData(blobData));
+        return new BorrowingReport(reportNum, month, year, new Date(), mapBorrowReportData(blobData));
     }
 
     /**
@@ -90,10 +90,8 @@ public class ReportsGenerator_Controller {
             System.out.println("No subscriber status report found for: " + month + " " + year);
             return null;
         }
-        int[] dailyActive = extractDailyValues(blobData, 0);
-        int[] dailyFreeze = extractDailyValues(blobData, 1);
 
-        return new SubscriberStatusReport(reportNum, month, year, new Date(), dailyActive, dailyFreeze);
+        return new SubscriberStatusReport(reportNum, month, year, new Date(), mapSubscriberStatusReportData(blobData));
     }
 
     /**
@@ -102,7 +100,7 @@ public class ReportsGenerator_Controller {
      * @param reportData report data as a List<String[]>
      * @return report data as Map<String, List<String>>
      */
-    private Map<String, List<String>> mapReportData(List<String[]> reportData) {
+    private Map<String, List<String>> mapBorrowReportData(List<String[]> reportData) {
         Map<String, List<String>> mappedData = new HashMap<>();
         for (String[] row : reportData) {
             if (row.length >= 3) {
@@ -111,26 +109,24 @@ public class ReportsGenerator_Controller {
         }
         return mappedData;
     }
-
+    
     /**
-     * Extracts daily values from report data.
-     *
-     * @param reportData The report data as a List<String[]>.
-     * @param columnIndex The column index to extract values from.
-     * @return An array of integers representing daily values.
+     * Maps report data from List<String[]> to a Map<String, int[]>.
+
+     * @param reportData report data as a List<String[]>
+     * @return report data as Map<String, int[]>
      */
-    private int[] extractDailyValues(List<String[]> reportData, int columnIndex) {
-        // Skip the header row and initialize the array for daily values
-        int[] dailyValues = new int[reportData.size() - 1]; // Exclude header row
-        for (int i = 1; i < reportData.size(); i++) { // Start from the second row
-            try {
-                dailyValues[i - 1] = Integer.parseInt(reportData.get(i)[columnIndex]);
-            } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-                dailyValues[i - 1] = 0; // Set to 0 if parsing fails or index is invalid
-                System.out.println("Error parsing value at row " + i + ", column " + columnIndex + ": " + e.getMessage());
+    private Map<String, int[]> mapSubscriberStatusReportData(List<String[]> reportData){
+    	Map<String, int[]> mappedData = new HashMap<>();
+    	int[] intDataArray=new int[2];
+        for (String[] row : reportData) {
+        	intDataArray[0]=Integer.parseInt(row[1]);
+        	intDataArray[1]=Integer.parseInt(row[2]);
+            if (row.length >= 3) {
+                mappedData.put(row[0], intDataArray);
             }
         }
-        return dailyValues;
+        return mappedData;
     }
 
 	public String getMonth() {
