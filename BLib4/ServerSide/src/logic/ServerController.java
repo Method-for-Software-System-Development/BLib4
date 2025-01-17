@@ -350,6 +350,7 @@ public class ServerController extends AbstractServer
             case "127":
                 //request to create new empty report for next month
                 dbController.insertEmptyMonthlyReport((List<String>) receiveMsg.data);
+                responseMsg = new MessageType("227", null);
                 break;
 
             case "128":
