@@ -954,7 +954,7 @@ public class DbController
                     rs2.next();
 
                     // send email to the subscriber
-                    String message = "Dear " + rs.getString("subscriber_first_name") + ", your order for the book " +  rs2.getString("book_title") + " with ID \"" + bookId + "\" has arrived. Please visit the library to collect it.";
+                    String message = "Dear " + rs.getString("subscriber_first_name") + ", your order for the book " + rs2.getString("book_title") + " with ID \"" + bookId + "\" has arrived. Please visit the library to collect it.";
                     Notification_Controller.getInstance().sendEmail(subscriberEmail, "The book you ordered is now available for you to borrow", message);
                 }
             }
@@ -2487,5 +2487,31 @@ public class DbController
 
         return messages;
     }
+
+    public void handleSaveSubscriberMissedSms(String subscriberId, String message)
+    {
+        PreparedStatement stmt;
+
+        try
+        {
+            // get the latest notification id
+            stmt = connection.prepareStatement("SELECT MAX(notification_id) FROM notification;");
+            ResultSet rs = stmt.executeQuery();
+            rs.next();
+            int notificationId = rs.getInt(1) + 1;
+
+
+            stmt = connection.prepareStatement("INSERT INTO notification (notification_id, notification_type, user_id, notification_date, notification_text, is_confirmed) VALUES (? ,'Subscriber',?, NOW(), ?, 0);");
+            stmt.setInt(1, notificationId);
+            stmt.setString(2, subscriberId);
+            stmt.setString(3, message);
+            stmt.executeUpdate();
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! save subscriber missed sms failed");
+        }
+    }
+
 }
 

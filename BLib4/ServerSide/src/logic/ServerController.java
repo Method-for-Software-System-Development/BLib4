@@ -32,10 +32,10 @@ public class ServerController extends AbstractServer
     private ServerMonitorFrameController monitorController;
 
     //Class variables *************************************************
-    private DbController dbController;
+    private static DbController dbController;
     private DocumentationController documantaionController;
-    private Map<String, ConnectionToClient> activeSubscribers;
-    private Map<String, ConnectionToClient> activeLibrarians;
+    private static Map<String, ConnectionToClient> activeSubscribers;
+    private static Map<String, ConnectionToClient> activeLibrarians;
     //Constructors ****************************************************
 
     /**
@@ -541,6 +541,27 @@ public class ServerController extends AbstractServer
         }
 
         return responseMsg;
+    }
+
+    public static void HandleSendSmsToSubscriber(String subscriberID, String message)
+    {
+        // check if the subscriber is connected
+        if (activeSubscribers.containsKey(subscriberID))
+        {
+            try
+            {
+                activeSubscribers.get(subscriberID).sendToClient(new MessageType("222", message));
+            }
+            catch (IOException e)
+            {
+                System.out.println("Error sending message to subscriber");
+            }
+        }
+        else
+        {
+            // add the subscriber message to the table in the DB
+            dbController.handleSaveSubscriberMissedSms(subscriberID, message);
+        }
     }
 
 }

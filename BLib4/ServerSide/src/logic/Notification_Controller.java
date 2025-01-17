@@ -92,7 +92,7 @@ public class Notification_Controller {
         sendEmail(email, "Reminder: Book Due Tomorrow", message);
 
         // Simulate send SMS to subscriber
-        // ToDo: Implement SMS service
+        ServerController.HandleSendSmsToSubscriber(subscriberID, message);
 
         System.out.println("Notification sent to subscriberID: " + subscriberID);
     }
