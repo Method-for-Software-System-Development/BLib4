@@ -14,7 +14,7 @@ import entities.user.Subscriber;
 
 public class DbController
 {
-    private static DbController instance = null;
+    private static volatile DbController instance = null;
     private Connection connection;
 
     /**
@@ -34,7 +34,13 @@ public class DbController
     {
         if (instance == null)
         {
-            instance = new DbController();
+            synchronized (DbController.class)
+            {
+                if (instance == null)
+                {
+                    instance = new DbController();
+                }
+            }
         }
         return instance;
     }
@@ -140,16 +146,17 @@ public class DbController
 
         return librarian;
     }
-    
-    /**
-     * The method run SQL query to get the subscriber from the db by id 
 
+    /**
+     * The method run SQL query to get the subscriber from the db by id
+     *
      * @param subscriberID subscriber reader code - the ID of subscriber
      * @return the subscriber if log in succeed and null if not
      */
-    public Subscriber handleLogInSubscriberByCard(String subscriberID) {
+    public Subscriber handleLogInSubscriberByCard(String subscriberID)
+    {
         Subscriber subscriber = null;
-    	PreparedStatement stmt;
+        PreparedStatement stmt;
 
         try
         {
@@ -160,10 +167,10 @@ public class DbController
             // we have only on a result if existed, else zero.
             if (rs.next())
             {
-            	 subscriber = new Subscriber(rs.getString("subscriber_id"),
-                         rs.getString("subscriber_first_name"), rs.getString("subscriber_last_name"),
-                         rs.getString("subscriber_phone_number"),
-                         rs.getString("subscriber_email"), rs.getBoolean("is_active"));
+                subscriber = new Subscriber(rs.getString("subscriber_id"),
+                        rs.getString("subscriber_first_name"), rs.getString("subscriber_last_name"),
+                        rs.getString("subscriber_phone_number"),
+                        rs.getString("subscriber_email"), rs.getBoolean("is_active"));
             }
         }
         catch (SQLException e)
@@ -372,6 +379,7 @@ public class DbController
 
     /**
      * The method run SQL query to get the subscriber history from the db
+     *
      * @param subscriber_id - the id of the subscriber
      * @return - the subscriber history as List<String[]>
      */
@@ -535,9 +543,6 @@ public class DbController
 
         if (returnValue)
         {
-            //ToDo: what if the subscriber ordered the book and not borrowed it yet? how to handle it?
-
-
             // check that we have enough copies of the book that not ordered
             try
             {
@@ -655,8 +660,6 @@ public class DbController
 
         return true;
     }
-
-    //ToDo: add handle ordered book borrow: need to update the order table and then borrow the book
 
     /**
      * The method run SQL query to handle book order by the subscriber
@@ -879,7 +882,19 @@ public class DbController
                     stmt.setString(1, subscriberId);
                     stmt.executeUpdate();
 
-                    //ToDo: send to scheduler to unfreeze the subscriber after a month
+                    // get the current id of the scheduler
+                    stmt = connection.prepareStatement("SELECT MAX(scheduler_id) FROM scheduler_triggers;");
+                    rs = stmt.executeQuery();
+                    rs.next();
+                    int schedulerId = rs.getInt(1) + 1;
+
+                    // add trigger to the table
+                    stmt = connection.prepareStatement("INSERT INTO scheduler_triggers (scheduler_id, trigger_date, trigger_operation, relevant_id) VALUES (?,?, ?, ?);");
+                    stmt.setString(1, String.valueOf(schedulerId));
+                    stmt.setDate(2, Date.valueOf(LocalDate.now().plusMonths(1)));
+                    stmt.setString(3, "freeze");
+                    stmt.setString(4, subscriberId);
+                    stmt.executeUpdate();
 
                     returnValue.add(true);
                     returnValue.add(true);
@@ -899,6 +914,56 @@ public class DbController
                 returnValue.add(false);
             }
         }
+
+        // return successful, check if there are orders for the book and send notification
+        if (returnValue.get(0))
+        {
+            try
+            {
+                // get the book id from the borrow
+                stmt = connection.prepareStatement("SELECT book_id from copy_of_the_book WHERE copy_id = (SELECT copy_id from borrow_book WHERE borrow_id = ?);");
+                stmt.setString(1, borrowId);
+                ResultSet rs = stmt.executeQuery();
+                rs.next();
+                String bookId = rs.getString(1);
+
+                // check if there are orders for the book and get the oldest order
+                stmt = connection.prepareStatement("SELECT * from subscriber_order WHERE book_id = ? AND is_active = true AND is_his_turn = false ORDER BY order_date ASC LIMIT 1;");
+                stmt.setString(1, bookId);
+                rs = stmt.executeQuery();
+
+                // check if we have a subscriber that waits for the book
+                if (rs.next())
+                {
+                    // update order to have his turn on
+                    stmt = connection.prepareStatement("UPDATE subscriber_order SET is_his_turn = true WHERE order_id = ?;");
+                    stmt.setString(1, rs.getString("order_id"));
+                    stmt.executeUpdate();
+
+                    // get the subscriber email
+                    stmt = connection.prepareStatement("SELECT subscriber_email from subscriber WHERE subscriber_id = ?;");
+                    stmt.setString(1, rs.getString("subscriber_id"));
+                    ResultSet rs2 = stmt.executeQuery();
+                    rs2.next();
+                    String subscriberEmail = rs2.getString(1);
+
+                    // get the book name
+                    stmt = connection.prepareStatement("SELECT book_title from book WHERE book_id = ?;");
+                    stmt.setString(1, bookId);
+                    rs2 = stmt.executeQuery();
+                    rs2.next();
+
+                    // send email to the subscriber
+                    String message = "Dear " + rs.getString("subscriber_first_name") + ", your order for the book " +  rs2.getString("book_title") + " with ID \"" + bookId + "\" has arrived. Please visit the library to collect it.";
+                    Notification_Controller.getInstance().sendEmail(subscriberEmail, "The book you ordered is now available for you to borrow", message);
+                }
+            }
+            catch (SQLException e)
+            {
+                System.out.println("Error! return borrowed book failed - cant check if there are orders for the book + send email");
+            }
+        }
+
 
         return returnValue;
     }
@@ -1063,7 +1128,7 @@ public class DbController
 
         return returnValue;
     }
-    
+
     /**
      * The method run SQL query to extend the borrow period of a book by the librarian
      *
@@ -1161,8 +1226,8 @@ public class DbController
 
                 // create a new row in the extension_book table with librarian details
                 stmt = connection.prepareStatement(
-                    "INSERT INTO extension_book (extention_id, borrow_id, original_due_date, new_due_date, extention_type, extention_operator, extention_date) " +
-                    "VALUES (?, ?, ?, ?, true, ?, CURRENT_DATE);"
+                        "INSERT INTO extension_book (extention_id, borrow_id, original_due_date, new_due_date, extention_type, extention_operator, extention_date) " +
+                                "VALUES (?, ?, ?, ?, true, ?, CURRENT_DATE);"
                 );
                 stmt.setString(1, String.valueOf(extendId));
                 stmt.setString(2, borrowId);
@@ -1260,7 +1325,7 @@ public class DbController
         List<Subscriber> dueSubscribers = new ArrayList<>();
 
         try (PreparedStatement stmt = connection.prepareStatement(
-                "SELECT subscriber_id FROM borrow_book WHERE borrow_return_date = DATE_ADD(CURRENT_DATE, INTERVAL 1 DAY)"
+                "SELECT subscriber_id FROM borrow_book WHERE borrow_due_date = DATE_ADD(CURRENT_DATE, INTERVAL 1 DAY)"
         ))
         {
             ResultSet rs = stmt.executeQuery();
@@ -1280,63 +1345,18 @@ public class DbController
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
+            System.out.println("Error! notify day before return date failed");
         }
 
         return dueSubscribers;
     }
 
-    /**
-     * Updates the database to mark subscribers eligible to extend their borrow period.
-     * This method performs the following:
-     * 1. Queries the database to find all subscribers whose return date is exactly one week away.
-     * 2. Updates the "can_extend" column in the database to TRUE for those subscribers.
-     */
-    //ToDO: maybe
-//    public String handleOpenOptionToExtendBorrow() {
-//        PreparedStatement selectStmt = null;
-//        PreparedStatement updateStmt = null;
-//
-//        try {
-//            // SQL query to find subscribers whose return date is a week from today
-//            String selectQuery = "SELECT subscriber_id FROM borrow_book WHERE return_date = DATE_ADD(CURRENT_DATE, INTERVAL 7 DAY)";
-//            selectStmt = connection.prepareStatement(selectQuery);
-//
-//            ResultSet rs = selectStmt.executeQuery();
-//
-//            // SQL query to update the "can_extend" field to TRUE
-//            String updateQuery = "UPDATE borrow_book SET can_extend = TRUE WHERE subscriber_id = ?";
-//            updateStmt = connection.prepareStatement(updateQuery);
-//
-//            while (rs.next()) {
-//                String subscriberId = rs.getString("subscriber_id");
-//
-//                // Update the database for each eligible subscriber
-//                updateStmt.setString(1, subscriberId);
-//                updateStmt.executeUpdate();
-//            }
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        } finally {
-//            try {
-//                // Ensure resources are closed to prevent leaks
-//                if (selectStmt != null) selectStmt.close();
-//                if (updateStmt != null) updateStmt.close();
-//            } catch (SQLException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//        return "Borrow extension options updated.";
-//    }
-    /**
-     * Removes unfulfilled reservations older than two days from the waitlist in the database.
-     */
+
     /**
      * Handles unfulfilled orders by retrieving books, updating the subscriber status,
      * and returning a map of books to the last subscriber waiting for each book.
      *
      * @return A map where the key is the book ID, and the value is the last subscriber waiting for the book.
-     * @throws SQLException if a database access error occurs.
      */
     public Map<String, Subscriber> handleDeleteUnfulfilledOrder()
     {
@@ -1419,21 +1439,7 @@ public class DbController
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
-        }
-        finally
-        {
-            try
-            {
-                if (bookResultSet != null) bookResultSet.close();
-                if (selectBookStmt != null) selectBookStmt.close();
-                if (updateStmt != null) updateStmt.close();
-                if (getLastWaitingSubscriberStmt != null) getLastWaitingSubscriberStmt.close();
-            }
-            catch (SQLException e)
-            {
-                e.printStackTrace();
-            }
+            System.out.println("Error! delete unfulfilled order failed");
         }
 
         return bookToSubscriberMap;
@@ -1494,20 +1500,7 @@ public class DbController
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
-        }
-        finally
-        {
-            try
-            {
-                if (rs != null) rs.close();
-                if (selectStmt != null) selectStmt.close();
-                if (updateSubscriberStmt != null) updateSubscriberStmt.close();
-            }
-            catch (SQLException e)
-            {
-                e.printStackTrace();
-            }
+            System.out.println("Error! one month from freeze date failed");
         }
     }
 
@@ -1537,30 +1530,20 @@ public class DbController
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
-        }
-        finally
-        {
-            try
-            {
-                if (rs != null) rs.close();
-                if (stmt != null) stmt.close();
-            }
-            catch (SQLException e)
-            {
-                e.printStackTrace();
-            }
+            System.out.println("Error! fetch subscriber name failed");
         }
 
         return subscriberName;
     }
 
     /**
-
-     Fetches the subscriber's name and the book title for their order.*
-     @param subscriberID The ID of the subscriber.
-     @return A map containing the subscriber's name and the book title.*/
-    public Map<String, String> fetchOrderDetails(String subscriberID){
+     * Fetches the subscriber's name and the book title for their order.*
+     *
+     * @param subscriberID The ID of the subscriber.
+     * @return A map containing the subscriber's name and the book title.
+     */
+    public Map<String, String> fetchOrderDetails(String subscriberID)
+    {
         Map<String, String> details = new HashMap<>();
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -1586,19 +1569,7 @@ public class DbController
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
-        }
-        finally
-        {
-            try
-            {
-                if (rs != null) rs.close();
-                if (stmt != null) stmt.close();
-            }
-            catch (SQLException e)
-            {
-                e.printStackTrace();
-            }
+            System.out.println("Error! fetch order details failed");
         }
 
         return details;
@@ -1607,6 +1578,7 @@ public class DbController
 
     /**
      * The method run SQL query to get the history of a subscriber by his id
+     *
      * @param history_id - the id of the history
      * @return - the history of the subscriber in byte array
      */
@@ -1636,8 +1608,9 @@ public class DbController
 
     /**
      * The method run SQL query to update the history of a subscriber by his id
+     *
      * @param history_id - the id of the history
-     * @param list - the new history file
+     * @param list       - the new history file
      */
     public boolean handleUpdateHistoryFileById(String history_id, List<String[]> list) throws IOException
     {
@@ -1662,6 +1635,7 @@ public class DbController
 
     /**
      * The method run SQL query to get the history of a subscriber by his id
+     *
      * @param subscriberId - the id of the subscriber
      * @return - the history of the subscriber in byte array
      */
@@ -1678,10 +1652,9 @@ public class DbController
 
     /**
      * The method run SQL query to update the history of a subscriber by his id
-     * @param subscriberId - the id of the subscriber
-     * @param list - the new history file
      *
-     * @throws IOException
+     * @param subscriberId - the id of the subscriber
+     * @param list         - the new history file
      */
     public void handleUpdateHistoryFileBySubscriberId(String subscriberId, List<String[]> list)
     {
@@ -1732,6 +1705,7 @@ public class DbController
 
     /**
      * The method run SQL query to get the book by book id
+     *
      * @param bookId - the id of the book to get
      * @return - Book object with the book details
      */
@@ -1764,6 +1738,7 @@ public class DbController
 
     /**
      * The method run SQL query to get the book by copy id
+     *
      * @param copyId - the id of the copy to get the book
      * @return - Book object with the book details
      */
@@ -1794,6 +1769,7 @@ public class DbController
 
     /**
      * The method run SQL query to get the subscriber id by the borrow id
+     *
      * @param borrowId - the id of the borrow
      * @return - the subscriber id
      */
@@ -1824,6 +1800,7 @@ public class DbController
 
     /**
      * The method run SQL query to get the borrow due date by the borrow id
+     *
      * @param borrowId - the id of the borrow
      * @return - the due date of the borrow
      */
@@ -1854,6 +1831,7 @@ public class DbController
 
     /**
      * The method run SQL query to get the subscriber by subscriber id
+     *
      * @param subscriberId - the id of the subscriber
      * @return - Subscriber object with the subscriber details
      */
@@ -1886,6 +1864,7 @@ public class DbController
 
     /**
      * The method run SQL query to get the book object by the borrow id
+     *
      * @param borrowId - the id of the borrow
      * @return - Book object with the book details
      */
@@ -1922,6 +1901,7 @@ public class DbController
 
     /**
      * The method run SQL query to get the book location by the book id
+     *
      * @param bookId - the id of the book
      * @return - The location in the library / the date the book will be available
      */
@@ -2047,6 +2027,7 @@ public class DbController
 
     /**
      * The method run SQL query to check if the book is available for order
+     *
      * @param bookId - the id of the book
      * @return - true if the book is available for order, false otherwise
      */
@@ -2128,75 +2109,98 @@ public class DbController
     }
 
 
-    public int fetchActiveSubscribersCount() {
+    public int fetchActiveSubscribersCount()
+    {
         String query = "SELECT COUNT(*) FROM subscriber WHERE is_active = 1";
         try (PreparedStatement stmt = connection.prepareStatement(query);
-             ResultSet rs = stmt.executeQuery()) {
-            if (rs.next()) {
+             ResultSet rs = stmt.executeQuery())
+        {
+            if (rs.next())
+            {
                 return rs.getInt(1);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! fetch active subscribers count failed");
         }
         return 0;
     }
 
-    public int fetchFrozenSubscribersCount() {
+    public int fetchFrozenSubscribersCount()
+    {
         String query = "SELECT COUNT(*) FROM subscriber WHERE is_active = 0";
         try (PreparedStatement stmt = connection.prepareStatement(query);
-             ResultSet rs = stmt.executeQuery()) {
-            if (rs.next()) {
+             ResultSet rs = stmt.executeQuery())
+        {
+            if (rs.next())
+            {
                 return rs.getInt(1);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! fetch frozen subscribers count failed");
         }
         return 0;
     }
+
     /**
      * Fetches the monthly subscriber status report for the current month.
      *
-     * @return List<String[]> where each row contains frozen_count, active_count, and day.
+     * @return List<String [ ]> where each row contains frozen_count, active_count, and day.
      */
-    public List<String[]> fetchMonthlySubscribersStatusReport() {
+    public List<String[]> fetchMonthlySubscribersStatusReport()
+    {
         String query = "SELECT report_file " +
                 "FROM monthly_reports " +
                 "WHERE report_type = 'SubscribersStatus' " +
                 "AND MONTH(report_date) = MONTH(CURRENT_DATE) " +
                 "AND YEAR(report_date) = YEAR(CURRENT_DATE)";
         try (PreparedStatement stmt = connection.prepareStatement(query);
-             ResultSet rs = stmt.executeQuery()) {
+             ResultSet rs = stmt.executeQuery())
+        {
 
-            if (rs.next()) {
+            if (rs.next())
+            {
                 byte[] blobData = rs.getBytes("report_file");
                 return BlobUtil.convertBlobToList(blobData); // Convert Blob to List<String[]>
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! fetch monthly subscribers status report failed");
         }
         return null; // Return null if no data found or error occurred
     }
+
     /**
      * Updates the monthly subscribers' status report in the database with the given Blob data.
      *
      * @param updatedBlob The Blob data representing the updated report.
      */
-    public void updateMonthlySubscribersStatusReport(byte[] updatedBlob) {
+    public void updateMonthlySubscribersStatusReport(byte[] updatedBlob)
+    {
         String updateQuery = "UPDATE monthly_reports " +
                 "SET report_file = ? " +
                 "WHERE report_type = 'SubscribersStatus' " +
                 "AND MONTH(report_date) = MONTH(CURRENT_DATE) " +
                 "AND YEAR(report_date) = YEAR(CURRENT_DATE)";
 
-        try (PreparedStatement stmt = connection.prepareStatement(updateQuery)) {
+        try (PreparedStatement stmt = connection.prepareStatement(updateQuery))
+        {
             stmt.setBytes(1, updatedBlob);
             int rowsAffected = stmt.executeUpdate();
             System.out.println("Report updated successfully. Rows affected: " + rowsAffected);
-        } catch (SQLException e) {
-            e.printStackTrace();
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! update monthly subscribers status report failed");
         }
     }
-    public Map<String, String> fetchTotalBorrowTime() {
+
+    public Map<String, String> fetchTotalBorrowTime()
+    {
         String query = "SELECT b.book_title, " +
                 "SUM(DATEDIFF(bb.borrow_return_date, DATE_FORMAT(CURRENT_DATE, '%Y-%m-01'))) AS total_borrow_time " +
                 "FROM borrow_book bb " +
@@ -2209,21 +2213,26 @@ public class DbController
         Map<String, String> totalBorrowTimeMap = new HashMap<>();
 
         try (PreparedStatement stmt = connection.prepareStatement(query);
-             ResultSet rs = stmt.executeQuery()) {
+             ResultSet rs = stmt.executeQuery())
+        {
 
-            while (rs.next()) {
+            while (rs.next())
+            {
                 String bookTitle = rs.getString("book_title");
                 String totalBorrowTime = rs.getString("total_borrow_time");
                 totalBorrowTimeMap.put(bookTitle, totalBorrowTime);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! fetch total borrow time failed");
         }
         return totalBorrowTimeMap;
     }
 
 
-    public Map<String, String> fetchLateBorrowTime() {
+    public Map<String, String> fetchLateBorrowTime()
+    {
         String query = "SELECT b.book_title, " +
                 "SUM(DATEDIFF(bb.borrow_return_date, bb.borrow_due_date)) AS late_borrow_time " +
                 "FROM borrow_book bb " +
@@ -2236,15 +2245,19 @@ public class DbController
         Map<String, String> lateBorrowTimeMap = new HashMap<>();
 
         try (PreparedStatement stmt = connection.prepareStatement(query);
-             ResultSet rs = stmt.executeQuery()) {
+             ResultSet rs = stmt.executeQuery())
+        {
 
-            while (rs.next()) {
+            while (rs.next())
+            {
                 String bookTitle = rs.getString("book_title");
                 String lateBorrowTime = rs.getString("late_borrow_time");
                 lateBorrowTimeMap.put(bookTitle, lateBorrowTime);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! fetch late borrow time failed");
         }
         return lateBorrowTimeMap;
     }
@@ -2255,22 +2268,27 @@ public class DbController
      * @param reportType The type of the report (e.g., BorrowingReport).
      * @param reportBlob The Blob data representing the report.
      */
-    public void saveMonthlyReport(String reportType, byte[] reportBlob) {
+    public void saveMonthlyReport(String reportType, byte[] reportBlob)
+    {
         String query = "INSERT INTO monthly_reports (report_type, report_file, report_date) " +
                 "VALUES (?, ?, DATE_FORMAT(CURRENT_DATE, '%Y-%m-01'), NOW()) " +
                 "ON DUPLICATE KEY UPDATE report_file = ?";
 
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        try (PreparedStatement stmt = connection.prepareStatement(query))
+        {
             stmt.setString(1, reportType);
             stmt.setBytes(2, reportBlob);
             stmt.setBytes(3, reportBlob); // For the ON DUPLICATE KEY UPDATE clause
             int rowsAffected = stmt.executeUpdate();
             System.out.println("Report saved to database. Rows affected: " + rowsAffected);
-        } catch (SQLException e) {
+        }
+        catch (SQLException e)
+        {
             e.printStackTrace();
             throw new RuntimeException("Failed to save the monthly report");
         }
     }
+
     /**
      * Inserts an empty report into the monthly_reports table for the next month.
      * Each new report gets a unique report_id automatically.
@@ -2278,20 +2296,27 @@ public class DbController
      * @param data- [0] the report type
      *              [1] the next month
      */
-    public void insertEmptyMonthlyReport(List<String> data) {
+    public void insertEmptyMonthlyReport(List<String> data)
+    {
         String query = "INSERT INTO monthly_reports (report_type, report_date, report_file) " +
                 "VALUES (?, ?, '')";
 
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        try (PreparedStatement stmt = connection.prepareStatement(query))
+        {
             stmt.setString(1, data.get(0));
             stmt.setString(2, data.get(1));
             int rowsAffected = stmt.executeUpdate();
-            if (rowsAffected > 0) {
+            if (rowsAffected > 0)
+            {
                 System.out.println("Empty report created for the next month. Rows affected: " + rowsAffected);
-            } else {
+            }
+            else
+            {
                 System.out.println("No report was inserted.");
             }
-        } catch (SQLException e) {
+        }
+        catch (SQLException e)
+        {
             e.printStackTrace();
             throw new RuntimeException("Failed to insert empty monthly report.");
         }
@@ -2305,22 +2330,27 @@ public class DbController
      *              [2] the year
      * @return The report ID, or -1 if not found.
      */
-    public int fetchReportId(List<String> data) {
+    public int fetchReportId(List<String> data)
+    {
         String query = "SELECT report_id " +
                 "FROM monthly_reports " +
                 "WHERE report_type = ? " +
                 "AND MONTH(report_date) = MONTH(STR_TO_DATE(?, '%M')) " +
                 "AND YEAR(report_date) = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+        try (PreparedStatement stmt = connection.prepareStatement(query))
+        {
             stmt.setString(1, data.get(0));
             stmt.setString(2, data.get(1));
             stmt.setString(3, data.get(2));
 
             ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
+            if (rs.next())
+            {
                 return rs.getInt("report_id");
             }
-        } catch (SQLException e) {
+        }
+        catch (SQLException e)
+        {
             e.printStackTrace();
             throw new RuntimeException("Failed to fetch report ID");
         }
@@ -2331,26 +2361,31 @@ public class DbController
      * Fetches the Blob data for a specific report from the database.
      *
      * @param data - [0] the report type
-     *               [1] the month
-     *               [2] the year
+     *             [1] the month
+     *             [2] the year
      * @return The Blob data as a byte array, or null if not found.
      */
-    public byte[] fetchReportBlob(List<String> data) {
+    public byte[] fetchReportBlob(List<String> data)
+    {
         String query = "SELECT report_file " +
                 "FROM monthly_reports " +
                 "WHERE report_type = ? " +
                 "AND MONTH(report_date) = MONTH(STR_TO_DATE(?, '%M')) " +
                 "AND YEAR(report_date) = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-        	stmt.setString(1, data.get(0));
+        try (PreparedStatement stmt = connection.prepareStatement(query))
+        {
+            stmt.setString(1, data.get(0));
             stmt.setString(2, data.get(1));
             stmt.setString(3, data.get(2));
 
             ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
+            if (rs.next())
+            {
                 return rs.getBytes("report_file");
             }
-        } catch (SQLException e) {
+        }
+        catch (SQLException e)
+        {
             e.printStackTrace();
             throw new RuntimeException("Failed to fetch report Blob");
         }
@@ -2359,6 +2394,7 @@ public class DbController
 
     /**
      * The method run SQL query to get all the librarian unread messages
+     *
      * @return - list of all the unread messages
      */
     public List<List<String>> handleGetUnreadLibrarianMessages()
@@ -2393,6 +2429,7 @@ public class DbController
 
     /**
      * The method run SQL query to update the librarian message to read
+     *
      * @param notificationId - the id of the message to update
      * @return - true if the update was successful, false otherwise
      */
@@ -2417,6 +2454,7 @@ public class DbController
 
     /**
      * The method run SQL query to get all the subscriber unread messages and then update them to read
+     *
      * @param subscriberId - the id of the subscriber
      * @return - list of all the unread messages
      */

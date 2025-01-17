@@ -10,16 +10,37 @@ import java.util.Map;
 import java.util.Properties;
 
 public class Notification_Controller {
-    private Notification notification;
     private DbController dbController;
+    private static volatile Notification_Controller instance = null;
 
     // Email credentials
     Dotenv dotenv = Dotenv.load();
     private final String EMAIL_ADDRESS =dotenv.get("EMAIL_ADDRESS");
     private final String EMAIL_PASSWORD = dotenv.get("EMAIL_PASSWORD");
 
-    public Notification_Controller(Notification notification) {
-        this.notification = notification;
+    /**
+     * Singleton instance getter.
+     * @return - The singleton instance of Notification_Controller.
+     */
+    public static Notification_Controller getInstance()
+    {
+        if (instance == null)
+        {
+            synchronized (Notification_Controller.class)
+            {
+                if (instance == null)
+                {
+                    instance = new Notification_Controller();
+                }
+            }
+        }
+        return instance;
+    }
+
+    /**
+     * Private constructor for Notification_Controller.
+     */
+    private Notification_Controller() {
         this.dbController = DbController.getInstance();
     }
 
@@ -63,16 +84,19 @@ public class Notification_Controller {
      *
      * @param subscriberID The subscriber's ID.
      * @param email        The subscriber's email.
-     * @param phoneNumber  The subscriber's phone number.
+     * @param message      The message to send.
      */
-    public void dayBeforeReturnDate_Email_SMS(String subscriberID, String email, String phoneNumber) {
-        String message = notification.getContent();
+    public void dayBeforeReturnDate_Email_SMS(String subscriberID, String email, String message) {
 
         // Send Email
         sendEmail(email, "Reminder: Book Due Tomorrow", message);
 
+        // Simulate send SMS to subscriber
+        // ToDo: Implement SMS service
+
         System.out.println("Notification sent to subscriberID: " + subscriberID);
     }
+
     /**
      * Sends a notification to a subscriber to confirm that their extension request has been approved.
      *
@@ -126,7 +150,7 @@ public class Notification_Controller {
      *
      * @param bookToSubscriberMap A map where the key is the book ID, and the value is the subscriber waiting for the book.
      */
-    public static void orderArrived(Map<String, Subscriber> bookToSubscriberMap) {
+    public void orderArrived(Map<String, Subscriber> bookToSubscriberMap) {
         for (Map.Entry<String, Subscriber> entry : bookToSubscriberMap.entrySet()) {
             String bookId = entry.getKey();
             Subscriber subscriber = entry.getValue();
@@ -138,7 +162,10 @@ public class Notification_Controller {
                 System.out.println("Sending order arrival notification to subscriberID: " + subscriber.getId());
                 System.out.println("Message: " + message);
 
-                // Simulate sending notification (e.g., email or SMS)
+                // Send email notification
+                sendEmail(subscriber.getEmail(), "Reminder: Book Due Tomorrow", message);
+
+
             } else {
                 System.out.println("No subscriber waiting for book ID: " + bookId);
             }
