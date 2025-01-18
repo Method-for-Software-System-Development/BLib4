@@ -27,12 +27,9 @@ public class ReportsGenerator_Controller {
 
     /**
      * Retrieves a BorrowingReport for a given month and year.
-     *
-     * @param month The month of the report.
-     * @param year The year of the report.
      * @return A BorrowingReport object, or null if not found.
      */
-    public BorrowingReport getBorrowingReport(String month, String year) {
+    public BorrowingReport getBorrowingReport() {
         System.out.println("Fetching borrowing report for: " + month + " " + year);
         // Create a list of data of the requested report to send to the server
         ArrayList<String> dataOfReport = new ArrayList<>();
@@ -61,12 +58,9 @@ public class ReportsGenerator_Controller {
 
     /**
      * Retrieves a SubscriberStatusReport for a given month and year.
-     *
-     * @param month The month of the report.
-     * @param year The year of the report.
      * @return A SubscriberStatusReport object, or null if not found.
      */
-    public SubscriberStatusReport getSubscriberStatusReport(String month, String year) {
+    public SubscriberStatusReport getSubscriberStatusReport() {
         System.out.println("Fetching subscriber status report for: " + month + " " + year);
         // Create a list of data of the requested report to send to the server
         ArrayList<String> dataOfReport = new ArrayList<>();

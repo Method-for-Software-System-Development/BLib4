@@ -23,16 +23,11 @@ public class BorrowTimeReport_Controller {
 	private Button btnClose;
 	
     private ReportsGenerator_Controller reportsGeneratorController;
-    private String month;
-    private String year;
 
 	@FXML
 	private void initialize() {
 		// Get the singleton instance of ReportsGenerator_Controller
 		reportsGeneratorController = ReportsGenerator_Controller.getInstance();
-		//Get month and year of the report
-		month=reportsGeneratorController.getMonth();
-		year=reportsGeneratorController.getYear();
 		// Initialize chart with data
 		borrowingReportChart.getData().setAll(generateBorrowingReportChart().getData());
 	}
@@ -63,7 +58,7 @@ public class BorrowTimeReport_Controller {
 		
 		// load data
 		//get the correct report
-		BorrowingReport borrowingReport=reportsGeneratorController.getBorrowingReport(month, year);
+		BorrowingReport borrowingReport=reportsGeneratorController.getBorrowingReport();
 		//add to graph the data for every book in the report
 		Map<String, List<String>> borrowingData=borrowingReport.getBorrowingData();
 		for (Map.Entry<String, List<String>> entry : borrowingData.entrySet()) {

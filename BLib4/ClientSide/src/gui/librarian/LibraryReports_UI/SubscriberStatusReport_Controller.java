@@ -20,11 +20,11 @@ public class SubscriberStatusReport_Controller {
 	private Button btnClose;
 	
     private ReportsGenerator_Controller reportsGeneratorController;
-    private String month;
-    private String year;
     
 	@FXML
 	private void initialize() {
+		// Get the singleton instance of ReportsGenerator_Controller
+		reportsGeneratorController = ReportsGenerator_Controller.getInstance();
 		// Initialize chart with data
 		subscriberStatusReportChart.getData().setAll(generateSubscriberStatusReportChart().getData());
 	}
@@ -55,7 +55,7 @@ public class SubscriberStatusReport_Controller {
 		
 		// load data
 		//get the correct report
-		SubscriberStatusReport subscriberStatusReport=reportsGeneratorController.getSubscriberStatusReport(month, year);
+		SubscriberStatusReport subscriberStatusReport=reportsGeneratorController.getSubscriberStatusReport();
 		//add to graph the data for every book in the report
 		Map<String, int[]> dailyActiveData=subscriberStatusReport.getUsersActivityStatus();
 		for (Map.Entry<String, int[]> entry : dailyActiveData.entrySet()) {
