@@ -55,8 +55,6 @@ public class SubscriberUI_Controller {
     private Text extendBookTitle;
     @FXML
     private DatePicker newReturnDatePicker;
-    @FXML
-    private Button submitButton;
 
     // Borrows Table FXML fields
     @FXML
@@ -415,6 +413,11 @@ public class SubscriberUI_Controller {
     @FXML
     private void goToSearch() {
         SceneManager.switchScene("/gui/common/search/Search_UI.fxml", "BLib.4 - Braude Library Management");
+    }
+
+    @FXML
+    private void goToViewHistory() {
+        SceneManager.switchScene("/gui/user/viewHistory/ViewHistory_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
     @FXML

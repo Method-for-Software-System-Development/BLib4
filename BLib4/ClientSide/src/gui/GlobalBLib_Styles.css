@@ -354,7 +354,7 @@
 
 /* Base styling for the TableView */
 .custom-table {
-    -fx-background-color: transparent;
+    -fx-background-color: #D8DBFF;
     -fx-border-color: transparent;
     -fx-border-width: 0px;
 }

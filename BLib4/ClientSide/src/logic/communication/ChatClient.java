@@ -46,6 +46,7 @@ public class ChatClient extends AbstractClient
     public static Librarian librarian;
     public static ArrayList<Boolean> array;
     public static ArrayList<ArrayList<String>> listOfBorrows;
+    public static ArrayList<ArrayList<String>> listOfActivities;
     public static int reportID;
     public static List<String[]> blobData;
     public static List<String> smsData;
@@ -142,7 +143,19 @@ public class ChatClient extends AbstractClient
                 break;
 
             case "212":
-                //ToDo: implement
+                // Convert List<String[]> to ArrayList<ArrayList<String>> with reordered indices
+                List<String[]> rawData = (List<String[]>) receiveMsg.getData();
+                listOfActivities = new ArrayList<>();
+
+                for (String[] array : rawData) {
+                    // Create a new ArrayList and reorder elements
+                    ArrayList<String> activity = new ArrayList<>();
+                    activity.add(array[3]); // Move index 3 to position 0
+                    activity.add(array[2]); // Move index 2 to position 1
+                    activity.add(array[0]); // Move index 0 to position 2
+                    // Add the reordered activity to the list
+                    listOfActivities.add(activity);
+                }
                 break;
 
             case "213":

@@ -573,6 +573,11 @@ public class ViewOrderBook_Controller implements DataReceiver {
     }
 
     @FXML
+    private void goToViewHistory() {
+        SceneManager.switchScene("/gui/user/viewHistory/ViewHistory_UI.fxml", "BLib.4 - Braude Library Management");
+    }
+
+    @FXML
     private void goToHomePage() {
         SceneManager.switchScene("/gui/common/homePage/HomePage_UI.fxml", "BLib.4 - Braude Library Management");
     }
