@@ -82,9 +82,11 @@ public class Subscriber_Controller {
         // check server response
     	if(ChatClient.serverResponse) {
     		loggedSubscriber=ChatClient.subscribers.get(0);
+            ClientUI.chat.accept(new MessageType("121",loggedSubscriber.getId()));
     		return ChatClient.subscribers.get(0);
     	}
-    	return null;    }
+    	return null;
+    }
 
     /**
      * This method creates a log in request to the server of librarian.
@@ -106,7 +108,7 @@ public class Subscriber_Controller {
     }
     
     /**
-     * This method sends a request to the server to log in a user of the given type.
+     * This method send a request to the server to log in a user of the given type.
      *
      * @param userID ID of the user.
      * @param password	password of the user.
@@ -119,22 +121,6 @@ public class Subscriber_Controller {
         dataOfLogIn.add(password);
         dataOfLogIn.add(type);
         ClientUI.chat.accept(new MessageType("100",dataOfLogIn));
-    }
-    
-    /**
-     * This method sends a request to the server to log in a subscriber by his reader card
-     * @param userCode the code of the subscriber card
-     * @return the subscriber if log in succeed and null if not
-     */
-    public Subscriber attemptSubscriberLogInByCard(String userCode) {
-    	//send a request to the server to log in the subscriber
-        ClientUI.chat.accept(new MessageType("101",userCode));
-        // check server response
-        if(ChatClient.serverResponse) {
-    		loggedSubscriber=ChatClient.subscribers.get(0);
-    		return ChatClient.subscribers.get(0);
-    	}
-    	return null;    
     }
     
     /**
@@ -191,40 +177,21 @@ public class Subscriber_Controller {
         alert.showAndWait();
 		return null;    	
     }
-    
+
     /**
-     * This method send a request to server to extend a borrow by subscriber
-     * 
-     * @param subscriberID ID of subscriber.
-     * @param copyID ID of the copy of book.
-     * @param newReturnDate the return date after extend.
-     * @return returns if extension succeed or not.
+     * Attempts to extend the return date of a borrow by the subscriber.
+     *
+     * @param borrowID      The ID of the borrow to be extended.
+     * @param newReturnDate The new return date requested for the borrow.
+     * @return true if the server approves the extension, false otherwise.
      */
-    public boolean extendBorrowBySubscriber(String subscriberID,String copyID,Date newReturnDate) {
-    	//Get the borrow ID from server
-    	String borrowID=null;
-    	ArrayList<ArrayList<String>>listOfBorrows=ChatClient.listOfBorrows;
-        ClientUI.chat.accept(new MessageType("110",subscriberID));
-        //Search for the borrow ID in the list of borrows of subscriber
-        for (int i = 0; i < listOfBorrows.size(); i++) {
-        	if(listOfBorrows.get(i).get(1).equals(copyID)) {
-        		borrowID=listOfBorrows.get(i).get(0);
-        		break;
-        	}
-        }
-        //copy ID not found in list of borrows
-        if(borrowID==null) {
-        	Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to extend the borrow-copy is not borrowed");
-            alert.setHeaderText("Error");
-            alert.showAndWait();
-            return false;
-        }	
-      	// Create a list of data of the borrow extension and send to server
+    public boolean extendBorrowBySubscriber(String borrowID, Date newReturnDate) {
+        // Create a list of data for the borrow extension and send to the server
         ArrayList<String> dataOfExtension = new ArrayList<>();
         dataOfExtension.add(borrowID);
         dataOfExtension.add(newReturnDate.toString());
-        ClientUI.chat.accept(new MessageType("111",dataOfExtension));
-        // return server response
+        ClientUI.chat.accept(new MessageType("111", dataOfExtension));
+        // Return server response
         return ChatClient.serverResponse;
     }
 }

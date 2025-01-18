@@ -50,6 +50,15 @@
     -fx-border-width: 0;
 }
 
+.whiteContainer {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 15;
+    -fx-padding: 15;
+    -fx-border-color: #454545;
+    -fx-border-width: 2px;
+    -fx-border-radius: 15px;
+}
+
 .scroll-pane {
     -fx-background-color: transparent;
     -fx-border-width: none;
@@ -243,6 +252,26 @@
     -fx-background-radius: 25px;
 }
 
+.disabled-button {
+    -fx-background-color: #999999;
+    -fx-border-color: #999999;
+    -fx-border-width: 2px;
+    -fx-border-radius: 25px;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-family: "Montserrat Bold";
+    -fx-font-size: 24px;
+    -fx-padding: 10 20;
+    -fx-cursor: hand;
+    -fx-background-radius: 25px;
+}
+.disabled-button:hover {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #999999;
+    -fx-text-fill: #999999;
+    -fx-border-radius: 25px;
+    -fx-background-radius: 25px;
+}
+
 /* ====== FORM ELEMENTS ====== */
 
 .custom-radio-button {
@@ -290,4 +319,107 @@
 
 .error-text-field {
     -fx-prompt-text-fill: #E74C3C;
+}
+
+.grey-date-picker {
+    -fx-border-color: #454545;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-border-width: 2px;
+    -fx-text-fill: #454545;
+    -fx-font-family: "Roboto Medium";
+    -fx-font-size: 20px;
+    -fx-padding: 0px;
+    -fx-prompt-text-fill: #999999;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+.grey-date-picker:focused {
+    -fx-border-color: #F86F03;
+}
+/* Style for the text field in the date picker */
+.grey-date-picker .text-field {
+    -fx-padding: 8px;
+}
+/* Hover effect for dates in the calendar popup */
+.grey-date-picker .date-picker-popup .day-cell:hover {
+    -fx-background-color: #B5BBFF;
+}
+/* Selected date style */
+.grey-date-picker .selected {
+    -fx-background-color: #525FE1;
+}
+
+/* ====== TABLE ====== */
+
+/* Base styling for the TableView */
+.custom-table {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-border-width: 0px;
+}
+
+/* Styling for the table headers */
+.custom-table .column-header {
+    -fx-background-color: #525FE1;
+    -fx-alignment: CENTER;
+}
+/* styling for the table header background */
+.table-view .column-header-background .filler {
+    -fx-background-color: #525FE1;
+}
+/* Styling for the labels in the table headers */
+.custom-table .column-header .label {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-family: "Roboto";
+    -fx-font-size: 20px;
+    -fx-pref-height: 70px;
+}
+/* Styling for the arrows in the table headers */
+.custom-table .column-header .arrow {
+    -fx-background-color: #FFFFFF;
+}
+
+/* Styling for odd rows (alternating row colors) */
+.custom-table .table-row-cell:odd {
+    -fx-background-color: #D8DBFF;
+}
+/* Row hover effect */
+.custom-table .table-row-cell:hover {
+    -fx-background-color: #B5BBFF;
+}
+
+/* Styling for table cells */
+.custom-table .table-cell {
+    -fx-font-family: "Roboto";
+    -fx-font-size: 20px;
+    -fx-text-fill: #454545;
+    -fx-alignment: CENTER;
+    -fx-border-color: #999999;
+    -fx-border-width: 0 0px 1px 0;
+}
+
+/* Scroll pane styling */
+.custom-table .scroll-bar {
+    -fx-background-color: transparent;
+    -fx-border-width: none;
+    -fx-padding: 0 0 15px 0;
+}
+.custom-table .scroll-bar .viewport {
+    -fx-background-color: transparent;
+}
+.custom-table .scroll-bar .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-height: 10px;
+}
+.custom-table .scroll-bar:vertical .increment-button,
+.custom-table .scroll-bar:vertical .decrement-button {
+    -fx-opacity: 0;
+}
+.custom-table .scroll-bar .thumb {
+    -fx-background-color: #454545;
+    -fx-background-radius: 5px;
+}
+.custom-table .scroll-bar .thumb:hover {
+    -fx-background-color: #525FE1;
 }
