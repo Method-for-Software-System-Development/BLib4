@@ -5,6 +5,7 @@
 package logic.communication;
 
 import entities.book.Book;
+import javafx.scene.control.Alert;
 import logic.communication.ChatIF;
 import gui.common.*;
 import entities.logic.*;
@@ -47,6 +48,7 @@ public class ChatClient extends AbstractClient
     public static ArrayList<ArrayList<String>> listOfBorrows;
     public static int reportID;
     public static List<String[]> blobData;
+    public static List<String> smsData;
 
     //Constructors ****************************************************
 
@@ -176,7 +178,16 @@ public class ChatClient extends AbstractClient
                 books = (List<Book>)receiveMsg.data;
                 break;
             case "222":
-                //ToDo: implement
+                smsData = (List<String>)receiveMsg.data;
+                for (int i = 0; i < smsData.size(); i++)
+                {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("SMS Simulation");
+                    alert.setHeaderText(null);
+                    alert.setContentText(smsData.get(i));
+                    alert.initOwner(SceneManager.getStage());
+                    alert.showAndWait();
+                }
                 break;
             case "223":
                 availability = (List<String>)receiveMsg.data;
