@@ -82,7 +82,7 @@
             </VBox.margin>
         </Button>
 
-        <Button fx:id="editProfileButton" maxWidth="Infinity" prefHeight="50.0" styleClass="transparent-button"
+        <Button fx:id="editProfileButton" maxWidth="Infinity" onAction="#goToEditProfile" prefHeight="50.0" styleClass="transparent-button"
                 text="Edit Profile">
             <graphic>
                 <ImageView fx:id="editProfileImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">

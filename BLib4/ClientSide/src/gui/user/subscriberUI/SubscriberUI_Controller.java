@@ -421,6 +421,11 @@ public class SubscriberUI_Controller {
     }
 
     @FXML
+    private void goToEditProfile() {
+        SceneManager.switchScene("/gui/user/editProfile/EditProfile_UI.fxml", "BLib.4 - Braude Library Management");
+    }
+
+    @FXML
     private void exitApp() {
         ClientUI.chat.getClient().quit();
     }

@@ -164,7 +164,8 @@ public class ChatClient extends AbstractClient
                 break;
 
             case "214":
-                //ToDo: implement
+                // status of update in the db, in format boolean
+                serverResponse = (boolean) receiveMsg.getData();
                 break;
 
             case "215":

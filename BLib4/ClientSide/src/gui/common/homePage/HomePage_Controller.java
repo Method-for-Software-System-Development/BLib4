@@ -477,6 +477,11 @@ public class HomePage_Controller {
         SceneManager.switchScene("/gui/user/viewHistory/ViewHistory_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    @FXML
+    private void goToEditProfile() {
+        SceneManager.switchScene("/gui/user/editProfile/EditProfile_UI.fxml", "BLib.4 - Braude Library Management");
+    }
+
     /**
      * Exits the application by quitting the client connection.
      */

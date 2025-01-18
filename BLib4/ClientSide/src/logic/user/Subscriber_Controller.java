@@ -148,34 +148,47 @@ public class Subscriber_Controller {
         //switch to home page
         SceneManager.switchScene("/gui/common/homePage/HomePage_UI.fxml", "BLib.4 - Braude Library Management");
     }
-    
+
     /**
-     * This method sends a request to the server to update the given subscriber
-     * 
-     * @param userID ID of the subscriber.
-     * @param firstName	first name of the subscriber.
-     * @param lastName	last name of the subscriber.
-     * @param phoneNumber phone number of the subscriber.
-     * @param email email of the subscriber.
-     * @param status status of the subscriber user.
-     * @return return the updated subscriber if update succeed and null if not.
+     * Updates the details of a subscriber.
+     *
+     * @param userID      The unique identifier of the subscriber whose details are to be updated.
+     * @param firstName   The updated first name of the subscriber.
+     * @param lastName    The updated last name of the subscriber.
+     * @param phoneNumber The updated phone number of the subscriber.
+     * @param email       The updated email address of the subscriber.
+     * @param status      The updated status of the subscriber (e.g., active or inactive).
+     * @return {@code true} if the update was successful, {@code false} otherwise.
+     *
+     * <p>This method creates a new {@link Subscriber} object with the updated details and sends it to the server
+     * for processing. The server response determines the success of the operation.</p>
      */
-    public Subscriber updateSubscriberDetails(String userID, String firstName, String lastName, String phoneNumber, String email, Boolean status) {
-    	//create a new subscriber with the updates and send to server
-    	Subscriber subscriber= new Subscriber(userID,firstName,lastName,phoneNumber,email,status);
-        ClientUI.chat.accept(new MessageType("113",subscriber));
-        //update succeed
-        if(ChatClient.serverResponse) {
-        	Alert alert = new Alert(Alert.AlertType.INFORMATION, "Subscriber updated successfully");
-            alert.setHeaderText("Success");
-            alert.showAndWait();
-        	return subscriber;
-        }
-        //update failed
-        Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to update the subscriber");
-        alert.setHeaderText("Error");
-        alert.showAndWait();
-		return null;    	
+    public boolean updateSubscriberDetails(String userID, String firstName, String lastName, String phoneNumber, String email, Boolean status) {
+        // Create a new subscriber with the updates and send to server
+        Subscriber subscriber = new Subscriber(userID, firstName, lastName, phoneNumber, email, status);
+        ClientUI.chat.accept(new MessageType("113", subscriber));
+        // Return server response
+        return ChatClient.serverResponse;
+    }
+
+    /**
+     * Updates the password of a subscriber.
+     *
+     * @param userID   The unique identifier of the subscriber whose password is to be updated.
+     * @param password The new password to be set for the subscriber.
+     * @return {@code true} if the password update was successful, {@code false} otherwise.
+     *
+     * <p>This method creates a data structure containing the subscriber's ID and the new password,
+     * then sends it to the server for processing. The server response determines the success of the operation.</p>
+     */
+    public boolean updateSubscriberPassword(String userID, String password) {
+        // Create a list of data for the password update and send to the server
+        ArrayList<String> dataOfPasswordUpdate = new ArrayList<>();
+        dataOfPasswordUpdate.add(userID);
+        dataOfPasswordUpdate.add(password);
+        ClientUI.chat.accept(new MessageType("114", dataOfPasswordUpdate));
+        // Return server response
+        return ChatClient.serverResponse;
     }
 
     /**
