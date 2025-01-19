@@ -124,6 +124,22 @@ public class Subscriber_Controller {
     }
     
     /**
+     * This method sends a request to the server to log in a subscriber by his reader card
+     * @param userCode the code of the subscriber card
+     * @return the subscriber if log in succeed and null if not
+     */
+    public Subscriber attemptSubscriberLogInByCard(String userCode) {
+    	//send a request to the server to log in the subscriber
+        ClientUI.chat.accept(new MessageType("101",userCode));
+        // check server response
+        if(ChatClient.serverResponse) {
+    		loggedSubscriber=ChatClient.subscribers.get(0);
+    		return ChatClient.subscribers.get(0);
+    	}
+    	return null;    
+    }
+    
+    /**
      * The method sends a log out request from a user
      */
     public void attemptLogOut() {
