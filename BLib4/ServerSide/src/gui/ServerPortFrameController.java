@@ -1,5 +1,6 @@
 package gui;
 
+import javafx.scene.control.Alert;
 import logic.ServerUI;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -15,49 +16,21 @@ import javafx.stage.Stage;
 
 public class ServerPortFrameController
 {
-
+    private Stage primaryStage;
 
     String temp = "";
 
     @FXML
-    private Button btnExit = null;
-    @FXML
-    private Button btnDone = null;
-    @FXML
-    private Label lbllist;
+    private TextField portTextField;
 
     @FXML
-    private TextField portxt;
     ObservableList<String> list;
 
     private String getport()
     {
-        return portxt.getText();
+        return portTextField.getText();
     }
 
-    /**
-     * This method is called when the user clicks the "Done" button and create connection to the server
-     *
-     * @param event
-     * @throws Exception
-     */
-    public void Done(ActionEvent event) throws Exception
-    {
-        String p;
-
-        p = getport();
-        if (p.trim().isEmpty())
-        {
-            System.out.println("You must enter a port number");
-        }
-        else
-        {
-            ServerUI.runServer(p);
-
-            // hide port window
-            ((Node) event.getSource()).getScene().getWindow().hide();
-        }
-    }
 
     /**
      * This method is called to start the port window
@@ -67,10 +40,11 @@ public class ServerPortFrameController
      */
     public void start(Stage primaryStage) throws Exception
     {
+        // ToDo: fix open the server port window
         Parent root = FXMLLoader.load(getClass().getResource("/gui/ServerPort.fxml"));
 
         Scene scene = new Scene(root);
-        scene.getStylesheets().add(getClass().getResource("/gui/ServerPort.css").toExternalForm());
+
         primaryStage.setTitle("Server");
         primaryStage.setScene(scene);
 
@@ -82,6 +56,8 @@ public class ServerPortFrameController
             e.consume();
             getExitBtn(new ActionEvent());
         });
+
+        this.primaryStage = primaryStage;
     }
 
     /**
@@ -95,4 +71,69 @@ public class ServerPortFrameController
         System.exit(0);
     }
 
+    /**
+     * Sets the port field to the default port value (5555).
+     */
+    @FXML
+    private void handleSetDefaultPort()
+    {
+        portTextField.setText("5555");
+    }
+
+    /**
+     * Validates the IP address and port fields.
+     * Ensures both fields are not empty before attempting to connect.
+     * If validation passes, tries to initiate the connection.
+     * Displays an error alert in case of failure.
+     */
+    @FXML
+    public void validate_connect_form(ActionEvent event)
+    {
+        // Reset styles before validation
+        portTextField.getStyleClass().remove("error-text-field");
+
+        boolean isValid = true;
+
+        // Store values in variables
+        String port = portTextField.getText();
+
+        // Validate port field
+        if (port == null || port.trim().isEmpty())
+        {
+            portTextField.setPromptText("Server port number is required");
+            portTextField.getStyleClass().add("error-text-field");
+            isValid = false;
+        }
+
+        // start the server
+        if (isValid)
+        {
+            try
+            {
+                ServerUI.runServer(this.primaryStage ,port);
+
+                // hide port window
+                //((Node) event.getSource()).getScene().getWindow().hide();
+            }
+            catch (Exception e)
+            {
+                showErrorAlert("Connection Error", "Failed to start the server. Please try again.");
+            }
+        }
+    }
+
+
+    /**
+     * Displays an error alert dialog with the provided title and message.
+     *
+     * @param title   the title of the alert
+     * @param message the content message of the alert
+     */
+    private void showErrorAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
 }

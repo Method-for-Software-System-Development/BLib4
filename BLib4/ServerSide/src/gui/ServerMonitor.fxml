@@ -1,22 +1,126 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.text.TextFlow?>
 
-<Pane prefHeight="432.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.ServerMonitorFrameController">
-   <children>
-      <TableView fx:id="monitorTable" layoutX="65.0" layoutY="84.0" prefHeight="334.0" prefWidth="471.0">
-        <columns>
-          <TableColumn fx:id="column1" prefWidth="66.0" text="#" />
-          <TableColumn fx:id="column2" prefWidth="167.0" text="IP" />
-            <TableColumn fx:id="column3" prefWidth="112.0" text="Host" />
-            <TableColumn fx:id="column4" prefWidth="125.0" text="Status" />
-        </columns>
-      </TableView>
-      <Button id="btnExit" fx:id="btnExit" layoutX="484.0" layoutY="40.0" mnemonicParsing="false" onAction="#getExitBtn" text="Exit" />
-      <Label id="ip_lbl" fx:id="ipLbl" layoutX="37.0" layoutY="32.0" text="Server ip:" />
-   </children>
-</Pane>
+<GridPane alignment="CENTER" hgap="15.0" prefHeight="1080.0" prefWidth="1920.0" styleClass="gridPane" stylesheets="@GlobalBLib_Styles.css" vgap="15.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.ServerMonitorFrameController">
+
+    <!-- Row Constraints -->
+    <rowConstraints>
+        <RowConstraints maxHeight="200.0" minHeight="200.0" prefHeight="200.0" />
+        <RowConstraints vgrow="ALWAYS" />
+    </rowConstraints>
+
+    <!-- Column Constraints -->
+    <columnConstraints>
+        <ColumnConstraints maxWidth="500.0" minWidth="500.0" prefWidth="500.0" />
+        <ColumnConstraints hgrow="ALWAYS" />
+    </columnConstraints>
+
+    <!-- Padding -->
+    <padding>
+        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+    </padding>
+
+    <!-- Menu (Left Panel) -->
+    <VBox alignment="TOP_CENTER" maxWidth="500.0" minWidth="500.0" prefWidth="500.0" styleClass="menu" GridPane.hgrow="NEVER" GridPane.rowSpan="2" GridPane.vgrow="ALWAYS">
+
+        <!-- Logo Image -->
+        <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@assets/images/logo.png" />
+            </image>
+            <VBox.margin>
+                <Insets bottom="25.0" top="15.0" />
+            </VBox.margin>
+        </ImageView>
+
+        <!-- White Separator -->
+        <Separator prefHeight="5.0" styleClass="menu-separator" />
+
+        <Text fx:id="userGreeting" styleClass="menu-title">
+            <VBox.margin>
+                <Insets bottom="25.0" top="25.0" />
+            </VBox.margin>
+        </Text>
+
+        <!-- White Separator -->
+        <Separator prefHeight="5.0" styleClass="menu-separator" />
+
+        <Button fx:id="exitButton" maxWidth="Infinity" onAction="#getExitBtn" prefHeight="50.0" styleClass="transparent-button" text="Exit Application">
+            <graphic>
+                <ImageView fx:id="exitImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                    <image>
+                        <Image url="@assets/icons/close_24dp_FFFFFF.png" />
+                    </image>
+                </ImageView>
+            </graphic>
+            <VBox.margin>
+                <Insets top="25.0" />
+            </VBox.margin>
+        </Button>
+
+        <!-- TextFlow for Credits -->
+        <TextFlow textAlignment="CENTER">
+            <Text styleClass="verySmall-white-text" text="Engineering Methods For Software Systems Development Semester Project by Group 4" />
+            <VBox.margin>
+                <Insets top="25.0" />
+            </VBox.margin>
+        </TextFlow>
+
+    </VBox>
+
+    <!-- Header (Top Panel) -->
+    <VBox alignment="BOTTOM_LEFT" maxHeight="200.0" minHeight="200.0" prefHeight="200.0" styleClass="header" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
+        <Text styleClass="header-title" text="Braude College Library Management Application">
+            <VBox.margin>
+                <Insets bottom="10.0" left="15.0" />
+            </VBox.margin>
+        </Text>
+    </VBox>
+
+    <!-- Main (Main Content Panel) -->
+    <VBox styleClass="main" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS">
+
+        <HBox spacing="10">
+            <Text styleClass="main-title" text="Activity History on My Reader Card:">
+                <VBox.margin>
+                    <Insets bottom="15.0" />
+                </VBox.margin>
+            </Text>
+            <Pane HBox.hgrow="ALWAYS" />
+            <Text fx:id="ipLbl" styleClass="main-title" text="Server IP: ">
+                <VBox.margin>
+                    <Insets bottom="15.0" />
+                </VBox.margin>
+            </Text>
+        </HBox>
+
+        <!-- Table View -->
+        <TableView fx:id="monitorTable" prefHeight="457.0" prefWidth="1345.0" styleClass="custom-table">
+            <columns>
+                <TableColumn fx:id="column1" prefWidth="170" resizable="false" text="#" />
+                <TableColumn fx:id="column2" prefWidth="170" resizable="false" text="IP" />
+                <TableColumn fx:id="column3" resizable="false" style="-fx-alignment: CENTER-LEFT" text="Host" />
+                <TableColumn fx:id="column4" resizable="false" style="-fx-alignment: CENTER-LEFT" text="Status" />
+            </columns>
+        </TableView>
+      <Text styleClass="main-title" text="Log:" />
+      <TextArea fx:id="console" prefHeight="344.0" prefWidth="1345.0" />
+
+    </VBox>
+</GridPane>

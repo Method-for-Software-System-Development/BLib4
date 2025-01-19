@@ -1,5 +1,6 @@
 package gui;
 
+import javafx.application.Platform;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -7,12 +8,15 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
+import javafx.scene.text.Text;
+import logic.ClientInfo;
 import ocsf.server.ConnectionToClient;
 
+import java.io.Console;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.*;
@@ -20,52 +24,75 @@ import java.util.*;
 public class ServerMonitorFrameController
 {
     private static int index = 1;
-    private ObservableList<List<String>> monitorList = FXCollections.observableArrayList();
-    private Property<ObservableList<List<String>>> monitorListProperty = new SimpleObjectProperty<>(monitorList);
+    private ObservableList<ClientInfo> monitorList = FXCollections.observableArrayList();
+    private Property<ObservableList<ClientInfo>> monitorListProperty = new SimpleObjectProperty<>(monitorList);
+
     private Map<ConnectionToClient, Integer> clientMap = new HashMap<>();
 
     @FXML
-    private TableView<List<String>> monitorTable;
+    private TableView<ClientInfo> monitorTable;
 
     @FXML
-    private TableColumn<List<String>, String> column1;
+    private TableColumn<ClientInfo, String> column1;
 
     @FXML
-    private TableColumn<List<String>, String> column2;
+    private TableColumn<ClientInfo, String> column2;
 
     @FXML
-    private TableColumn<List<String>, String> column3;
+    private TableColumn<ClientInfo, String> column3;
 
     @FXML
-    private TableColumn<List<String>, String> column4;
+    private TableColumn<ClientInfo, String> column4;
     @FXML
     private Button monitorButton;
+
     @FXML
-    private Label ipLbl;
+    private Text ipLbl;
+
+    @FXML
+    private TextArea console;
+    private PrintStream ps;
 
     /**
      * This method is called to initialize the table of active clients
      */
     @FXML
-    private void initialize()
-    {
-        // Initialize your components here if needed
+    private void initialize() {
+        ps = new PrintStream(new Console(console));
+
+        System.setOut(ps);
+        System.setErr(ps);
+        console.setEditable(false);
+
         monitorTable.itemsProperty().bind(monitorListProperty);
 
+        column1.setCellValueFactory(cellData -> cellData.getValue().indexProperty());
+        column2.setCellValueFactory(cellData -> cellData.getValue().ipProperty());
+        column3.setCellValueFactory(cellData -> cellData.getValue().hostProperty());
+        column4.setCellValueFactory(cellData -> cellData.getValue().statusProperty());
 
-        column1.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().get(0)));
-        column2.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().get(1)));
-        column3.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().get(2)));
-        column4.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().get(3)));
-
-        // get the local ip and present on the window
-        try (final DatagramSocket socket = new DatagramSocket())
-        {
+        try (final DatagramSocket socket = new DatagramSocket()) {
             socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
             ipLbl.setText("Server ip: " + socket.getLocalAddress().getHostAddress());
+        } catch (Exception ignored) {
         }
-        catch (Exception ignored)
+    }
+
+    public class Console extends OutputStream
+    {
+        private TextArea console;
+
+        public Console(TextArea console) {
+            this.console = console;
+        }
+
+        public void appendText(String valueOf) {
+            Platform.runLater(() -> console.appendText(valueOf));
+        }
+
+        public void write(int b) throws IOException
         {
+            appendText(String.valueOf((char)b));
         }
     }
 
@@ -88,15 +115,14 @@ public class ServerMonitorFrameController
      * @param host
      * @param ip
      */
-    private void addRow(String host, String ip)
-    {
-        List<String> list = new ArrayList<>();
-        list.add(String.valueOf(index++));
-        list.add(ip);
-        list.add(host);
-        list.add("Connected");
+    private void addRow(String host, String ip) {
+        ClientInfo clientInfo = new ClientInfo(String.valueOf(index++), ip, host, "Connected");
 
-        this.monitorList.add(list);
+        Platform.runLater(() -> {
+            monitorList.add(clientInfo);
+            monitorTable.refresh();
+            System.out.println("Row added: " + clientInfo);
+        });
     }
 
     /**
@@ -104,10 +130,13 @@ public class ServerMonitorFrameController
      *
      * @param client
      */
-    public void clientConnected(ConnectionToClient client)
-    {
-        clientMap.put(client, index);
-        addRow(Objects.requireNonNull(client.getInetAddress()).getHostName(), client.getInetAddress().getHostAddress());
+    public void clientConnected(ConnectionToClient client) {
+        Platform.runLater(() -> {
+            clientMap.put(client, index);
+            addRow(Objects.requireNonNull(client.getInetAddress()).getHostName(), client.getInetAddress().getHostAddress());
+            monitorTable.refresh();
+            System.out.println("Client connected: " + client);
+        });
     }
 
     /**
@@ -115,20 +144,21 @@ public class ServerMonitorFrameController
      *
      * @param client
      */
-    public void clientDisconnected(ConnectionToClient client)
-    {
-        int index = clientMap.get(client);
+    public void clientDisconnected(ConnectionToClient client) {
+        Platform.runLater(() -> {
+            int index = clientMap.get(client);
 
-        // remove the client from the table
-        for (List<String> list : monitorList)
-        {
-            if (list.get(0).equals(String.valueOf(index)))
-            {
-                monitorList.remove(list);
-                break;
+            // remove the client from the table
+            for (ClientInfo clientInfo : monitorList) {
+                if (clientInfo.getIndex().equals(String.valueOf(index))) {
+                    monitorList.remove(clientInfo);
+                    monitorTable.refresh();
+                    System.out.println("Row removed: " + clientInfo);
+                    break;
+                }
             }
-        }
-
-        clientMap.remove(client);
+            clientMap.remove(client);
+            System.out.println("Client disconnected: " + client);
+        });
     }
 }
