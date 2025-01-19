@@ -1,6 +1,7 @@
 package gui.common.viewOrderBook;
 
 import entities.book.Book;
+import entities.logic.MessageType;
 import entities.user.Librarian;
 import entities.user.Subscriber;
 import javafx.fxml.FXML;
@@ -12,6 +13,7 @@ import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import logic.communication.ChatClient;
 import logic.communication.ClientUI;
 import logic.communication.DataReceiver;
 import logic.communication.SceneManager;
@@ -348,38 +350,27 @@ public class ViewOrderBook_Controller implements DataReceiver {
         Text locationOrDateTitle = new Text();
         locationOrDateTitle.getStyleClass().add("small-bold-purple-text");
 
-        // *** TEMPORARY FOR GUI TESTING ***
-        availabilityTitle.setText("The book is currently not available for borrowing. It's expected to return on:  ");
-        locationOrDateTitle.setText("14/01/2025");
-
-//        // *** NOT WORKING ***
-//
-//        // Get the availability of the book
-//        ClientUI.chat.accept(new MessageType("123", book.getBookId()));
-//        availability = ChatClient.availability;
-//        // Check if the book is available for borrowing
-//        if (availability.get(0).equals("0"))
-//        {
-//            availabilityTitle.setText("The book is available for borrowing in the library. It's shelf location is:  ");
-//            locationOrDateTitle.setText(availability.get(1));
-//        }
-//        else
-//        {
-//            availabilityTitle.setText("The book is currently not available for borrowing. It's expected to return on:  ");
-//            locationOrDateTitle.setText(availability.get(1));
-//        }
+        // Get the availability of the book
+        ClientUI.chat.accept(new MessageType("123", String.valueOf(book.getBookId())));
+        availability = ChatClient.availability;
+        // Check if the book is available for borrowing
+        if (availability.get(0).equals("Library"))
+        {
+            availabilityTitle.setText("The book is available for borrowing in the library. It's shelf location is:  ");
+            locationOrDateTitle.setText(availability.get(1));
+        }
+        else
+        {
+            availabilityTitle.setText("The book is currently not available for borrowing. It's expected to return on:  ");
+            locationOrDateTitle.setText(availability.get(1));
+        }
 
         availabilityHBox.getChildren().addAll(availabilityTitle, locationOrDateTitle);
 
-//        // *** NOT WORKING ***
-//
-//        // Check if the user can order the book
-//        ClientUI.chat.accept(new MessageType("124", book.getBookId()));
-//        canOrder = ChatClient.serverResponse;
-
-        // *** TEMPORARY FOR GUI TESTING ***
-        canOrder = true;
-
+        // Check if the user can order the book
+        ClientUI.chat.accept(new MessageType("124", String.valueOf(book.getBookId())));
+        canOrder = ChatClient.serverResponse;
+        
         if (canOrder) {
             // Create a spacer to push the order button to the right
             Region orderButtonSpacer = new Region();

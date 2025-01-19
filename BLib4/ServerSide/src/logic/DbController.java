@@ -1991,23 +1991,18 @@ public class DbController
                     rs = stmt.executeQuery();
                     rs.next();
                     Date expectedReturnDate = rs.getDate(1);
-
-                    returnValue.add(expectedReturnDate.toLocalDate().plusWeeks(2).toString());
+                    LocalDate newDate = expectedReturnDate.toLocalDate().plusWeeks(2);
+                    returnValue.add(newDate.toString());
                 }
                 else
                 {
                     // get all the active borrow due date ordered by the due date
-                    stmt = connection.prepareStatement("SELECT borrow_due_date from borrow_book WHERE copy_id IN (SELECT copy_id from copy_of_the_book WHERE book_id = ?) ORDER BY borrow_due_date;");
+                    stmt = connection.prepareStatement("SELECT borrow_due_date from borrow_book WHERE copy_id IN (SELECT copy_id from copy_of_the_book WHERE book_id = ?) ORDER BY borrow_due_date DESC LIMIT 1;");
                     stmt.setString(1, bookId);
                     stmt.executeQuery();
 
                     rs = stmt.executeQuery();
-                    int i = 0;
-                    while (i < ordered)
-                    {
-                        rs.next();
-                        i++;
-                    }
+                    rs.next();
 
                     Date expectedReturnDate = rs.getDate(1);
                     returnValue.add(expectedReturnDate.toLocalDate().toString());
@@ -2060,12 +2055,12 @@ public class DbController
                     if (copies - ordered > 0)
                     {
                         // there is a copy available to borrow, we cant order the book
-                        returnValue = false;
+                        returnValue = true;
                     }
                     else
                     {
                         // there is no copy available to borrow, we can order the book
-                        returnValue = true;
+                        returnValue = false;
                     }
                 }
             }
