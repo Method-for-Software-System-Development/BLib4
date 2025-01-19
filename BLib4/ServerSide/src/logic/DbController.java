@@ -2147,20 +2147,28 @@ public class DbController
      */
     public List<String[]> fetchMonthlySubscribersStatusReport()
     {
-        String query = "SELECT report_file " +
-                "FROM monthly_reports " +
-                "WHERE report_type = 'SubscribersStatus' " +
-                "AND MONTH(report_date) = MONTH(CURRENT_DATE) " +
-                "AND YEAR(report_date) = YEAR(CURRENT_DATE)";
-        try (PreparedStatement stmt = connection.prepareStatement(query);
-             ResultSet rs = stmt.executeQuery())
+        try 
         {
+        	// get the latest report (max report_id) for the same report type
+        	PreparedStatement stmt = connection.prepareStatement("SELECT MAX(report_id) FROM monthly_reports WHERE report_type = 'SubscribersStatus'");
+        	ResultSet rs = stmt.executeQuery();
+        	
+        	rs.next();
+        	int reportId = rs.getInt(1);
+        	
+        	String query = "SELECT report_file " +
+        			"FROM monthly_reports " +
+        			"WHERE report_id = ?;";
+        	stmt = connection.prepareStatement(query);
+            stmt.setInt(1, reportId);
+            rs = stmt.executeQuery();
 
             if (rs.next())
             {
                 byte[] blobData = rs.getBytes("report_file");
                 return BlobUtil.convertBlobToList(blobData); // Convert Blob to List<String[]>
             }
+            else return new ArrayList<>();
         }
         catch (SQLException e)
         {
@@ -2176,15 +2184,23 @@ public class DbController
      */
     public void updateMonthlySubscribersStatusReport(byte[] updatedBlob)
     {
-        String updateQuery = "UPDATE monthly_reports " +
-                "SET report_file = ? " +
-                "WHERE report_type = 'SubscribersStatus' " +
-                "AND MONTH(report_date) = MONTH(CURRENT_DATE) " +
-                "AND YEAR(report_date) = YEAR(CURRENT_DATE)";
 
-        try (PreparedStatement stmt = connection.prepareStatement(updateQuery))
+        try 
         {
+        	// get the latest report (max report_id) for the same report type
+        	PreparedStatement stmt = connection.prepareStatement("SELECT MAX(report_id) FROM monthly_reports WHERE report_type = 'SubscribersStatus'");
+        	ResultSet rs = stmt.executeQuery();
+        	
+        	rs.next();
+        	int reportId = rs.getInt(1);
+        	
+        	
+        	String updateQuery = "UPDATE monthly_reports " +
+        			"SET report_file = ? " +
+        			"WHERE report_id = ?";
+        	stmt = connection.prepareStatement(updateQuery);
             stmt.setBytes(1, updatedBlob);
+            stmt.setInt(2,reportId);
             int rowsAffected = stmt.executeUpdate();
             System.out.println("Report updated successfully. Rows affected: " + rowsAffected);
         }
@@ -2196,15 +2212,28 @@ public class DbController
 
     public Map<String, String> fetchTotalBorrowTime()
     {
-        String query = "SELECT b.book_title, " +
-                "SUM(DATEDIFF(bb.borrow_return_date, DATE_FORMAT(CURRENT_DATE, '%Y-%m-01'))) AS total_borrow_time " +
-                "FROM borrow_book bb " +
-                "JOIN copy_of_the_book cob ON bb.copy_id = cob.copy_id " +
-                "JOIN book b ON cob.book_id = b.book_id " +
-                "WHERE bb.borrow_return_date >= DATE_FORMAT(CURRENT_DATE, '%Y-%m-01') " +
-                "AND MONTH(bb.borrow_return_date) = MONTH(CURRENT_DATE) " +
-                "AND YEAR(bb.borrow_return_date) = YEAR(CURRENT_DATE) " +
-                "GROUP BY b.book_title";
+        String query =
+        		"SELECT " +
+        	    "b.book_title, " +
+        	    "SUM(" +
+        	    "    CASE " +
+        	    "        WHEN bb.borrow_return_date IS NOT NULL THEN DATEDIFF(bb.borrow_return_date, bb.borrow_date) " + 
+        	    "        ELSE DATEDIFF(CURRENT_DATE, bb.borrow_date) " + 
+        	    "    END" +
+                ") AS total_borrow_time " +
+                "FROM " +
+                "    borrow_book bb " +
+                "JOIN " +
+                "    copy_of_the_book cob ON bb.copy_id = cob.copy_id " +
+                "JOIN " +
+                "    book b ON cob.book_id = b.book_id " +
+                "WHERE " +
+                "    bb.borrow_date >= DATE_FORMAT(CURRENT_DATE, '%Y-%m-01') " +
+                "    AND MONTH(bb.borrow_date) = MONTH(CURRENT_DATE) " +
+                "    AND YEAR(bb.borrow_date) = YEAR(CURRENT_DATE) " +
+                "GROUP BY " +
+                "    b.book_title;";
+        
         Map<String, String> totalBorrowTimeMap = new HashMap<>();
 
         try (PreparedStatement stmt = connection.prepareStatement(query);
@@ -2225,23 +2254,39 @@ public class DbController
         return totalBorrowTimeMap;
     }
 
-
     public Map<String, String> fetchLateBorrowTime()
     {
-        String query = "SELECT b.book_title, " +
-                "SUM(DATEDIFF(bb.borrow_return_date, bb.borrow_due_date)) AS late_borrow_time " +
-                "FROM borrow_book bb " +
-                "JOIN copy_of_the_book cob ON bb.copy_id = cob.copy_id " +
-                "JOIN book b ON cob.book_id = b.book_id " +
-                "WHERE bb.borrow_return_date > bb.borrow_due_date " +
-                "AND MONTH(bb.borrow_due_date) = MONTH(CURRENT_DATE) " +
-                "AND YEAR(bb.borrow_due_date) = YEAR(CURRENT_DATE) " +
-                "GROUP BY b.book_title";
+        String query =
+        		"SELECT " +
+        	    "b.book_title, " +
+        	    "SUM(" +
+        	    "    CASE " +
+        	    "        WHEN bb.borrow_return_date IS NOT NULL AND bb.borrow_return_date > bb.borrow_due_date THEN " +
+        	    "		 	DATEDIFF(bb.borrow_return_date, bb.borrow_due_date) " +
+        	    "        WHEN bb.borrow_return_date IS NULL AND CURRENT_DATE > bb.borrow_due_date THEN " + 
+        	    "		 	DATEDIFF(CURRENT_DATE, bb.borrow_due_date) "+	
+        	    "		 ELSE 0 "+
+        	    "    END" +
+                ") AS late_borrow_time " +
+                "FROM " +
+                "    borrow_book bb " +
+                "JOIN " +
+                "    copy_of_the_book cob ON bb.copy_id = cob.copy_id " +
+                "JOIN " +
+                "    book b ON cob.book_id = b.book_id " +
+                "WHERE " +
+                "    bb.borrow_date >= DATE_FORMAT(CURRENT_DATE, '%Y-%m-01') " +
+                "    AND MONTH(bb.borrow_date) = MONTH(CURRENT_DATE) " +
+                "    AND YEAR(bb.borrow_date) = YEAR(CURRENT_DATE) " +
+                "GROUP BY " +
+                "    b.book_title;";
+        
         Map<String, String> lateBorrowTimeMap = new HashMap<>();
 
-        try (PreparedStatement stmt = connection.prepareStatement(query);
-             ResultSet rs = stmt.executeQuery())
+        try 
         {
+        	PreparedStatement stmt = connection.prepareStatement(query);
+        	ResultSet rs = stmt.executeQuery();
 
             while (rs.next())
             {
@@ -2252,7 +2297,8 @@ public class DbController
         }
         catch (SQLException e)
         {
-            System.out.println("Error! fetch late borrow time failed");
+            System.out.println("Error executing the query: " + e.getMessage());
+            e.printStackTrace();  
         }
         return lateBorrowTimeMap;
     }
@@ -2265,17 +2311,21 @@ public class DbController
      */
     public void saveMonthlyReport(String reportType, byte[] reportBlob)
     {
-        String query = "INSERT INTO monthly_reports (report_type, report_file, report_date) " +
-                "VALUES (?, ?, DATE_FORMAT(CURRENT_DATE, '%Y-%m-01'), NOW()) " +
-                "ON DUPLICATE KEY UPDATE report_file = ?";
-
-        try (PreparedStatement stmt = connection.prepareStatement(query))
+    	try
         {
+    		// get the latest report (max report_id) for the same report type
+            PreparedStatement stmt = connection.prepareStatement("SELECT MAX(report_id) FROM monthly_reports WHERE report_type = ?");
             stmt.setString(1, reportType);
-            stmt.setBytes(2, reportBlob);
-            stmt.setBytes(3, reportBlob); // For the ON DUPLICATE KEY UPDATE clause
-            int rowsAffected = stmt.executeUpdate();
-            System.out.println("Report saved to database. Rows affected: " + rowsAffected);
+            ResultSet rs = stmt.executeQuery();
+
+            rs.next();
+            int reportId = rs.getInt(1);
+
+            // update the report with the new data
+            stmt = connection.prepareStatement("UPDATE monthly_reports SET report_file = ? WHERE report_id = ?");
+            stmt.setBytes(1, reportBlob);
+            stmt.setInt(2, reportId);
+            stmt.executeUpdate();
         }
         catch (SQLException e)
         {
@@ -2290,16 +2340,27 @@ public class DbController
      *
      * @param data- [0] the report type
      *              [1] the next month
+     *              [2] the year
      */
     public void insertEmptyMonthlyReport(List<String> data)
     {
-        String query = "INSERT INTO monthly_reports (report_type, report_date, report_file) " +
-                "VALUES (?, ?, '')";
+        String query = "INSERT INTO monthly_reports (report_id, report_type, report_month, report_year, report_file) " +
+                "VALUES (?,?, ?, ? , '')";
 
-        try (PreparedStatement stmt = connection.prepareStatement(query))
+        try 
         {
-            stmt.setString(1, data.get(0));
-            stmt.setString(2, data.get(1));
+        	PreparedStatement stmt = connection.prepareStatement("SELECT MAX(report_id) FROM monthly_reports;");
+            ResultSet rs = stmt.executeQuery();
+            int notificationId;
+            if(rs.next())
+            	notificationId = rs.getInt(1) + 1;
+            else notificationId=1;
+            
+            stmt = connection.prepareStatement(query);
+            stmt.setString(1, ""+notificationId);
+            stmt.setString(2, data.get(0));
+            stmt.setInt(3, Integer.parseInt(data.get(1)));
+            stmt.setInt(4, Integer.parseInt(data.get(2)));
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected > 0)
             {
@@ -2330,13 +2391,13 @@ public class DbController
         String query = "SELECT report_id " +
                 "FROM monthly_reports " +
                 "WHERE report_type = ? " +
-                "AND MONTH(report_date) = MONTH(STR_TO_DATE(?, '%M')) " +
-                "AND YEAR(report_date) = ?";
+                "AND report_month = ? " +
+                "AND report_year = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query))
         {
             stmt.setString(1, data.get(0));
-            stmt.setString(2, data.get(1));
-            stmt.setString(3, data.get(2));
+            stmt.setInt(2, Integer.parseInt(data.get(1)));
+            stmt.setInt(3, Integer.parseInt(data.get(2)));
 
             ResultSet rs = stmt.executeQuery();
             if (rs.next())
@@ -2365,13 +2426,13 @@ public class DbController
         String query = "SELECT report_file " +
                 "FROM monthly_reports " +
                 "WHERE report_type = ? " +
-                "AND MONTH(report_date) = MONTH(STR_TO_DATE(?, '%M')) " +
-                "AND YEAR(report_date) = ?";
+                "AND report_month = ? " +
+                "AND report_year = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query))
         {
             stmt.setString(1, data.get(0));
-            stmt.setString(2, data.get(1));
-            stmt.setString(3, data.get(2));
+            stmt.setInt(2, Integer.parseInt(data.get(1)));
+            stmt.setInt(3, Integer.parseInt(data.get(2)));
 
             ResultSet rs = stmt.executeQuery();
             if (rs.next())

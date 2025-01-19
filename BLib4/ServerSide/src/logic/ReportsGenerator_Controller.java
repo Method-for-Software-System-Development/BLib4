@@ -11,11 +11,21 @@ import java.util.Map;
 
 public class ReportsGenerator_Controller {
 
+    private static ReportsGenerator_Controller instance;
+
 
     private final DbController dbController;
 
     public ReportsGenerator_Controller() {
         this.dbController = DbController.getInstance();
+    }
+    public static ReportsGenerator_Controller getInstance()
+    {
+        if (instance == null)
+        {
+            instance = new ReportsGenerator_Controller();
+        }
+        return instance;
     }
 
     /**
@@ -28,11 +38,9 @@ public class ReportsGenerator_Controller {
         String activeCount = String.valueOf(dbController.fetchActiveSubscribersCount()); // Fetch active subscribers count
         String frozenCount = String.valueOf(dbController.fetchFrozenSubscribersCount()); // Fetch frozen subscribers count
         String currentDate = LocalDate.now().toString(); // Get current date as string
-        updateAndFetchMonthlySubscribersStatusReport("currentDate", "activeCount", "frozenCount"); // Update the monthly report
+        updateAndFetchMonthlySubscribersStatusReport(currentDate, activeCount, frozenCount); // Update the monthly report
         System.out.println("Daily subscriber status updated successfully.");
     }
-
-
 
     /**
      * Fetches borrowing report data from the database and returns it as a Map.
@@ -47,8 +55,8 @@ public class ReportsGenerator_Controller {
 
         for (String bookTitle : totalBorrowTimeMap.keySet()) {
             List<String> bookData = new ArrayList<>();
-            bookData.set(0,totalBorrowTimeMap.get(bookTitle));
-            bookData.set(1, lateBorrowTimeMap.getOrDefault(bookTitle, "0"));
+            bookData.add(totalBorrowTimeMap.get(bookTitle));
+            bookData.add(lateBorrowTimeMap.getOrDefault(bookTitle, "0"));
             borrowingReportData.put(bookTitle, bookData);
         }
 
@@ -99,7 +107,6 @@ public class ReportsGenerator_Controller {
 
         // Convert the report data to List<String[]> format for BlobUtil
         List<String[]> reportData = new ArrayList<>();
-        reportData.add(new String[]{"Book Title", "Total Borrow Time", "Late Borrow Time"}); // Header row
 
         for (Map.Entry<String, List<String>> entry : borrowingReportData.entrySet()) {
             String bookTitle = entry.getKey();

@@ -5,7 +5,10 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
+import logic.communication.SceneManager;
 import logic.librarian.ReportsGenerator_Controller;
+
+import java.util.List;
 import java.util.Map;
 
 import entities.report.SubscriberStatusReport;
@@ -57,12 +60,13 @@ public class SubscriberStatusReport_Controller {
 		//get the correct report
 		SubscriberStatusReport subscriberStatusReport=reportsGeneratorController.getSubscriberStatusReport();
 		//add to graph the data for every book in the report
-		Map<String, int[]> dailyActiveData=subscriberStatusReport.getUsersActivityStatus();
-		for (Map.Entry<String, int[]> entry : dailyActiveData.entrySet()) {
-			String date = entry.getKey();
-			int[] dataDate = entry.getValue();  
-			activeSubscribersSeries.getData().add(new XYChart.Data<>(date, dataDate[0]));
-			frozenSubscribersSeries.getData().add(new XYChart.Data<>(date, dataDate[1]));
+		List<String[]> dailyActiveData=subscriberStatusReport.getUsersActivityStatus();
+		
+		
+		for (int i=0;i<dailyActiveData.size();i++) {
+			String date = dailyActiveData.get(i)[0];
+			activeSubscribersSeries.getData().add(new XYChart.Data<>(date, Integer.parseInt(dailyActiveData.get(i)[1])));
+			frozenSubscribersSeries.getData().add(new XYChart.Data<>(date, Integer.parseInt(dailyActiveData.get(i)[2])));
 		 }	
 		
 		// Add data to the chart
@@ -75,6 +79,6 @@ public class SubscriberStatusReport_Controller {
 	private void handleClose(ActionEvent event){
 		//switch to previous window
 		//*********gui of the previous window not ready, when ready need to enter the path!!********
-     //   SceneManager.switchScene("Enter path");
+        SceneManager.switchScene("/gui/testing/generateReport.fxml","Reports Generator");
 	}
 }

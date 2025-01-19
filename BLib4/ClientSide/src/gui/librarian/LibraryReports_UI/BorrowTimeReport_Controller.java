@@ -76,6 +76,6 @@ public class BorrowTimeReport_Controller {
 	private void handleClose(ActionEvent event){
 		//switch to previous window
 		//*********gui of the previous window not ready, when ready need to enter the path!!********
-     //   SceneManager.switchScene("Enter path");
+        SceneManager.switchScene("/gui/testing/generateReport.fxml","Reports Generator");
 	}
 }

@@ -72,7 +72,7 @@ public class ReportsGenerator_Controller {
         int reportNum = ChatClient.reportID;
         //if report id not found response is -1
         if (reportNum == -1) {
-            System.out.println("No subscriber status report found for: " + month + " " + year);
+            System.out.println("No subscriber status report id found for: " + month + " " + year);
             return null;
         }
         // send message to server to get blob data of a report
@@ -85,7 +85,7 @@ public class ReportsGenerator_Controller {
             return null;
         }
 
-        return new SubscriberStatusReport(reportNum, month, year, new Date(), mapSubscriberStatusReportData(blobData));
+        return new SubscriberStatusReport(reportNum, month, year, new Date(), blobData);
     }
 
     /**
@@ -99,25 +99,6 @@ public class ReportsGenerator_Controller {
         for (String[] row : reportData) {
             if (row.length >= 3) {
                 mappedData.put(row[0], Arrays.asList(row[1], row[2]));
-            }
-        }
-        return mappedData;
-    }
-    
-    /**
-     * Maps report data from List<String[]> to a Map<String, int[]>.
-
-     * @param reportData report data as a List<String[]>
-     * @return report data as Map<String, int[]>
-     */
-    private Map<String, int[]> mapSubscriberStatusReportData(List<String[]> reportData){
-    	Map<String, int[]> mappedData = new HashMap<>();
-    	int[] intDataArray=new int[2];
-        for (String[] row : reportData) {
-        	intDataArray[0]=Integer.parseInt(row[1]);
-        	intDataArray[1]=Integer.parseInt(row[2]);
-            if (row.length >= 3) {
-                mappedData.put(row[0], intDataArray);
             }
         }
         return mappedData;
