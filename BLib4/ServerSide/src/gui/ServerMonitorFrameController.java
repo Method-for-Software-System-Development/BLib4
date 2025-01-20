@@ -13,7 +13,6 @@ import javafx.scene.text.Text;
 import logic.ClientInfo;
 import ocsf.server.ConnectionToClient;
 
-import java.io.Console;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -43,8 +42,6 @@ public class ServerMonitorFrameController
 
     @FXML
     private TableColumn<ClientInfo, String> column4;
-    @FXML
-    private Button monitorButton;
 
     @FXML
     private Text ipLbl;
@@ -65,6 +62,7 @@ public class ServerMonitorFrameController
         console.setEditable(false);
 
         monitorTable.itemsProperty().bind(monitorListProperty);
+        //monitorTable.setItems(monitorList);
 
         column1.setCellValueFactory(cellData -> cellData.getValue().indexProperty());
         column2.setCellValueFactory(cellData -> cellData.getValue().ipProperty());
@@ -117,12 +115,8 @@ public class ServerMonitorFrameController
      */
     private void addRow(String host, String ip) {
         ClientInfo clientInfo = new ClientInfo(String.valueOf(index++), ip, host, "Connected");
-
-        Platform.runLater(() -> {
-            monitorList.add(clientInfo);
-            monitorTable.refresh();
-            System.out.println("Row added: " + clientInfo);
-        });
+        monitorList.add(clientInfo);
+        monitorTable.refresh();
     }
 
     /**
@@ -145,6 +139,7 @@ public class ServerMonitorFrameController
      * @param client
      */
     public void clientDisconnected(ConnectionToClient client) {
+        System.out.println("Client disconnected: " + client);
         Platform.runLater(() -> {
             int index = clientMap.get(client);
 
@@ -153,12 +148,10 @@ public class ServerMonitorFrameController
                 if (clientInfo.getIndex().equals(String.valueOf(index))) {
                     monitorList.remove(clientInfo);
                     monitorTable.refresh();
-                    System.out.println("Row removed: " + clientInfo);
                     break;
                 }
             }
             clientMap.remove(client);
-            System.out.println("Client disconnected: " + client);
         });
     }
 }

@@ -422,20 +422,7 @@ public class ServerController extends AbstractServer
     @Override
     protected void clientConnected(ConnectionToClient client)
     {
-        System.out.println("Client connected");
-
         monitorController.clientConnected(client);
-    }
-
-    /**
-     * This method is called when the server is disconnected from a client.
-     *
-     * @param client the connection with the client.
-     */
-    @Override
-    protected synchronized void clientDisconnected(ConnectionToClient client)
-    {
-        System.out.println("Client disconnected!");
     }
 
     /**

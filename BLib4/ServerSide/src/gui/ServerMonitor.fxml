@@ -17,7 +17,7 @@
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.text.TextFlow?>
 
-<GridPane alignment="CENTER" hgap="15.0" prefHeight="1080.0" prefWidth="1920.0" styleClass="gridPane" stylesheets="@GlobalBLib_Styles.css" vgap="15.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.ServerMonitorFrameController">
+<GridPane alignment="CENTER" hgap="15.0" prefHeight="1080.0" prefWidth="1920.0" styleClass="gridPane" stylesheets="/gui/GlobalBLib_Styles.css" vgap="15.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.ServerMonitorFrameController">
 
     <!-- Row Constraints -->
     <rowConstraints>
@@ -42,7 +42,7 @@
         <!-- Logo Image -->
         <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
             <image>
-                <Image url="@assets/images/logo.png" />
+                <Image url="/gui/assets/images/logo.png" />
             </image>
             <VBox.margin>
                 <Insets bottom="25.0" top="15.0" />
@@ -65,7 +65,7 @@
             <graphic>
                 <ImageView fx:id="exitImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
                     <image>
-                        <Image url="@assets/icons/close_24dp_FFFFFF.png" />
+                        <Image url="/gui/assets/icons/close_24dp_FFFFFF.png" />
                     </image>
                 </ImageView>
             </graphic>
@@ -97,7 +97,7 @@
     <VBox styleClass="main" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS">
 
         <HBox spacing="10">
-            <Text styleClass="main-title" text="Activity History on My Reader Card:">
+            <Text styleClass="main-title" text="Active connected clients:">
                 <VBox.margin>
                     <Insets bottom="15.0" />
                 </VBox.margin>
@@ -113,10 +113,10 @@
         <!-- Table View -->
         <TableView fx:id="monitorTable" prefHeight="457.0" prefWidth="1345.0" styleClass="custom-table">
             <columns>
-                <TableColumn fx:id="column1" prefWidth="170" resizable="false" text="#" />
-                <TableColumn fx:id="column2" prefWidth="170" resizable="false" text="IP" />
-                <TableColumn fx:id="column3" resizable="false" style="-fx-alignment: CENTER-LEFT" text="Host" />
-                <TableColumn fx:id="column4" resizable="false" style="-fx-alignment: CENTER-LEFT" text="Status" />
+                <TableColumn fx:id="column1" prefWidth="209.0" resizable="false" text="#" />
+                <TableColumn fx:id="column2" prefWidth="450.0" resizable="false" text="IP" />
+                <TableColumn fx:id="column3" minWidth="0.0" prefWidth="337.0" resizable="false" text="Host" />
+                <TableColumn fx:id="column4" prefWidth="348.0" resizable="false" text="Status" />
             </columns>
         </TableView>
       <Text styleClass="main-title" text="Log:" />

@@ -6,6 +6,7 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.Pane?>
 
+<?import javafx.scene.text.Text?>
 <Pane prefHeight="432.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.ServerMonitorFrameController">
    <children>
       <TableView fx:id="monitorTable" layoutX="65.0" layoutY="84.0" prefHeight="334.0" prefWidth="471.0">
@@ -17,6 +18,6 @@
         </columns>
       </TableView>
       <Button id="btnExit" fx:id="btnExit" layoutX="484.0" layoutY="40.0" mnemonicParsing="false" onAction="#getExitBtn" text="Exit" />
-      <Label id="ip_lbl" fx:id="ipLbl" layoutX="37.0" layoutY="32.0" text="Server ip:" />
+      <Text id="ip_lbl" fx:id="ipLbl" layoutX="37.0" layoutY="32.0" text="Server ip:" />
    </children>
 </Pane>

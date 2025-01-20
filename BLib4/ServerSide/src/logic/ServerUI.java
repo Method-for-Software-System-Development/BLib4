@@ -7,6 +7,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import entities.user.Subscriber;
 
@@ -20,7 +21,7 @@ import gui.ServerPortFrameController;
 public class ServerUI extends Application
 {
     public static Vector<Subscriber> subscribers = new Vector<Subscriber>();
-
+    private static Stage primaryStage;
 
     public static void main(String args[]) throws Exception
     {
@@ -39,8 +40,7 @@ public class ServerUI extends Application
     @Override
     public void start(Stage primaryStage) throws Exception
     {
-        // TODO Auto-generated method stub
-
+        this.primaryStage = primaryStage;
 
         // Set the primary stage
         SceneManager.setStage(primaryStage);
@@ -61,6 +61,9 @@ public class ServerUI extends Application
         // Show the stage
         primaryStage.show();
 
+        // update primary stage
+
+
     }
 
     /**
@@ -69,7 +72,7 @@ public class ServerUI extends Application
      * @param p the port number
      * @throws IOException
      */
-    public static void runServer(Stage primaryStage, String p) throws IOException
+    public static void runServer(String p) throws IOException
     {
         int port = 0; //Port to listen on
 
@@ -85,31 +88,31 @@ public class ServerUI extends Application
 
 
         // Open the server monitor window
-//        FXMLLoader loader = new FXMLLoader();
-//
-//        Pane root = loader.load(ServerUI.class.getResource("/gui/ServerMonitor.fxml").openStream());
-//        ServerMonitorFrameController serverMonitorFrameController = loader.getController();
-//
-//        Scene scene = new Scene(root);
-//        primaryStage.setTitle("Server Monitor");
-//
-//        primaryStage.setScene(scene);
-//        primaryStage.show();
-//
-//        // Set the action to be performed when the user tries to close the window
-//        primaryStage.setOnCloseRequest(e ->
-//        {
-//            e.consume();
-//            System.exit(0);
-//        });
+        FXMLLoader loader = new FXMLLoader();
+
+        Pane root = loader.load(ServerUI.class.getResource("/gui/ServerMonitor.fxml").openStream());
+        ServerMonitorFrameController serverMonitorFrameController = loader.getController();
+
+        Scene scene = new Scene(root);
+        primaryStage.setTitle("Server Monitor");
+
+        primaryStage.setScene(scene);
+        primaryStage.show();
+        openHomePage(primaryStage);
+        // Set the action to be performed when the user tries to close the window
+        primaryStage.setOnCloseRequest(e ->
+        {
+            e.consume();
+            System.exit(0);
+        });
 
 
         // get the controller of the server monitor window
-        FXMLLoader loader = new FXMLLoader(ServerUI.class.getResource("/gui/ServerMonitor.fxml"));
-        Parent root = loader.load();
-        ServerMonitorFrameController serverMonitorFrameController = loader.getController();
-
-        openHomePage(SceneManager.getStage());
+//        FXMLLoader loader = new FXMLLoader(ServerUI.class.getResource("/gui/ServerMonitor.fxml"));
+//        Parent root = loader.load();
+//        ServerMonitorFrameController serverMonitorFrameController = loader.getController();
+//
+//        openHomePage(SceneManager.getStage());
 
         // Create a new ServerController to start the server
         ServerController sv = new ServerController(port, serverMonitorFrameController);
@@ -131,7 +134,7 @@ public class ServerUI extends Application
      */
     public static void openHomePage(Stage primaryStage) {
         // Set the scene for the home page
-        SceneManager.switchScene("/gui/ServerMonitor.fxml", "BLib.4 - Braude Library Management");
+        //SceneManager.switchScene("/gui/ServerMonitor.fxml", "BLib.4 - Braude Library Management");
 
 
 
@@ -143,21 +146,21 @@ public class ServerUI extends Application
         primaryStage.setMinHeight(720); // Minimum height
 
         // Variables to store window size
-        final double[] lastWidth = {primaryStage.getWidth()};
-        final double[] lastHeight = {primaryStage.getHeight()};
+//        final double[] lastWidth = {primaryStage.getWidth()};
+//        final double[] lastHeight = {primaryStage.getHeight()};
 
-        // Add listener to track changes in full-screen state
-        primaryStage.fullScreenProperty().addListener((observable, oldValue, isFullScreen) -> {
-            if (!isFullScreen) {
-                // Restore previous size when exiting full-screen
-                primaryStage.setWidth(lastWidth[0]);
-                primaryStage.setHeight(lastHeight[0]);
-            } else {
-                // Save the size before entering full-screen
-                lastWidth[0] = primaryStage.getWidth();
-                lastHeight[0] = primaryStage.getHeight();
-            }
-        });
+//        // Add listener to track changes in full-screen state
+//        primaryStage.fullScreenProperty().addListener((observable, oldValue, isFullScreen) -> {
+//            if (!isFullScreen) {
+//                // Restore previous size when exiting full-screen
+//                primaryStage.setWidth(lastWidth[0]);
+//                primaryStage.setHeight(lastHeight[0]);
+//            } else {
+//                // Save the size before entering full-screen
+//                lastWidth[0] = primaryStage.getWidth();
+//                lastHeight[0] = primaryStage.getHeight();
+//            }
+//        });
 
 
         // Set initial size
@@ -168,12 +171,12 @@ public class ServerUI extends Application
 //        primaryStage.setFullScreen(true);
 //        primaryStage.setFullScreenExitHint("Press ESC to exit full-screen mode");
 
-        // Add listener to toggle full screen when maximized
-        primaryStage.maximizedProperty().addListener((observable, oldValue, isMaximized) -> {
-            if (isMaximized) {
-                primaryStage.setFullScreen(true);
-            }
-        });
+//        // Add listener to toggle full screen when maximized
+//        primaryStage.maximizedProperty().addListener((observable, oldValue, isMaximized) -> {
+//            if (isMaximized) {
+//                primaryStage.setFullScreen(true);
+//            }
+//        });
 
     }
 }

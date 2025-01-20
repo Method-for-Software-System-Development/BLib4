@@ -16,8 +16,6 @@ import javafx.stage.Stage;
 
 public class ServerPortFrameController
 {
-    private Stage primaryStage;
-
     String temp = "";
 
     @FXML
@@ -57,7 +55,6 @@ public class ServerPortFrameController
             getExitBtn(new ActionEvent());
         });
 
-        this.primaryStage = primaryStage;
     }
 
     /**
@@ -110,7 +107,7 @@ public class ServerPortFrameController
         {
             try
             {
-                ServerUI.runServer(this.primaryStage ,port);
+                ServerUI.runServer(port);
 
                 // hide port window
                 //((Node) event.getSource()).getScene().getWindow().hide();
