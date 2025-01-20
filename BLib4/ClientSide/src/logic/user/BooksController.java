@@ -1,35 +1,42 @@
 package logic.user;
 
+import java.sql.Connection;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import entities.logic.MessageType;
-import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
 import logic.communication.ChatClient;
 import logic.communication.ClientUI;
 
 
 public class BooksController {
-	private static BooksController instance = null;
+	private static volatile BooksController instance = null;
 
 	/*
 	 * Private constructor for BooksControllers
 	 */
 	public BooksController() {
 	}
-	/*
-	 * Singleton pattern implementation for BooksController
-	 */
-
-	public static BooksController getInstance() {
-		if(instance == null) {
-			instance = new BooksController();
-			return instance;
+	
+	 /**
+     * get the instance of the BooksController for singleton
+     *
+     * @return the instance of the BooksController
+     */
+	public static BooksController getInstance() 
+	{
+		if(instance == null) 
+		{
+			 synchronized (BooksController.class)
+	            {
+	                if (instance == null)
+	                {
+	                    instance = new BooksController();
+	                }
+	            }
 		}
 		return instance;
 	}
+	
 	
 	 /**
      * Checks the availability of a book copy by its ID.
@@ -44,16 +51,9 @@ public class BooksController {
 
 	        // Wait for the server's response
 	        if (ChatClient.serverResponse) {
-	            // If the server indicates the copy is available
-	        	Alert alert = new Alert(Alert.AlertType.INFORMATION, "A book copy "+copyID+ " availabile");
-	            alert.setHeaderText("Success");
-	            alert.showAndWait();
 	            return true;
 	        } else {
 	            // If the server indicates the copy is not available
-	        	Alert alert = new Alert(Alert.AlertType.ERROR, "A book copy "+copyID+ " unavailabile");
-	            alert.setHeaderText("Error");
-	            alert.showAndWait();
 	            return false;
 	        }
 	    } catch (Exception e) {
