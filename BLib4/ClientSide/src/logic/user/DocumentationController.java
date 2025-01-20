@@ -1,4 +1,4 @@
-package gui.user;
+package logic.user;
 
 import entities.logic.Borrow;
 
