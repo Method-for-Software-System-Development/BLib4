@@ -56,6 +56,9 @@ public class SubscriberStatusReport_Controller {
 		XYChart.Series<String, Number> frozenSubscribersSeries = new XYChart.Series<>();
 		frozenSubscribersSeries.setName("Frozen Subscribers");
 		
+		XYChart.Series<String, Number> numberOfSubscribersSeries = new XYChart.Series<>();
+		numberOfSubscribersSeries.setName("Number of Subscribers");
+		
 		// load data
 		//get the correct report
 		SubscriberStatusReport subscriberStatusReport=reportsGeneratorController.getSubscriberStatusReport();
@@ -67,10 +70,11 @@ public class SubscriberStatusReport_Controller {
 			String date = dailyActiveData.get(i)[0];
 			activeSubscribersSeries.getData().add(new XYChart.Data<>(date, Integer.parseInt(dailyActiveData.get(i)[1])));
 			frozenSubscribersSeries.getData().add(new XYChart.Data<>(date, Integer.parseInt(dailyActiveData.get(i)[2])));
+			numberOfSubscribersSeries.getData().add(new XYChart.Data<>(date, Integer.parseInt(dailyActiveData.get(i)[1])+Integer.parseInt(dailyActiveData.get(i)[2])));
 		 }	
 		
 		// Add data to the chart
-		barChart.getData().addAll(activeSubscribersSeries, frozenSubscribersSeries);
+		barChart.getData().addAll(activeSubscribersSeries, frozenSubscribersSeries,numberOfSubscribersSeries);
 		
 		return barChart;
 	}
