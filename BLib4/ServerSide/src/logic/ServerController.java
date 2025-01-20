@@ -192,12 +192,16 @@ public class ServerController extends AbstractServer
             case "111":
                 // Request by the subscriber to extend book borrow
                 responseMsg = new MessageType("211", dbController.handleSubscriberExtendBorrow((List<String>) receiveMsg.data));
+                // Casting receiveMsg into List<String> type
+                List<String> dataList = (List<String>) receiveMsg.data;
+                // Getting borrow id
+                String borrowId = dataList.get(0);
                 // Getting book name by borrow ID
-                String bookName = (dbController.getBookDetailsByBorrowId((String) receiveMsg.data)).getTitle();
+                String bookName = (dbController.getBookDetailsByBorrowId(borrowId)).getTitle();
                 if ((boolean) responseMsg.getData())
                 {
                     // Getting subscriber ID by borrow ID
-                    String subscriberID = dbController.getSubscriberIdFromBorrowId((String) receiveMsg.data);
+                    String subscriberID = dbController.getSubscriberIdFromBorrowId(borrowId);
                     // Getting history file of subscriber
                     List<String[]> historyList = dbController.getHistoryFileBySubscriberId(subscriberID);
                     // Document extend granted
@@ -208,10 +212,10 @@ public class ServerController extends AbstractServer
                 else
                 {
                     // Getting subscriber ID by borrow ID
-                    String subscriberID = dbController.getSubscriberIdFromBorrowId((String) receiveMsg.data);
+                    String subscriberID = dbController.getSubscriberIdFromBorrowId(borrowId);
                     // Getting history file of subscriber
                     List<String[]> historyList = dbController.getHistoryFileBySubscriberId(subscriberID);
-                    // TODO change first null to book name
+                    // Updating subscriber history file 
                     List<String[]> newHistoryList = documantaionController.documentOnReaderCard("111-2", historyList, bookName, null);
                     // Updating subscriber history file in DB
                     dbController.handleUpdateHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0), newHistoryList);
