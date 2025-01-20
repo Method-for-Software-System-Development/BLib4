@@ -42,7 +42,7 @@ public class Subscriber_Controller {
      * @param email email of the user.
      * @param password	password of the user.
      */
-	public void addNewSubscriber(String userID, String firstName, String lastName, String phoneNumber, String email,String password) {
+	public boolean addNewSubscriber(String userID, String firstName, String lastName, String phoneNumber, String email,String password) {
         // Create a list of data of the new subscriber to send to the server
         ArrayList<String> dataOfNewSubscriber = new ArrayList<>();	
         dataOfNewSubscriber.add(userID);
@@ -53,19 +53,8 @@ public class Subscriber_Controller {
         dataOfNewSubscriber.add(password);
         // send message to server to get all subscribers
         ClientUI.chat.accept(new MessageType("104",dataOfNewSubscriber));
-        // check server response and show alert
-        if (ChatClient.serverResponse)
-        {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Subscriber signed up successfully");
-            alert.setHeaderText("Success");
-            alert.showAndWait();
-        }
-        else
-        {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to sign up the subscriber");
-            alert.setHeaderText("Error");
-            alert.showAndWait();
-        }   
+        // Return server response
+        return ChatClient.serverResponse;
 	}
 
 	/**

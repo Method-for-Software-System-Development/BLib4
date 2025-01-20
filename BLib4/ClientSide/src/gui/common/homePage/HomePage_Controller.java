@@ -78,6 +78,36 @@ public class HomePage_Controller {
     @FXML
     private ImageView logoutImageView;
 
+    // FXML fields for seeIfLibrarianLoggedIn
+    @FXML
+    private VBox seeIfLibrarianLoggedIn;
+    @FXML
+    private Text userGreeting2;
+    @FXML
+    private Button librarianDashButton;
+    @FXML
+    private ImageView librarianDashImageView;
+    @FXML
+    private Button searchBooksButton3;
+    @FXML
+    private ImageView searchBooksImageView3;
+    @FXML
+    private Button newBorrowButton;
+    @FXML
+    private ImageView newBorrowImageView;
+    @FXML
+    private Button addSubscriberButton;
+    @FXML
+    private ImageView addSubscriberImageView;
+    @FXML
+    private Button reportsButton;
+    @FXML
+    private ImageView reportsImageView;
+    @FXML
+    private Button logoutButton2;
+    @FXML
+    private ImageView logoutImageView2;
+
     // FXML fields for both
     @FXML
     private Button exitButton;
@@ -110,17 +140,29 @@ public class HomePage_Controller {
         isLibrarianLoggedIn = subscriberController.getLoggedLibrarian() != null;
 
         // Show the appropriate VBox based on login status
-        if (isSubscriberLoggedIn || isLibrarianLoggedIn) {
+        if (isSubscriberLoggedIn) {
             seeIfNotLoggedIn.setVisible(false);
             seeIfNotLoggedIn.setManaged(false);
             seeIfLoggedIn.setVisible(true);
             seeIfLoggedIn.setManaged(true);
+            seeIfLibrarianLoggedIn.setVisible(false);
+            seeIfLibrarianLoggedIn.setManaged(false);
             userGreeting.setText(getGreetingMessage() + " " + subscriberController.getLoggedSubscriber().getFirstName() + " !");
+        } else if (isLibrarianLoggedIn) {
+            seeIfNotLoggedIn.setVisible(false);
+            seeIfNotLoggedIn.setManaged(false);
+            seeIfLoggedIn.setVisible(false);
+            seeIfLoggedIn.setManaged(false);
+            seeIfLibrarianLoggedIn.setVisible(true);
+            seeIfLibrarianLoggedIn.setManaged(true);
+            userGreeting2.setText(getGreetingMessage() + " " + subscriberController.getLoggedLibrarian().getName() + " !");
         } else {
             seeIfNotLoggedIn.setVisible(true);
             seeIfNotLoggedIn.setManaged(true);
             seeIfLoggedIn.setVisible(false);
             seeIfLoggedIn.setManaged(false);
+            seeIfLibrarianLoggedIn.setVisible(false);
+            seeIfLibrarianLoggedIn.setManaged(false);
         }
 
         // Set up radio buttons for account type selection
@@ -184,6 +226,48 @@ public class HomePage_Controller {
         });
         logoutButton.setOnMouseExited(event -> {
             logoutImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/logout_24dp_FFFFFF.png")));
+        });
+
+        librarianDashButton.setOnMouseEntered(event -> {
+            librarianDashImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/local_library_24dp_F86F03.png")));
+        });
+        librarianDashButton.setOnMouseExited(event -> {
+            librarianDashImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/local_library_24dp_FFFFFF.png")));
+        });
+
+        searchBooksButton3.setOnMouseEntered(event -> {
+            searchBooksImageView3.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/search_24dp_525FE1.png")));
+        });
+        searchBooksButton3.setOnMouseExited(event -> {
+            searchBooksImageView3.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/search_24dp_FFFFFF.png")));
+        });
+
+        newBorrowButton.setOnMouseEntered(event -> {
+            newBorrowImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/post_add_24dp_525FE1.png")));
+        });
+        newBorrowButton.setOnMouseExited(event -> {
+            newBorrowImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/post_add_24dp_FFFFFF.png")));
+        });
+
+        addSubscriberButton.setOnMouseEntered(event -> {
+            addSubscriberImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/person_add_24dp_525FE1.png")));
+        });
+        addSubscriberButton.setOnMouseExited(event -> {
+            addSubscriberImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/person_add_24dp_FFFFFF.png")));
+        });
+
+        reportsButton.setOnMouseEntered(event -> {
+            reportsImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/bar_chart_24dp_525FE1.png")));
+        });
+        reportsButton.setOnMouseExited(event -> {
+            reportsImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/bar_chart_24dp_FFFFFF.png")));
+        });
+
+        logoutButton2.setOnMouseEntered(event -> {
+            logoutImageView2.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/logout_24dp_525FE1.png")));
+        });
+        logoutButton2.setOnMouseExited(event -> {
+            logoutImageView2.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/logout_24dp_FFFFFF.png")));
         });
 
         exitButton.setOnMouseEntered(event -> {
@@ -461,7 +545,11 @@ public class HomePage_Controller {
 
     @FXML
     private void goToDashboard() {
-        SceneManager.switchScene("/gui/user/subscriberUI/SubscriberUI_UI.fxml", "BLib.4 - Braude Library Management");
+        if (isSubscriberLoggedIn) {
+            SceneManager.switchScene("/gui/user/subscriberUI/SubscriberUI_UI.fxml", "BLib.4 - Braude Library Management");
+        } else if (isLibrarianLoggedIn) {
+            SceneManager.switchScene("/gui/librarian/librarianUI/LibrarianUI_UI.fxml", "BLib.4 - Braude Library Management");
+        }
     }
 
     /**
@@ -480,6 +568,16 @@ public class HomePage_Controller {
     @FXML
     private void goToEditProfile() {
         SceneManager.switchScene("/gui/user/editProfile/EditProfile_UI.fxml", "BLib.4 - Braude Library Management");
+    }
+
+    @FXML
+    private void goToLibrarianDash() {
+        SceneManager.switchScene("/gui/librarian/librarianUI/LibrarianUI_UI.fxml", "BLib.4 - Braude Library Management");
+    }
+
+    @FXML
+    private void goToAddSubscriber() {
+        SceneManager.switchScene("/gui/librarian/addSubscriber/AddSubscriber_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
     /**

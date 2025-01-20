@@ -205,6 +205,90 @@
         </VBox>
         <!-- ***************** End of VBox for logged in ***************** -->
 
+        <!-- ***************** This VBox will be shown if the librarian is logged in ***************** -->
+        <VBox fx:id="seeIfLibrarianLoggedIn" alignment="TOP_CENTER">
+
+            <Text fx:id="userGreeting2" styleClass="menu-title">
+                <VBox.margin>
+                    <Insets bottom="25.0" top="25.0"/>
+                </VBox.margin>
+            </Text>
+
+            <!-- White Separator -->
+            <Separator prefHeight="5.0" styleClass="menu-separator"/>
+
+            <Button fx:id="librarianDashButton" maxWidth="Infinity" onAction="#goToLibrarianDash" prefHeight="50.0" styleClass="orange-button" text="Librarian Dashboard">
+                <graphic>
+                    <ImageView fx:id="librarianDashImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                        <image>
+                            <Image url="@../../assets/icons/local_library_24dp_FFFFFF.png"/>
+                        </image>
+                    </ImageView>
+                </graphic>
+                <VBox.margin>
+                    <Insets top="25.0" />
+                </VBox.margin>
+            </Button>
+
+            <Button fx:id="newBorrowButton" maxWidth="Infinity" prefHeight="50.0" styleClass="transparent-button"
+                    text="New Borrow">
+                <graphic>
+                    <ImageView fx:id="newBorrowImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                        <image>
+                            <Image url="@../../assets/icons/post_add_24dp_FFFFFF.png"/>
+                        </image>
+                    </ImageView>
+                </graphic>
+                <VBox.margin>
+                    <Insets top="25.0"/>
+                </VBox.margin>
+            </Button>
+
+            <Button fx:id="addSubscriberButton" maxWidth="Infinity" onAction="#goToAddSubscriber" prefHeight="50.0" styleClass="transparent-button"
+                    text="Add Subscriber">
+                <graphic>
+                    <ImageView fx:id="addSubscriberImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                        <image>
+                            <Image url="@../../assets/icons/person_add_24dp_FFFFFF.png"/>
+                        </image>
+                    </ImageView>
+                </graphic>
+                <VBox.margin>
+                    <Insets top="25.0"/>
+                </VBox.margin>
+            </Button>
+
+            <Button fx:id="reportsButton" maxWidth="Infinity" prefHeight="50.0" styleClass="transparent-button"
+                    text="Library Reports">
+                <graphic>
+                    <ImageView fx:id="reportsImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                        <image>
+                            <Image url="@../../assets/icons/bar_chart_24dp_FFFFFF.png"/>
+                        </image>
+                    </ImageView>
+                </graphic>
+                <VBox.margin>
+                    <Insets top="25.0"/>
+                </VBox.margin>
+            </Button>
+
+            <Button fx:id="logoutButton2" maxWidth="Infinity" onAction="#logout" prefHeight="50.0"
+                    styleClass="transparent-button" text="Logout">
+                <graphic>
+                    <ImageView fx:id="logoutImageView2" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                        <image>
+                            <Image url="@../../assets/icons/logout_24dp_FFFFFF.png"/>
+                        </image>
+                    </ImageView>
+                </graphic>
+                <VBox.margin>
+                    <Insets top="25.0"/>
+                </VBox.margin>
+            </Button>
+
+        </VBox>
+        <!-- ***************** End of VBox for logged in ***************** -->
+
         <!-- Spacer Region -->
         <Region fx:id="menuButtonsSpacer" VBox.vgrow="ALWAYS"/>
 

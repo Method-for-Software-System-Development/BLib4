@@ -6,9 +6,9 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 <GridPane alignment="CENTER" hgap="15.0" prefHeight="1080.0" prefWidth="1920.0" styleClass="gridPane"
-          stylesheets="@../../GlobalBLib_Styles.css, @LibrarianUI_Styles.css" vgap="15.0"
+          stylesheets="@../../GlobalBLib_Styles.css, @AddSubscriber_Styles.css" vgap="15.0"
           xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1"
-          fx:controller="gui.librarian.librarianUI.LibrarianUI_Controller">
+          fx:controller="gui.librarian.addSubscriber.AddSubscriber_Controller">
 
     <!-- Row Constraints -->
     <rowConstraints>
@@ -54,6 +54,19 @@
         <Separator prefHeight="5.0" styleClass="menu-separator"/>
 
         <!-- Menu Buttons -->
+        <Button fx:id="librarianDashButton" maxWidth="Infinity" onAction="#goToLibrarianDash" prefHeight="50.0" styleClass="orange-button" text="Librarian Dashboard">
+            <graphic>
+                <ImageView fx:id="librarianDashImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                    <image>
+                        <Image url="@../../assets/icons/local_library_24dp_FFFFFF.png"/>
+                    </image>
+                </ImageView>
+            </graphic>
+            <VBox.margin>
+                <Insets top="25.0" />
+            </VBox.margin>
+        </Button>
+
         <Button fx:id="searchBooksButton" maxWidth="Infinity" onAction="#goToSearch" prefHeight="50.0"
                 styleClass="transparent-button" text="Search For Books">
             <graphic>
@@ -74,20 +87,6 @@
                 <ImageView fx:id="newBorrowImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
                     <image>
                         <Image url="@../../assets/icons/post_add_24dp_FFFFFF.png"/>
-                    </image>
-                </ImageView>
-            </graphic>
-            <VBox.margin>
-                <Insets top="25.0"/>
-            </VBox.margin>
-        </Button>
-
-        <Button fx:id="addSubscriberButton" maxWidth="Infinity" onAction="#goToAddSubscriber" prefHeight="50.0" styleClass="transparent-button"
-                text="Add Subscriber">
-            <graphic>
-                <ImageView fx:id="addSubscriberImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
-                    <image>
-                        <Image url="@../../assets/icons/person_add_24dp_FFFFFF.png"/>
                     </image>
                 </ImageView>
             </graphic>
@@ -179,6 +178,58 @@
     <!-- Main (Main Content Panel) -->
     <VBox styleClass="main" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1"
           GridPane.vgrow="ALWAYS">
+
+        <Text styleClass="main-title" text="Add New Subscriber:">
+            <VBox.margin>
+                <Insets bottom="15.0" />
+            </VBox.margin>
+        </Text>
+
+        <TextFlow>
+            <Text text="Below is a form for creating a new library subscriber account. "/>
+            <Text style="-fx-fill: #E74C3C" text="All fields are mandatory.&#10;"/>
+            <Text text="Please ensure the accuracy of the ID number, first name, and last name, as these cannot be changed later.&#10;Other details can be updated by the subscriber."/>
+            <VBox.margin>
+                <Insets bottom="50.0" />
+            </VBox.margin>
+        </TextFlow>
+
+        <!-- Add Subscriber Form -->
+        <GridPane fx:id="addSubscriberForm" alignment="CENTER" hgap="15" vgap="20">
+
+            <!-- User ID -->
+            <Text text="User ID:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+            <TextField fx:id="userIdField" prefHeight="50.0" prefWidth="350.0" promptText="Enter User ID" styleClass="grey-text-field" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+            <Pane GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.columnSpan="2" />
+
+            <!-- First Name and Last Name -->
+            <Text text="First Name:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+            <TextField fx:id="firstNameField" prefHeight="50.0" prefWidth="350.0" promptText="Enter First Name" styleClass="grey-text-field" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <Pane prefWidth="30.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+            <Text text="Last Name:" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+            <TextField fx:id="lastNameField" prefHeight="50.0" prefWidth="350.0" promptText="Enter Last Name" styleClass="grey-text-field" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+
+            <!-- Phone Number and Email -->
+            <Text text="Phone Number:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+            <TextField fx:id="phoneNumberField" prefHeight="50.0" prefWidth="350.0" promptText="Enter Phone Number (05XXXXXXXX)" styleClass="grey-text-field" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <Pane GridPane.columnIndex="2" GridPane.rowIndex="2" />
+            <Text text="Email:" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+            <TextField fx:id="emailField" prefHeight="50.0" prefWidth="350.0" promptText="Enter Email Address" styleClass="grey-text-field" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+
+            <!-- Password and Confirm Password -->
+            <Text text="Password:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+            <PasswordField fx:id="passwordField" prefHeight="50.0" prefWidth="350.0" promptText="Enter Password" styleClass="grey-text-field" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <Pane GridPane.columnIndex="2" GridPane.rowIndex="3" />
+            <Text text="Confirm Password:" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+            <PasswordField fx:id="confirmPasswordField" prefHeight="50.0" prefWidth="350.0" promptText="Re-enter Password" styleClass="grey-text-field" GridPane.columnIndex="4" GridPane.rowIndex="3" />
+
+            <!-- Buttons -->
+            <HBox alignment="CENTER_RIGHT" spacing="20" GridPane.columnIndex="0" GridPane.columnSpan="5" GridPane.rowIndex="4">
+                <Button fx:id="clearButton" prefHeight="50.0" prefWidth="150.0" styleClass="grey-transparent-button" text="Clear" onAction="#clear_form" />
+                <Button fx:id="submitButton" prefHeight="50.0" prefWidth="150.0" styleClass="orange-orange-button" text="Submit" onAction="#validate_addSubscriber_form" />
+            </HBox>
+
+        </GridPane>
 
     </VBox>
 </GridPane>
