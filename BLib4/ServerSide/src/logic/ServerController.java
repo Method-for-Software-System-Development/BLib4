@@ -125,6 +125,7 @@ public class ServerController extends AbstractServer
             case "107":
                 // Borrow book request - create new borrow in the system
                 responseMsg = new MessageType("207", dbController.handleBorrowBook((List<String>) receiveMsg.data));
+
                 // If query to sign a new subscriber returns true - document on reader card
                 if ((boolean) responseMsg.getData())
                 {

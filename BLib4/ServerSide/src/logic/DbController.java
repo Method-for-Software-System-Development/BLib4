@@ -512,6 +512,29 @@ public class DbController
         PreparedStatement stmt;
         boolean returnValue = true;
         String bookId = "";
+        ResultSet rs;
+
+
+        // check if the copy exists
+        try
+        {
+            stmt = connection.prepareStatement("SELECT * from copy_of_the_book where copy_id = ?;");
+            stmt.setString(1, copyId);
+            rs = stmt.executeQuery();
+
+            if (!rs.next())
+            {
+                List<String> returnList = new ArrayList<>();
+                returnList.add("false");
+                return returnList;
+            }
+
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! check borrowed book availability failed - The book not found");
+        }
+
 
         // check if the book is not borrowed
         try
@@ -519,7 +542,7 @@ public class DbController
             stmt = connection.prepareStatement("SELECT * from copy_of_the_book WHERE copy_id = ?;");
             stmt.setString(1, copyId);
 
-            ResultSet rs = stmt.executeQuery();
+            rs = stmt.executeQuery();
             if (rs.next())
             {
                 // save the book id for the next query
@@ -550,7 +573,7 @@ public class DbController
                 stmt = connection.prepareStatement("SELECT COUNT(*) from copy_of_the_book WHERE book_id = ? AND is_available = true;");
                 stmt.setString(1, bookId);
 
-                ResultSet rs = stmt.executeQuery();
+                rs = stmt.executeQuery();
                 rs.next();
                 int copyAvailableToBorrow = rs.getInt(1);
 
@@ -583,7 +606,7 @@ public class DbController
         {
             stmt = connection.prepareStatement("SELECT subscriber_id FROM subscriber_order WHERE book_id = ? AND is_active = true AND is_his_turn = true;");
             stmt.setString(1, bookId);
-            ResultSet rs = stmt.executeQuery();
+            rs = stmt.executeQuery();
             while (rs.next())
             {
                 returnList.add(rs.getString("subscriber_id"));
@@ -603,11 +626,31 @@ public class DbController
      * @param borrowDetails - the details of the borrow (subscriber id and copy id)
      * @return - true if the borrow succeeds, else false
      */
-    public boolean handleBorrowBook(List<String> borrowDetails)
+    public int handleBorrowBook(List<String> borrowDetails)
     {
         PreparedStatement stmt;
         String subscriberId = borrowDetails.get(0);
         String copyId = borrowDetails.get(1);
+        ResultSet rs;
+
+        // check if the subscriber in the DB
+        try
+        {
+            stmt = connection.prepareStatement("SELECT * from subscriber WHERE subscriber_id = ?;");
+            stmt.setString(1, subscriberId);
+            rs = stmt.executeQuery();
+
+            if (!rs.next())
+            {
+                return 1;
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! borrow book failed - cant check if the subscriber is in the db");
+            return 3;
+        }
+
 
         // Check that the subscriber not frozen
         try
@@ -615,21 +658,20 @@ public class DbController
             stmt = connection.prepareStatement("SELECT * from subscriber WHERE subscriber_id = ?;");
             stmt.setString(1, subscriberId);
 
-            ResultSet rs = stmt.executeQuery();
+            rs = stmt.executeQuery();
             if (rs.next())
             {
                 if (!rs.getBoolean("is_active"))
                 {
-                    return false;
+                    return 2;
                 }
             }
         }
         catch (SQLException e)
         {
             System.out.println("Error! borrow book failed - the subscriber is frozen");
-            return false;
+            return 3;
         }
-
 
         try
         {
@@ -641,7 +683,7 @@ public class DbController
 
             // get the last borrow id
             stmt = connection.prepareStatement("SELECT MAX(borrow_id) FROM borrow_book;");
-            ResultSet rs = stmt.executeQuery();
+            rs = stmt.executeQuery();
             rs.next();
             int borrowId = rs.getInt(1) + 1;
 
@@ -655,10 +697,11 @@ public class DbController
         catch (SQLException e)
         {
             System.out.println("Error! borrow book failed - cant add the borrow to the db");
-            return false;
+            return 3;
         }
 
-        return true;
+        // the borrow succeeded
+        return 0;
     }
 
     /**
