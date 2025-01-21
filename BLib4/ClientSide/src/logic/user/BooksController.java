@@ -53,13 +53,7 @@ public class BooksController {
         return subscriberIdWithOrder;
     }
 	
-	
-	 /**
-     * Checks the availability of a book copy by its ID.
-     *
-     * @param copyID The ID of the book copy to check.
-     * @return true if the book copy is available, false otherwise.
-     */
+
     /**
      * Checks the availability of a book copy based on its unique ID.
      * The method communicates with the server to check if the book copy is available.
