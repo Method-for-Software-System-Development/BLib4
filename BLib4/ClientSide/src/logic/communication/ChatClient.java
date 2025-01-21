@@ -50,6 +50,7 @@ public class ChatClient extends AbstractClient
     public static int reportID;
     public static List<String[]> blobData;
     public static List<String> smsData;
+    public static int borrowHandle;
 
     //Constructors ****************************************************
 
@@ -119,8 +120,8 @@ public class ChatClient extends AbstractClient
                 break;
 
             case "207":
-                //ToDo: implement
-            	serverResponse = (boolean) receiveMsg.getData(); // true means success
+                // State of borrow 
+            	borrowHandle = (int) receiveMsg.getData();
                 break;
 
             case "208":
