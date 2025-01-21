@@ -3,11 +3,13 @@ package logic.librarian;
 import logic.communication.*;
 import entities.logic.MessageType;
 import java.util.ArrayList;
+import logic.user.*;
 
 import logic.user.*;
 
 public class BorrowController {
-	private static BorrowController instance = null;
+	private static volatile BorrowController instance = null;
+	private static BooksController  BookController = BooksController.getInstance();
 
     /*
      * Private constructor 
@@ -15,42 +17,68 @@ public class BorrowController {
     private BorrowController() {
     }
  
-    /*
-     * getInstance is  singleton for BorrowController
+    /**
+     * get the instance of the BorrowController for singleton
+     * 
+     * @return the instance of BorrowController
      */
     public static BorrowController getInstance() {
-    	if(instance == null) {
-    		instance = new BorrowController();
-    		return instance;
-    	}
-    	return instance;
+		if(instance == null) 
+		{
+			 synchronized (BorrowController.class)
+	            {
+	                if (instance == null)
+	                {
+	                    instance = new BorrowController();
+	                }
+	            }
+		}
+		return instance;
     }
     
-    /*
-     * Handles the borrow button action.
-     * Sends subscriber ID and book ID to the server for validation (Message Type 107).
-     * Waits for server response (Message Type 207).
+    /**
+     * Creating a new borrow for subscriber
+     * 
+     * @param enteredSubscriberID		Subscriber ID input via the librarian in GUI
+     * @param enteredCopyBookID			Copy ID input via librarian in GUI for the book to borrow
+     * @return							Return value return from query in DB
      */
-    public void createNewBorrow(String enteredSubscriberID, String enteredCopyBookID ) {
+    public int createNewBorrow(String enteredSubscriberID, String enteredCopyBookID ) {
         try {
-            if(BooksController.getInstance().checkAvailability(enteredCopyBookID)) {
-                // Create a list to be sent in the message to the server
-                ArrayList<String> detailsOfBorrow = new ArrayList<>();
-                detailsOfBorrow.add(enteredSubscriberID);
-                detailsOfBorrow.add(enteredCopyBookID);
-                
-                // Sending the server subscriberID and bookID
-                ClientUI.chat.accept(new MessageType("107", detailsOfBorrow)); 
-            }
+            // Create a list to be sent in the message to the server
+            ArrayList<String> detailsOfBorrow = new ArrayList<>();
+            detailsOfBorrow.add(enteredSubscriberID);
+            detailsOfBorrow.add(enteredCopyBookID);
+
+			// Sending the server subscriberID and bookID
+			ClientUI.chat.accept(new MessageType("107", detailsOfBorrow));
         }catch(Exception e) {
         	System.out.println(e.toString());
         }
+        // Returning query return value
+        return ChatClient.borrowHandle;
     }
     
-    /*
-     * Method to extend the due date of a borrow.
-     * It retrieves the borrow ID and the new selected date from the UI,
-     * builds an ArrayList to send to the server, and handles the server response.
+    /**
+     * Checking if Subscriber ID is in the list of ordered books
+     * 
+     * @param SubscriberID			Subscriber ID entered by librarian
+     * @return						Return true if the subscriber is on the wait list
+     */
+    public boolean isSubscriberInWaitList(String SubscriberID) {
+    	for(String Subid : BookController.getSubscriberIdWithOrder()) {
+    		if(SubscriberID.equals(Subid)) {
+    			return true;
+    		}
+    	}
+    	return false;
+    }
+    
+    /**
+     * Extend borrow via librarian - manual extension
+     * 
+     * @param Borrow_id				Borrow ID input via librarian in GUI
+     * @param selectedDate			Selected date for new return date
      */
     public void extendBorrow(String Borrow_id, String selectedDate ) {
     	try {
@@ -69,10 +97,10 @@ public class BorrowController {
     	}
     }
     
-    /*
-     * Method to return a borrowed item.
-     * It retrieves the borrow ID from the UI, sends it to the server,
-     * and handles the response to confirm if the return was successful or failed.
+    /**
+     * Return of a book by subscriber 
+     * 
+     * @param Borrow_id				Borrow ID of the returned book to the library
      */
     public void returnBorrow(String Borrow_id) {
     	try {
