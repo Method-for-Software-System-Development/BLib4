@@ -1136,7 +1136,7 @@ public class DbController
             try
             {
                 // get the last extend id
-                stmt = connection.prepareStatement("SELECT MAX(extention_id) FROM extension_book;");
+                stmt = connection.prepareStatement("SELECT MAX(extension_id) FROM extension_book;");
                 ResultSet rs = stmt.executeQuery();
                 rs.next();
                 int extendId = rs.getInt(1) + 1;
@@ -1149,7 +1149,7 @@ public class DbController
                 Date currentDueDate = rs.getDate(1);
 
                 // create a new row in the extension_book table
-                stmt = connection.prepareStatement("INSERT INTO extension_book (extention_id, borrow_id, original_due_date, new_due_date, extention_type) VALUES (?,?, ?, ?, false);");
+                stmt = connection.prepareStatement("INSERT INTO extension_book (extension_id, borrow_id, original_due_date, new_due_date, extension_type) VALUES (?,?, ?, ?, false);");
                 stmt.setString(1, String.valueOf(extendId));
                 stmt.setString(2, borrowId);
                 stmt.setDate(3, currentDueDate);
@@ -1255,7 +1255,7 @@ public class DbController
             try
             {
                 // get the last extension id
-                stmt = connection.prepareStatement("SELECT MAX(extention_id) FROM extension_book;");
+                stmt = connection.prepareStatement("SELECT MAX(extension_id) FROM extension_book;");
                 ResultSet rs = stmt.executeQuery();
                 rs.next();
                 int extendId = rs.getInt(1) + 1;
@@ -1269,7 +1269,7 @@ public class DbController
 
                 // create a new row in the extension_book table with librarian details
                 stmt = connection.prepareStatement(
-                        "INSERT INTO extension_book (extention_id, borrow_id, original_due_date, new_due_date, extention_type, extention_operator, extention_date) " +
+                        "INSERT INTO extension_book (extension_id, borrow_id, original_due_date, new_due_date, extension_type, extension_operator, extension_date) " +
                                 "VALUES (?, ?, ?, ?, true, ?, CURRENT_DATE);"
                 );
                 stmt.setString(1, String.valueOf(extendId));
