@@ -20,6 +20,7 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class LibrarianUI_Controller {
 
@@ -55,8 +56,42 @@ public class LibrarianUI_Controller {
     @FXML
     private ImageView exitImageView;
 
+    // Messages FXML fields
+    @FXML
+    private Text numberOfMessages;
+    @FXML
+    private TableView<MessageEntry> messagesTable;
+    @FXML
+    private TableColumn<MessageEntry, String> messageIdColumn;
+    @FXML
+    private TableColumn<MessageEntry, String> messageDateColumn;
+    @FXML
+    private TableColumn<MessageEntry, String> messageContentColumn;
+    @FXML
+    private TableColumn<MessageEntry, Void> confirmColumn;
+
+    // Subscribers Table FXML fields
+    @FXML
+    private TableView<SubscriberEntry> subscribersTable;
+    @FXML
+    private TableColumn<SubscriberEntry, String> userIdColumn;
+    @FXML
+    private TableColumn<SubscriberEntry, String> firstNameColumn;
+    @FXML
+    private TableColumn<SubscriberEntry, String> lastNameColumn;
+    @FXML
+    private TableColumn<SubscriberEntry, String> statusColumn;
+    @FXML
+    private TableColumn<SubscriberEntry, Void> borrowsColumn;
+    @FXML
+    private TableColumn<SubscriberEntry, Void> readerCardColumn;
+
     // Fields
     private Subscriber_Controller subscriberController;
+    private ArrayList<ArrayList<String>> messages;
+    private final ObservableList<MessageEntry> messageEntries = FXCollections.observableArrayList(); // List of message entries (dynamic)
+    private ArrayList<ArrayList<String>> subscribers;
+    private final ObservableList<SubscriberEntry> subscriberEntries = FXCollections.observableArrayList(); // List of message entries (dynamic)subscribers;
 
     @FXML
     public void initialize() {
@@ -115,6 +150,239 @@ public class LibrarianUI_Controller {
         exitButton.setOnMouseExited(event -> {
             exitImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/close_24dp_FFFFFF.png")));
         });
+
+//        ClientUI.chat.accept(new MessageType("128", null));
+//        messages = ChatClient.listOfMessages;
+
+        // FOR TESTING
+        initializeMessagesForTesting();
+
+        if (messages.isEmpty())
+        {
+            numberOfMessages.setText("No new unapproved messages.");
+            messagesTable.setVisible(false);
+            messagesTable.setManaged(false);
+        }
+        else
+        {
+            numberOfMessages.setText("You have " + messages.size() + " new messages:");
+        }
+
+        // ********************************** SETUP MESSAGES TABLE **********************************
+
+        // Initialize table columns
+        messageIdColumn.setCellValueFactory(data -> data.getValue().messageIdProperty());
+        messageDateColumn.setCellValueFactory(data -> data.getValue().messageDateProperty());
+        messageContentColumn.setCellValueFactory(data -> data.getValue().messageContentProperty());
+
+        // Add Confirm button
+        confirmColumn.setCellFactory(param -> new TableCell<MessageEntry, Void>() {
+            private final Button confirmButton = new Button("Confirm");
+            {
+                // Set the CSS class for the button
+                confirmButton.getStyleClass().add("small-orange-orange-button");
+
+                // Set preferred size for the button
+                confirmButton.setPrefHeight(30.0);
+                confirmButton.setPrefWidth(90.0);
+
+                // Set the action for the button
+                confirmButton.setOnAction(event -> {
+                    MessageEntry entry = getTableView().getItems().get(getIndex());
+                    String messageId = entry.getMessageId();
+                    ClientUI.chat.accept(new MessageType("129", messageId));
+                    if (ChatClient.serverResponse) {
+                        refreshMessagesTable();
+                    } else {
+                        showErrorAlert("Error", "Failed to confirm message.");
+                    }
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null); // Clear the cell for empty rows
+                } else {
+                    setGraphic(confirmButton); // Add the button for non-empty rows
+                }
+            }
+        });
+
+        messagesTable.setFixedCellSize(35); // Set the row height
+        messagesTable.setSelectionModel(null); // Disable row selection
+
+        // Hide the table header
+        messagesTable.widthProperty().addListener((obs, oldVal, newVal) -> {
+            messagesTable.lookup("TableHeaderRow").setVisible(false);
+        });
+
+        // Hide the first column
+        messageIdColumn.setVisible(false);
+
+        // Populate the table
+        loadMessagesData();
+        messagesTable.setItems(messageEntries);
+
+        // Ensure the messageContentColumn fills the remaining space
+        messageContentColumn.prefWidthProperty().bind(
+                messagesTable.widthProperty()
+                        .subtract(170) // Subtract the total width of fixed columns
+                        .subtract(110)
+                        .subtract(2) // Subtract the border width
+                        .subtract(messagesTable.getItems().size() > 7 ? 20 : 0) // Subtract 20 if more than 7 rows for the scrollbar
+        );
+
+        // ********************************** SETUP SUBSCRIBERS TABLE **********************************
+
+        ClientUI.chat.accept(new MessageType("115", null));
+        subscribers = ChatClient.listOfSubscribersForLibrarian;
+
+        // Add rounded corners to the TableView
+        Rectangle clip = new Rectangle();
+        clip.setArcWidth(20);  // Set horizontal corner radius
+        clip.setArcHeight(20); // Set vertical corner radius
+        // Bind the clip's size to the TableView's size
+        clip.widthProperty().bind(subscribersTable.widthProperty());
+        clip.heightProperty().bind(subscribersTable.heightProperty());
+        // Apply the clip to the TableView
+        subscribersTable.setClip(clip);
+
+        // Initialize table columns
+        userIdColumn.setCellValueFactory(data -> data.getValue().userIdProperty());
+        firstNameColumn.setCellValueFactory(data -> data.getValue().firstNameProperty());
+        lastNameColumn.setCellValueFactory(data -> data.getValue().lastNameProperty());
+        statusColumn.setCellValueFactory(data -> data.getValue().statusProperty());
+
+        // Add Borrows button
+        borrowsColumn.setCellFactory(param -> new TableCell<SubscriberEntry, Void>() {
+            private final Button borrowsButton = new Button("Active Borrows");
+            {
+                // Set the CSS class for the button
+                borrowsButton.getStyleClass().add("small-purple-transparent-button");
+
+                // Set preferred size for the button
+                borrowsButton.setPrefHeight(30.0);
+                borrowsButton.setPrefWidth(150.0);
+
+                // Set the action for the button
+                borrowsButton.setOnAction(event -> {
+                    SubscriberEntry entry = getTableView().getItems().get(getIndex());
+                    String userId = entry.getUserId();
+                    SceneManager.switchSceneWithData("/gui/librarian/subscriberBorrows/SubscriberBorrows_UI.fxml", "BLib.4 - Braude Library Management", userId);
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null); // Clear the cell for empty rows
+                } else {
+                    setGraphic(borrowsButton); // Add the button for non-empty rows
+                }
+            }
+        });
+
+        // Add Reader Card button
+        readerCardColumn.setCellFactory(param -> new TableCell<SubscriberEntry, Void>() {
+            private final Button readerCardButton = new Button("Reader Card");
+            {
+                // Set the CSS class for the button
+                readerCardButton.getStyleClass().add("small-purple-transparent-button");
+
+                // Set preferred size for the button
+                readerCardButton.setPrefHeight(30.0);
+                readerCardButton.setPrefWidth(150.0);
+
+                // Set the action for the button
+                readerCardButton.setOnAction(event -> {
+                    SubscriberEntry entry = getTableView().getItems().get(getIndex());
+                    String userId = entry.getUserId();
+                    SceneManager.switchSceneWithData("/gui/librarian/readerCard/ReaderCard_UI.fxml", "BLib.4 - Braude Library Management", userId);
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null); // Clear the cell for empty rows
+                } else {
+                    setGraphic(readerCardButton); // Add the button for non-empty rows
+                }
+            }
+        });
+
+        subscribersTable.setPlaceholder(new Text("No subscribers to display.")); // Set the placeholder text
+        subscribersTable.setFixedCellSize(35); // Set the row height
+        subscribersTable.setSelectionModel(null); // Disable row selection
+
+        // Populate the table
+        loadSubscribersData();
+        subscribersTable.setItems(subscriberEntries);
+
+        subscribersTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+    }
+
+    private void loadMessagesData() {
+        for (ArrayList<String> message : messages) {
+            MessageEntry entry = new MessageEntry(
+                    message.get(0), // Message ID
+                    message.get(1), // Message Date
+                    message.get(2)  // Message Content
+            );
+            messageEntries.add(entry);
+        }
+    }
+
+    private void loadSubscribersData() {
+        for (ArrayList<String> subscriber : subscribers) {
+            SubscriberEntry entry = new SubscriberEntry(
+                    subscriber.get(0), // User ID
+                    subscriber.get(1), // First Name
+                    subscriber.get(2), // Last Name
+                    subscriber.get(3)  // Status
+            );
+            subscriberEntries.add(entry);
+        }
+    }
+
+    private void refreshMessagesTable() {
+        // Clear existing data
+        messageEntries.clear();
+        // Fetch updated borrow data from the server
+        ClientUI.chat.accept(new MessageType("128", null));
+        messages = ChatClient.listOfMessages;
+        if (messages.isEmpty())
+        {
+            numberOfMessages.setText("No new unapproved messages.");
+            messagesTable.setVisible(false);
+            messagesTable.setManaged(false);
+        }
+        else
+        {
+            numberOfMessages.setText("You have " + messages.size() + " new messages:");
+        }
+        // Load the updated data into the table
+        loadMessagesData();
+    }
+
+    private void initializeMessagesForTesting() {
+        messages = new ArrayList<>();
+
+        // Adding 10 example records
+        messages.add(new ArrayList<>(Arrays.asList("1", "01/01/2025", "Overdue book notification")));
+        messages.add(new ArrayList<>(Arrays.asList("2", "02/01/2025", "Reservation ready for pickup")));
+        messages.add(new ArrayList<>(Arrays.asList("3", "03/01/2025", "New book recommendation")));
+        messages.add(new ArrayList<>(Arrays.asList("4", "04/01/2025", "Membership renewal reminder")));
+        messages.add(new ArrayList<>(Arrays.asList("5", "05/01/2025", "System maintenance notice")));
+        messages.add(new ArrayList<>(Arrays.asList("6", "06/01/2025", "Event invitation: Book Club")));
+        messages.add(new ArrayList<>(Arrays.asList("7", "07/01/2025", "Borrowing policy update")));
+        messages.add(new ArrayList<>(Arrays.asList("8", "08/01/2025", "Your reserved book is overdue")));
+        messages.add(new ArrayList<>(Arrays.asList("9", "09/01/2025", "Returned book confirmation")));
+        messages.add(new ArrayList<>(Arrays.asList("10", "10/01/2025", "Account activity report")));
     }
 
     /**
@@ -137,6 +405,21 @@ public class LibrarianUI_Controller {
     }
 
     /**
+     * Displays an error alert with the specified title and message.
+     *
+     * @param title   the title of the error alert
+     * @param message the message displayed in the error alert
+     */
+    private void showErrorAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.initOwner(SceneManager.getStage());
+        alert.showAndWait();
+    }
+
+    /**
      * Logs out the current user and navigates to the Home Page.
      */
     @FXML
@@ -152,6 +435,11 @@ public class LibrarianUI_Controller {
     @FXML
     private void goToSearch() {
         SceneManager.switchScene("/gui/common/search/Search_UI.fxml", "BLib.4 - Braude Library Management");
+    }
+
+    @FXML
+    private void goToNewBorrow() {
+        SceneManager.switchScene("/gui/librarian/newBorrow/NewBorrow_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
     @FXML

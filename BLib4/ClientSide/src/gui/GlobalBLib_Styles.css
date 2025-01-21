@@ -193,6 +193,24 @@
     -fx-background-radius: 25px;
 }
 
+.small-purple-transparent-button {
+    -fx-background-color: transparent;
+    -fx-border-color: #525FE1;
+    -fx-border-width: 2px;
+    -fx-border-radius: 15px;
+    -fx-text-fill: #525FE1;
+    -fx-font-family: "Montserrat Bold";
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+    -fx-background-radius: 15px;
+}
+.small-purple-transparent-button:hover {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #525FE1;
+    -fx-border-radius: 15px;
+    -fx-background-radius: 15px;
+}
+
 .grey-transparent-button {
     -fx-background-color: transparent;
     -fx-border-color: #454545;
@@ -250,6 +268,25 @@
     -fx-text-fill: #F86F03;
     -fx-border-radius: 25px;
     -fx-background-radius: 25px;
+}
+
+.small-orange-orange-button {
+    -fx-background-color: #F86F03;
+    -fx-border-color: #F86F03;
+    -fx-border-width: 2px;
+    -fx-border-radius: 15px;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-family: "Montserrat Bold";
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+    -fx-background-radius: 15px;
+}
+.small-orange-orange-button:hover {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #F86F03;
+    -fx-text-fill: #F86F03;
+    -fx-border-radius: 15px;
+    -fx-background-radius: 15px;
 }
 
 .disabled-button {

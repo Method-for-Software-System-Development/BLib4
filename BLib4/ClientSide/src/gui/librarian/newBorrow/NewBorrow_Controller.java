@@ -1,4 +1,4 @@
-package gui.librarian.addSubscriber;
+package gui.librarian.newBorrow;
 
 import entities.logic.MessageType;
 import entities.user.Librarian;
@@ -16,6 +16,7 @@ import javafx.scene.text.Text;
 import logic.communication.ChatClient;
 import logic.communication.ClientUI;
 import logic.communication.SceneManager;
+import logic.librarian.BorrowController;
 import logic.user.Subscriber_Controller;
 
 import java.sql.Date;
@@ -24,7 +25,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
-public class AddSubscriber_Controller {
+public class NewBorrow_Controller {
 
     // FXML fields
     @FXML
@@ -42,9 +43,9 @@ public class AddSubscriber_Controller {
     @FXML
     private ImageView searchBooksImageView;
     @FXML
-    private Button newBorrowButton;
+    private Button addSubscriberButton;
     @FXML
-    private ImageView newBorrowImageView;
+    private ImageView addSubscriberImageView;
     @FXML
     private Button reportsButton;
     @FXML
@@ -76,11 +77,14 @@ public class AddSubscriber_Controller {
 
     // Fields
     private Subscriber_Controller subscriberController;
+    private BorrowController borrowController;
 
     @FXML
     public void initialize() {
         // Get the singleton instance of Subscriber_Controller
         subscriberController = Subscriber_Controller.getInstance();
+        // Get the singleton instance of BorrowController
+        borrowController = BorrowController.getInstance();
 
         // Set the greeting message
         userGreeting.setText(getGreetingMessage() + " " + subscriberController.getLoggedLibrarian().getName() + " !");
@@ -107,11 +111,11 @@ public class AddSubscriber_Controller {
             searchBooksImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/search_24dp_FFFFFF.png")));
         });
 
-        newBorrowButton.setOnMouseEntered(event -> {
-            newBorrowImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/post_add_24dp_525FE1.png")));
+        addSubscriberButton.setOnMouseEntered(event -> {
+            addSubscriberImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/person_add_24dp_525FE1.png")));
         });
-        newBorrowButton.setOnMouseExited(event -> {
-            newBorrowImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/post_add_24dp_FFFFFF.png")));
+        addSubscriberButton.setOnMouseExited(event -> {
+            addSubscriberImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/person_add_24dp_FFFFFF.png")));
         });
 
         reportsButton.setOnMouseEntered(event -> {
@@ -329,8 +333,8 @@ public class AddSubscriber_Controller {
     }
 
     @FXML
-    private void goToNewBorrow() {
-        SceneManager.switchScene("/gui/librarian/newBorrow/NewBorrow_UI.fxml", "BLib.4 - Braude Library Management");
+    private void goToAddSubscriber() {
+        SceneManager.switchScene("/gui/librarian/addSubscriber/AddSubscriber_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
     @FXML

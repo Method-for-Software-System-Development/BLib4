@@ -47,6 +47,8 @@ public class ChatClient extends AbstractClient
     public static ArrayList<Boolean> array;
     public static ArrayList<ArrayList<String>> listOfBorrows;
     public static ArrayList<ArrayList<String>> listOfActivities;
+    public static ArrayList<ArrayList<String>> listOfMessages;
+    public static ArrayList<ArrayList<String>> listOfSubscribersForLibrarian;
     public static int reportID;
     public static List<String[]> blobData;
     public static List<String> smsData;
@@ -170,7 +172,24 @@ public class ChatClient extends AbstractClient
                 break;
 
             case "215":
-                //ToDo: implement
+                subscribers = (List<Subscriber>) receiveMsg.getData();
+                listOfSubscribersForLibrarian = new ArrayList<>();
+                for (Subscriber sub : subscribers)
+                {
+                    ArrayList<String> subscriberData = new ArrayList<>();
+                    subscriberData.add(sub.getId());
+                    subscriberData.add(sub.getFirstName());
+                    subscriberData.add(sub.getLastName());
+                    if (sub.getStatus())
+                    {
+                        subscriberData.add("Active");
+                    }
+                    else
+                    {
+                        subscriberData.add("Frozen");
+                    }
+                    listOfSubscribersForLibrarian.add(subscriberData);
+                }
                 break;
 
             case "216":
@@ -216,6 +235,14 @@ public class ChatClient extends AbstractClient
             case "226":
             	//response for blob data of report request
             	blobData=(List<String[]>) receiveMsg.data;
+            case "228":
+                // list of unread librarian messages
+                listOfMessages=(ArrayList<ArrayList<String>>) receiveMsg.getData();
+                break;
+            case "229":
+                //response from server for message confirmation
+                serverResponse = (boolean) receiveMsg.getData();
+                break;
             	
             //!/ remove this /////////////////////////////////
             case "0200":
