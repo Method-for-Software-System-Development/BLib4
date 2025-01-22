@@ -1,6 +1,6 @@
 package logic;
+
 import io.github.cdimascio.dotenv.Dotenv;
-import entities.logic.Notification;
 import entities.user.Subscriber;
 
 import javax.mail.*;
@@ -9,17 +9,19 @@ import javax.mail.internet.MimeMessage;
 import java.util.Map;
 import java.util.Properties;
 
-public class Notification_Controller {
+public class Notification_Controller
+{
     private DbController dbController;
     private static volatile Notification_Controller instance = null;
 
     // Email credentials
     Dotenv dotenv = Dotenv.load();
-    private final String EMAIL_ADDRESS =dotenv.get("EMAIL_ADDRESS");
+    private final String EMAIL_ADDRESS = dotenv.get("EMAIL_ADDRESS");
     private final String EMAIL_PASSWORD = dotenv.get("EMAIL_PASSWORD");
 
     /**
      * Singleton instance getter.
+     *
      * @return - The singleton instance of Notification_Controller.
      */
     public static Notification_Controller getInstance()
@@ -40,7 +42,8 @@ public class Notification_Controller {
     /**
      * Private constructor for Notification_Controller.
      */
-    private Notification_Controller() {
+    private Notification_Controller()
+    {
         this.dbController = DbController.getInstance();
     }
 
@@ -51,21 +54,25 @@ public class Notification_Controller {
      * @param subject        Subject of the email.
      * @param content        Content of the email.
      */
-    public void sendEmail(String recipientEmail, String subject, String content) {
+    public void sendEmail(String recipientEmail, String subject, String content)
+    {
         Properties properties = new Properties();
         properties.put("mail.smtp.auth", "true");
         properties.put("mail.smtp.starttls.enable", "true");
         properties.put("mail.smtp.host", "smtp.gmail.com");
         properties.put("mail.smtp.port", "587");
 
-        Session session = Session.getInstance(properties, new Authenticator() {
+        Session session = Session.getInstance(properties, new Authenticator()
+        {
             @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
+            protected PasswordAuthentication getPasswordAuthentication()
+            {
                 return new PasswordAuthentication(EMAIL_ADDRESS, EMAIL_PASSWORD);
             }
         });
 
-        try {
+        try
+        {
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(EMAIL_ADDRESS));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
@@ -74,7 +81,9 @@ public class Notification_Controller {
 
             Transport.send(message);
             System.out.println("Email sent successfully to " + recipientEmail);
-        } catch (MessagingException e) {
+        }
+        catch (MessagingException e)
+        {
             e.printStackTrace();
         }
     }
@@ -86,7 +95,8 @@ public class Notification_Controller {
      * @param email        The subscriber's email.
      * @param message      The message to send.
      */
-    public void dayBeforeReturnDate_Email_SMS(String subscriberID, String email, String message) {
+    public void dayBeforeReturnDate_Email_SMS(String subscriberID, String email, String message)
+    {
 
         // Send Email
         sendEmail(email, "Reminder: Book Due Tomorrow", message);
@@ -101,10 +111,12 @@ public class Notification_Controller {
      * Sends a notification to a subscriber to confirm that their extension request has been approved.
      *
      * @param subscriberID The ID of the subscriber.
-     * @param copyID The ID of the book copy being extended.
+     * @param copyID       The ID of the book copy being extended.
      */
-    public void extensionApproval(String subscriberID, String copyID) {
-        try {
+    public void extensionApproval(String subscriberID, String copyID)
+    {
+        try
+        {
             // Fetch the subscriber's name and book title from DBController
             Map<String, String> orderDetails = dbController.fetchOrderDetails(subscriberID);
             String subscriberName = orderDetails.getOrDefault("subscriberName", "Subscriber");
@@ -115,7 +127,9 @@ public class Notification_Controller {
             System.out.println("Message: " + message);
 
             // Simulate sending notification (e.g., email or SMS)
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             System.err.println("Error while sending approval notification: " + e.getMessage());
             e.printStackTrace();
         }
@@ -125,10 +139,12 @@ public class Notification_Controller {
      * Sends a notification to a subscriber to inform them that their extension request has been rejected.
      *
      * @param subscriberID The ID of the subscriber.
-     * @param copyID The ID of the book copy for which the extension was requested.
+     * @param copyID       The ID of the book copy for which the extension was requested.
      */
-    public void extensionRejection(String subscriberID, String copyID) {
-        try {
+    public void extensionRejection(String subscriberID, String copyID)
+    {
+        try
+        {
             // Fetch the subscriber's name and book title from DBController
             Map<String, String> orderDetails = dbController.fetchOrderDetails(subscriberID);
             String subscriberName = orderDetails.getOrDefault("subscriberName", "Subscriber");
@@ -139,7 +155,9 @@ public class Notification_Controller {
             System.out.println("Message: " + message);
 
             // Simulate sending notification (e.g., email or SMS)
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             System.err.println("Error while sending rejection notification: " + e.getMessage());
             e.printStackTrace();
         }
@@ -150,12 +168,15 @@ public class Notification_Controller {
      *
      * @param bookToSubscriberMap A map where the key is the book ID, and the value is the subscriber waiting for the book.
      */
-    public void orderArrived(Map<String, Subscriber> bookToSubscriberMap) {
-        for (Map.Entry<String, Subscriber> entry : bookToSubscriberMap.entrySet()) {
+    public void orderArrived(Map<String, Subscriber> bookToSubscriberMap)
+    {
+        for (Map.Entry<String, Subscriber> entry : bookToSubscriberMap.entrySet())
+        {
             String bookId = entry.getKey();
             Subscriber subscriber = entry.getValue();
 
-            if (subscriber != null) {
+            if (subscriber != null)
+            {
                 String subscriberName = subscriber.getFirstName() + " " + subscriber.getLastName();
                 String message = "Dear " + subscriberName + ", your order for the book with ID \"" + bookId + "\" has arrived. Please visit the library to collect it.";
 
@@ -164,9 +185,9 @@ public class Notification_Controller {
 
                 // Send email notification
                 sendEmail(subscriber.getEmail(), "Reminder: Book Due Tomorrow", message);
-
-
-            } else {
+            }
+            else
+            {
                 System.out.println("No subscriber waiting for book ID: " + bookId);
             }
         }

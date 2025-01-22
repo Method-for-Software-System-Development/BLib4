@@ -1,6 +1,3 @@
-// This file contains material supporting section 3.7 of the textbook:
-// "Object Oriented Software Engineering" and is issued under the open-source
-// license found at www.lloseng.com
 package logic;
 
 import java.io.IOException;
@@ -17,16 +14,9 @@ import entities.user.Subscriber;
 import ocsf.server.*;
 
 /**
- * This class overrides some methods in the abstract
- * superclass to give more functionality to the server.
- *
- * @author Dr Timothy C. Lethbridge
- * @author Dr Robert Lagani&egrave;re
- * @author Fran&ccedil;ois B&eacute;langer
- * @author Paul Holden
- * @version July 2000
+ * The ServerController class is responsible for handling all the server's logic.
+ * It receives messages from the client, processes them, and sends a response back.
  */
-
 public class ServerController extends AbstractServer
 {
     private ServerMonitorFrameController monitorController;
@@ -536,6 +526,11 @@ public class ServerController extends AbstractServer
         return responseMsg;
     }
 
+    /**
+     * The method handle to send sms to subscriber
+     * @param subscriberID - the subscriber id
+     * @param message - the message to send
+     */
     public static void HandleSendSmsToSubscriber(String subscriberID, String message)
     {
         // check if the subscriber is connected

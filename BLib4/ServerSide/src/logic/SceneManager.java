@@ -1,6 +1,5 @@
 package logic;
 
-import gui.ServerMonitorFrameController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -25,15 +24,6 @@ public class SceneManager
     }
 
     /**
-     * Returns the primary stage of the application.
-     *
-     * @return The primary stage.
-     */
-    public static Stage getStage() {
-        return primaryStage;
-    }
-
-    /**
      * Switches the scene of the primary stage without altering stage properties.
      *
      * @param fxmlPath The path to the FXML file.
@@ -51,5 +41,4 @@ public class SceneManager
             System.out.println("Error loading scene: " + e.getMessage());
         }
     }
-
 }

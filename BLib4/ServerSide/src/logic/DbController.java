@@ -624,7 +624,8 @@ public class DbController
      * The method run SQL query to handle the borrow of a book
      *
      * @param borrowDetails - the details of the borrow (subscriber id and copy id)
-     * @return - true if the borrow succeeds, else false
+     * @return - 0 if the borrow succeeds, 1 if the subscriber not found,
+     * 2 if the subscriber is frozen, 3 if the borrow failed due to db error
      */
     public int handleBorrowBook(List<String> borrowDetails)
     {
@@ -1654,6 +1655,7 @@ public class DbController
      *
      * @param history_id - the id of the history
      * @param list       - the new history file
+     * @return - true if the update succeeds, else false
      */
     public boolean handleUpdateHistoryFileById(String history_id, List<String[]> list) throws IOException
     {
@@ -1723,6 +1725,12 @@ public class DbController
         }
     }
 
+    /**
+     * The method run SQL query to get the history id by the subscriber id
+     *
+     * @param subscriberId - the id of the subscriber
+     * @return - the history id
+     */
     private String getHistoryIdBySubscriberId(String subscriberId)
     {
         PreparedStatement stmt = null;
@@ -2056,8 +2064,6 @@ public class DbController
             {
                 System.out.println("Error! get book location failed - cant get the book location");
             }
-
-
         }
 
         return returnValue;
@@ -2147,6 +2153,11 @@ public class DbController
     }
 
 
+    /**
+     * The method run SQL query to get the active subscribers count
+     *
+     * @return - the number of active subscribers
+     */
     public int fetchActiveSubscribersCount()
     {
         String query = "SELECT COUNT(*) FROM subscriber WHERE is_active = 1";
@@ -2165,6 +2176,11 @@ public class DbController
         return 0;
     }
 
+    /**
+     * The method run SQL query to get the frozen subscribers count
+     *
+     * @return - the number of frozen subscribers
+     */
     public int fetchFrozenSubscribersCount()
     {
         String query = "SELECT COUNT(*) FROM subscriber WHERE is_active = 0";
@@ -2190,19 +2206,19 @@ public class DbController
      */
     public List<String[]> fetchMonthlySubscribersStatusReport()
     {
-        try 
+        try
         {
-        	// get the latest report (max report_id) for the same report type
-        	PreparedStatement stmt = connection.prepareStatement("SELECT MAX(report_id) FROM monthly_reports WHERE report_type = 'SubscribersStatus'");
-        	ResultSet rs = stmt.executeQuery();
-        	
-        	rs.next();
-        	int reportId = rs.getInt(1);
-        	
-        	String query = "SELECT report_file " +
-        			"FROM monthly_reports " +
-        			"WHERE report_id = ?;";
-        	stmt = connection.prepareStatement(query);
+            // get the latest report (max report_id) for the same report type
+            PreparedStatement stmt = connection.prepareStatement("SELECT MAX(report_id) FROM monthly_reports WHERE report_type = 'SubscribersStatus'");
+            ResultSet rs = stmt.executeQuery();
+
+            rs.next();
+            int reportId = rs.getInt(1);
+
+            String query = "SELECT report_file " +
+                    "FROM monthly_reports " +
+                    "WHERE report_id = ?;";
+            stmt = connection.prepareStatement(query);
             stmt.setInt(1, reportId);
             rs = stmt.executeQuery();
 
@@ -2227,23 +2243,22 @@ public class DbController
      */
     public void updateMonthlySubscribersStatusReport(byte[] updatedBlob)
     {
-
-        try 
+        try
         {
-        	// get the latest report (max report_id) for the same report type
-        	PreparedStatement stmt = connection.prepareStatement("SELECT MAX(report_id) FROM monthly_reports WHERE report_type = 'SubscribersStatus'");
-        	ResultSet rs = stmt.executeQuery();
-        	
-        	rs.next();
-        	int reportId = rs.getInt(1);
-        	
-        	
-        	String updateQuery = "UPDATE monthly_reports " +
-        			"SET report_file = ? " +
-        			"WHERE report_id = ?";
-        	stmt = connection.prepareStatement(updateQuery);
+            // get the latest report (max report_id) for the same report type
+            PreparedStatement stmt = connection.prepareStatement("SELECT MAX(report_id) FROM monthly_reports WHERE report_type = 'SubscribersStatus'");
+            ResultSet rs = stmt.executeQuery();
+
+            rs.next();
+            int reportId = rs.getInt(1);
+
+
+            String updateQuery = "UPDATE monthly_reports " +
+                    "SET report_file = ? " +
+                    "WHERE report_id = ?";
+            stmt = connection.prepareStatement(updateQuery);
             stmt.setBytes(1, updatedBlob);
-            stmt.setInt(2,reportId);
+            stmt.setInt(2, reportId);
             int rowsAffected = stmt.executeUpdate();
             System.out.println("Report updated successfully. Rows affected: " + rowsAffected);
         }
@@ -2253,30 +2268,35 @@ public class DbController
         }
     }
 
+    /**
+     * Fetches the monthly borrowing report for the current month - total borrow time.
+     *
+     * @return - Map<String, String> where the key is the book title and the value is the total borrow time.
+     */
     public Map<String, String> fetchTotalBorrowTime()
     {
         String query =
-        		"SELECT " +
-        	    "b.book_title, " +
-        	    "SUM(" +
-        	    "    CASE " +
-        	    "        WHEN bb.borrow_return_date IS NOT NULL THEN DATEDIFF(bb.borrow_return_date, bb.borrow_date) " + 
-        	    "        ELSE DATEDIFF(CURRENT_DATE, bb.borrow_date) " + 
-        	    "    END" +
-                ") AS total_borrow_time " +
-                "FROM " +
-                "    borrow_book bb " +
-                "JOIN " +
-                "    copy_of_the_book cob ON bb.copy_id = cob.copy_id " +
-                "JOIN " +
-                "    book b ON cob.book_id = b.book_id " +
-                "WHERE " +
-                "    bb.borrow_date >= DATE_FORMAT(CURRENT_DATE, '%Y-%m-01') " +
-                "    AND MONTH(bb.borrow_date) = MONTH(CURRENT_DATE) " +
-                "    AND YEAR(bb.borrow_date) = YEAR(CURRENT_DATE) " +
-                "GROUP BY " +
-                "    b.book_title;";
-        
+                "SELECT " +
+                        "b.book_title, " +
+                        "SUM(" +
+                        "    CASE " +
+                        "        WHEN bb.borrow_return_date IS NOT NULL THEN DATEDIFF(bb.borrow_return_date, bb.borrow_date) " +
+                        "        ELSE DATEDIFF(CURRENT_DATE, bb.borrow_date) " +
+                        "    END" +
+                        ") AS total_borrow_time " +
+                        "FROM " +
+                        "    borrow_book bb " +
+                        "JOIN " +
+                        "    copy_of_the_book cob ON bb.copy_id = cob.copy_id " +
+                        "JOIN " +
+                        "    book b ON cob.book_id = b.book_id " +
+                        "WHERE " +
+                        "    bb.borrow_date >= DATE_FORMAT(CURRENT_DATE, '%Y-%m-01') " +
+                        "    AND MONTH(bb.borrow_date) = MONTH(CURRENT_DATE) " +
+                        "    AND YEAR(bb.borrow_date) = YEAR(CURRENT_DATE) " +
+                        "GROUP BY " +
+                        "    b.book_title;";
+
         Map<String, String> totalBorrowTimeMap = new HashMap<>();
 
         try (PreparedStatement stmt = connection.prepareStatement(query);
@@ -2297,39 +2317,44 @@ public class DbController
         return totalBorrowTimeMap;
     }
 
+    /**
+     * Fetches the monthly borrowing report for the current month - late borrow time.
+     *
+     * @return - Map<String, String> where the key is the book title and the value is the late borrow time.
+     */
     public Map<String, String> fetchLateBorrowTime()
     {
         String query =
-        		"SELECT " +
-        	    "b.book_title, " +
-        	    "SUM(" +
-        	    "    CASE " +
-        	    "        WHEN bb.borrow_return_date IS NOT NULL AND bb.borrow_return_date > bb.borrow_due_date THEN " +
-        	    "		 	DATEDIFF(bb.borrow_return_date, bb.borrow_due_date) " +
-        	    "        WHEN bb.borrow_return_date IS NULL AND CURRENT_DATE > bb.borrow_due_date THEN " + 
-        	    "		 	DATEDIFF(CURRENT_DATE, bb.borrow_due_date) "+	
-        	    "		 ELSE 0 "+
-        	    "    END" +
-                ") AS late_borrow_time " +
-                "FROM " +
-                "    borrow_book bb " +
-                "JOIN " +
-                "    copy_of_the_book cob ON bb.copy_id = cob.copy_id " +
-                "JOIN " +
-                "    book b ON cob.book_id = b.book_id " +
-                "WHERE " +
-                "    bb.borrow_date >= DATE_FORMAT(CURRENT_DATE, '%Y-%m-01') " +
-                "    AND MONTH(bb.borrow_date) = MONTH(CURRENT_DATE) " +
-                "    AND YEAR(bb.borrow_date) = YEAR(CURRENT_DATE) " +
-                "GROUP BY " +
-                "    b.book_title;";
-        
+                "SELECT " +
+                        "b.book_title, " +
+                        "SUM(" +
+                        "    CASE " +
+                        "        WHEN bb.borrow_return_date IS NOT NULL AND bb.borrow_return_date > bb.borrow_due_date THEN " +
+                        "		 	DATEDIFF(bb.borrow_return_date, bb.borrow_due_date) " +
+                        "        WHEN bb.borrow_return_date IS NULL AND CURRENT_DATE > bb.borrow_due_date THEN " +
+                        "		 	DATEDIFF(CURRENT_DATE, bb.borrow_due_date) " +
+                        "		 ELSE 0 " +
+                        "    END" +
+                        ") AS late_borrow_time " +
+                        "FROM " +
+                        "    borrow_book bb " +
+                        "JOIN " +
+                        "    copy_of_the_book cob ON bb.copy_id = cob.copy_id " +
+                        "JOIN " +
+                        "    book b ON cob.book_id = b.book_id " +
+                        "WHERE " +
+                        "    bb.borrow_date >= DATE_FORMAT(CURRENT_DATE, '%Y-%m-01') " +
+                        "    AND MONTH(bb.borrow_date) = MONTH(CURRENT_DATE) " +
+                        "    AND YEAR(bb.borrow_date) = YEAR(CURRENT_DATE) " +
+                        "GROUP BY " +
+                        "    b.book_title;";
+
         Map<String, String> lateBorrowTimeMap = new HashMap<>();
 
-        try 
+        try
         {
-        	PreparedStatement stmt = connection.prepareStatement(query);
-        	ResultSet rs = stmt.executeQuery();
+            PreparedStatement stmt = connection.prepareStatement(query);
+            ResultSet rs = stmt.executeQuery();
 
             while (rs.next())
             {
@@ -2341,7 +2366,7 @@ public class DbController
         catch (SQLException e)
         {
             System.out.println("Error executing the query: " + e.getMessage());
-            e.printStackTrace();  
+            e.printStackTrace();
         }
         return lateBorrowTimeMap;
     }
@@ -2354,9 +2379,9 @@ public class DbController
      */
     public void saveMonthlyReport(String reportType, byte[] reportBlob)
     {
-    	try
+        try
         {
-    		// get the latest report (max report_id) for the same report type
+            // get the latest report (max report_id) for the same report type
             PreparedStatement stmt = connection.prepareStatement("SELECT MAX(report_id) FROM monthly_reports WHERE report_type = ?");
             stmt.setString(1, reportType);
             ResultSet rs = stmt.executeQuery();
@@ -2390,17 +2415,17 @@ public class DbController
         String query = "INSERT INTO monthly_reports (report_id, report_type, report_month, report_year, report_file) " +
                 "VALUES (?,?, ?, ? , '')";
 
-        try 
+        try
         {
-        	PreparedStatement stmt = connection.prepareStatement("SELECT MAX(report_id) FROM monthly_reports;");
+            PreparedStatement stmt = connection.prepareStatement("SELECT MAX(report_id) FROM monthly_reports;");
             ResultSet rs = stmt.executeQuery();
             int notificationId;
-            if(rs.next())
-            	notificationId = rs.getInt(1) + 1;
-            else notificationId=1;
-            
+            if (rs.next())
+                notificationId = rs.getInt(1) + 1;
+            else notificationId = 1;
+
             stmt = connection.prepareStatement(query);
-            stmt.setString(1, ""+notificationId);
+            stmt.setString(1, "" + notificationId);
             stmt.setString(2, data.get(0));
             stmt.setInt(3, Integer.parseInt(data.get(1)));
             stmt.setInt(4, Integer.parseInt(data.get(2)));
@@ -2587,6 +2612,12 @@ public class DbController
         return messages;
     }
 
+    /**
+     * The method run SQL query to save the subscriber missed sms in DB
+     *
+     * @param subscriberId - the id of the subscriber
+     * @param message      - the message of the sms
+     */
     public void handleSaveSubscriberMissedSms(String subscriberId, String message)
     {
         PreparedStatement stmt;
