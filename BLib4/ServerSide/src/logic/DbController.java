@@ -395,6 +395,13 @@ public class DbController
 
             ResultSet rs = stmt.executeQuery();
             rs.next();
+            int historyId = rs.getInt(1);
+
+            stmt = connection.prepareStatement("SELECT history_file FROM subsribers_history WHERE id = ?;");
+            stmt.setInt(1, historyId);
+            rs = stmt.executeQuery();
+            rs.next();
+
             byte[] blob = rs.getBytes(1);
 
             history = BlobUtil.convertBlobToList(blob);

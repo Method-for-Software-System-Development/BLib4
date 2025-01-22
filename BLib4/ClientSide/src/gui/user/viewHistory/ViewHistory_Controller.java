@@ -119,12 +119,10 @@ public class ViewHistory_Controller {
             exitImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/close_24dp_FFFFFF.png")));
         });
 
-//        // Get the subscriber's activities
-//        ClientUI.chat.accept(new MessageType("112", subscriberController.getLoggedSubscriber().getId()));
-//        subscriberActivities = ChatClient.listOfActivities;
-
-        // FOR TESTING PURPOSES
-        initializeSubscriberActivitiesForTesting();
+        // Get the subscriber's activities
+        ClientUI.chat.accept(new MessageType("112", subscriberController.getLoggedSubscriber().getId()));
+        subscriberActivities = ChatClient.listOfActivities;
+        System.out.println(subscriberActivities);
 
         // Add rounded corners to the TableView
         Rectangle clip = new Rectangle();
