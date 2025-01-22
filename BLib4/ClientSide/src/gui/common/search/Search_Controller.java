@@ -325,7 +325,7 @@ public class Search_Controller {
                 toServer.add("name");
                 toServer.add(title);
             } else if (!subject.isEmpty()) {
-                toServer.add("subject");
+                toServer.add("category");
                 toServer.add(subject);
             } else if (!freeText.isEmpty()) {
                 toServer.add("freeText");
