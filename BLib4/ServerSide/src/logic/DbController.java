@@ -208,19 +208,19 @@ public class DbController
             stmt = connection.prepareStatement("INSERT INTO subsribers_history (id) SELECT MAX(id)+  1 FROM subsribers_history;");
             stmt.executeUpdate();
 
+            // get the max id of the history table
+            stmt = connection.prepareStatement("SELECT MAX(id) FROM subsribers_history;");
+            rs = stmt.executeQuery();
+            rs.next();
+            int historyId = rs.getInt(1);
+
             // insert an empty history to the new row
             List<String[]> emptyHistory = new ArrayList<>();
             byte[] blob = BlobUtil.convertListToBlob(emptyHistory);
-            stmt = connection.prepareStatement("UPDATE subsribers_history SET history_file = ? WHERE id = (SELECT MAX(id) FROM subsribers_history);");
+            stmt = connection.prepareStatement("UPDATE subsribers_history SET history_file = ? WHERE id = ?;");
             stmt.setBytes(1, blob);
+            stmt.setInt(2,historyId);
             stmt.executeUpdate();
-
-            // get the id of the new row
-            stmt = connection.prepareStatement("SELECT MAX(id) FROM subsribers_history;");
-            rs = stmt.executeQuery();
-
-            rs.next();
-            int historyId = rs.getInt(1);
 
             //create a new row in the subscriber table
             stmt = connection.prepareStatement("INSERT INTO subscriber (subscriber_id, subscriber_first_name, " +
