@@ -103,6 +103,10 @@ public class ChatClient extends AbstractClient
                 librarian= (Librarian) receiveMsg.getData();
                 break;
 
+            case "2002":
+                // response for log out request
+                break;
+
             case "203":
             	// log in failed 
             	serverResponse=false;
