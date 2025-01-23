@@ -1318,10 +1318,20 @@ public class DbController
         try
         {
             // Prepare the SQL query with the MATCH and AGAINST functions
-            stmt = connection.prepareStatement("SELECT DISTINCT B.book_id, B.book_title, B.book_author, B.edition_number, B.print_date, B.book_subject, B.description, B.book_cover, C.purchase_date\n" +
+            stmt = connection.prepareStatement("SELECT DISTINCT B.book_id,\n" +
+                    "                B.book_title,\n" +
+                    "                B.book_author,\n" +
+                    "                B.edition_number,\n" +
+                    "                B.print_date,\n" +
+                    "                B.book_subject,\n" +
+                    "                B.description,\n" +
+                    "                B.book_cover,\n" +
+                    "                C.latest_purchase_date\n" +
                     "FROM book B\n" +
-                    "         JOIN copy_of_the_book C ON B.book_id = C.book_id\n" +
-                    "ORDER BY C.purchase_date DESC\n" +
+                    "         JOIN (SELECT book_id, MAX(purchase_date) AS latest_purchase_date\n" +
+                    "               FROM copy_of_the_book\n" +
+                    "               GROUP BY book_id) C ON B.book_id = C.book_id\n" +
+                    "ORDER BY C.latest_purchase_date DESC\n" +
                     "LIMIT 5;");
 
             ResultSet rs = stmt.executeQuery();
