@@ -8,6 +8,8 @@ import logic.communication.SceneManager;
 import logic.librarian.ReportsGenerator_Controller;
 
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +24,9 @@ public class BorrowTimeReport_Controller {
 	@FXML
 	private Button btnClose;
 	
+	@FXML
+    private Label reportInfo;
+	
     private ReportsGenerator_Controller reportsGeneratorController;
 
 	@FXML
@@ -30,6 +35,7 @@ public class BorrowTimeReport_Controller {
 		reportsGeneratorController = ReportsGenerator_Controller.getInstance();
 		// Initialize chart with data
 		borrowingReportChart.getData().setAll(generateBorrowingReportChart().getData());
+		reportInfo.setText(reportsGeneratorController.getMonth()+"/"+reportsGeneratorController.getYear());
 	}
 	
 	/**

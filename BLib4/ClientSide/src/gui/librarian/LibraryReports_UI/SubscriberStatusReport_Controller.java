@@ -5,6 +5,8 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.text.Text;
 import logic.communication.SceneManager;
 import logic.librarian.ReportsGenerator_Controller;
 
@@ -22,6 +24,9 @@ public class SubscriberStatusReport_Controller {
 	@FXML
 	private Button btnClose;
 	
+	@FXML
+    private Label reportInfo;
+	
     private ReportsGenerator_Controller reportsGeneratorController;
     
 	@FXML
@@ -30,6 +35,7 @@ public class SubscriberStatusReport_Controller {
 		reportsGeneratorController = ReportsGenerator_Controller.getInstance();
 		// Initialize chart with data
 		subscriberStatusReportChart.getData().setAll(generateSubscriberStatusReportChart().getData());
+		reportInfo.setText(reportsGeneratorController.getMonth()+"/"+reportsGeneratorController.getYear());
 	}
 	
 	/**
