@@ -270,11 +270,6 @@ public class ServerController extends AbstractServer
                 responseMsg = new MessageType("215", dbController.handleGetAllSubscribers());
                 break;
 
-            case "116":
-                // Request by the librarian to get subscriber membership card
-                //ToDo: implement
-                break;
-
             case "117":
                 // Request by the librarian to manually extend book borrow
                 responseMsg = new MessageType("217", dbController.handleLibrarianExtendBorrow((List<String>) receiveMsg.data));
@@ -292,18 +287,6 @@ public class ServerController extends AbstractServer
                     // Updating subscriber history file in DB
                     dbController.handleUpdateHistoryFileBySubscriberId(subscriberID, newHistoryList);
                 }
-                break;
-
-            case "118":
-                // Request by the librarian to get book borrow time report
-                //? what data need to return
-                //ToDo: implement
-                break;
-
-            case "119":
-                // Request by the librarian to get subscriber status report
-                //? what data need to return
-                //ToDo: implement
                 break;
 
             case "120":
@@ -340,12 +323,6 @@ public class ServerController extends AbstractServer
                 //Request to get blob data of a report
                 byte[] blobData = dbController.fetchReportBlob((List<String>) receiveMsg.data);
                 responseMsg = new MessageType("226", BlobUtil.convertBlobToList(blobData));
-                break;
-
-            case "127":
-                //request to create new empty report for next month
-                dbController.insertEmptyMonthlyReport((List<String>) receiveMsg.data);
-                responseMsg = new MessageType("227", null);
                 break;
 
             case "128":

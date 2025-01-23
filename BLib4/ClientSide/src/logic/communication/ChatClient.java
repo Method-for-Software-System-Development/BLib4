@@ -198,26 +198,16 @@ public class ChatClient extends AbstractClient
                 }
                 break;
 
-            case "216":
-                //ToDo: implement
-                break;
-
             case "217":
                 // status of update in the db, in format boolean
                 serverResponse = (boolean) receiveMsg.getData();
                 break;
 
-            case "218":
-                //ToDo: implement
-                break;
-
-            case "219":
-                //ToDo: implement
-                break;
             case "220":
             case "221":
                 books = (List<Book>)receiveMsg.data;
                 break;
+
             case "222":
                 smsData = (List<String>)receiveMsg.data;
                 for (int i = 0; i < smsData.size(); i++)
@@ -230,49 +220,34 @@ public class ChatClient extends AbstractClient
                     alert.showAndWait();
                 }
                 break;
+
             case "223":
                 availability = (List<String>)receiveMsg.data;
                 break;
+
             case "224":
                 serverResponse = (boolean) receiveMsg.getData();
                 break;
+
             case "225":
             	//response for report id request
             	reportID=(int) receiveMsg.data;
+                break;
+
             case "226":
             	//response for blob data of report request
             	blobData=(List<String[]>) receiveMsg.data;
+                break;
+
             case "228":
                 // list of unread librarian messages
                 listOfMessages=(ArrayList<ArrayList<String>>) receiveMsg.getData();
                 break;
+
             case "229":
                 //response from server for message confirmation
                 serverResponse = (boolean) receiveMsg.getData();
                 break;
-            	
-            //!/ remove this /////////////////////////////////
-            case "0200":
-                // list of all the subscribers in db, in format List<Subscriber>
-                subscribers.clear();
-                subscribers = (List<Subscriber>) receiveMsg.getData();
-                break;
-
-//            case "0201":
-//                // subscriber details, in format Subscriber
-//                Subscriber subscriber = (Subscriber) receiveMsg.getData();
-//                subscribers.clear();
-//                if (subscriber != null)
-//                {
-//                    subscribers.add(subscriber);
-//                }
-//                break;
-
-            case "0202":
-                // status of update in the db, in format boolean
-                serverResponse = (boolean) receiveMsg.getData();
-                break;
-            //!/ end of remove this //////////////////////////////////
 
             default:
                 System.out.println("Invalid message received from server");
