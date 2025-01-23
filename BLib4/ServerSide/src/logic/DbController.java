@@ -2292,28 +2292,31 @@ public class DbController
      */
     public Map<String, String> fetchTotalBorrowTime()
     {
-        String query =
-                "SELECT " +
-                        "b.book_title, " +
-                        "SUM(" +
-                        "    CASE " +
-                        "        WHEN bb.borrow_return_date IS NOT NULL THEN DATEDIFF(bb.borrow_return_date, bb.borrow_date) " +
-                        "        ELSE DATEDIFF(CURRENT_DATE, bb.borrow_date) " +
-                        "    END" +
-                        ") AS total_borrow_time " +
-                        "FROM " +
-                        "    borrow_book bb " +
-                        "JOIN " +
-                        "    copy_of_the_book cob ON bb.copy_id = cob.copy_id " +
-                        "JOIN " +
-                        "    book b ON cob.book_id = b.book_id " +
-                        "WHERE " +
-                        "    bb.borrow_date >= DATE_FORMAT(CURRENT_DATE, '%Y-%m-01') " +
-                        "    AND MONTH(bb.borrow_date) = MONTH(CURRENT_DATE) " +
-                        "    AND YEAR(bb.borrow_date) = YEAR(CURRENT_DATE) " +
-                        "GROUP BY " +
-                        "    b.book_title;";
-
+    	String query = "SELECT b.book_title,\n" +
+                "       SUM(\n" +
+                "               CASE\n" +
+                "                   WHEN bb.borrow_return_date IS NOT NULL AND MONTH(bb.borrow_date) <> MONTH(CURRENT_DATE)\n" +
+                "                       AND MONTH(bb.borrow_return_date) = MONTH(CURRENT_DATE) THEN\n" +
+                "                       DATEDIFF(bb.borrow_return_date, DATE_FORMAT(CURRENT_DATE, '%Y-%m-01')) + 1\n" +
+                "                   WHEN bb.borrow_return_date IS NOT NULL AND MONTH(bb.borrow_date) = MONTH(CURRENT_DATE)\n" +
+                "                       AND MONTH(bb.borrow_return_date) = MONTH(CURRENT_DATE) THEN\n" +
+                "                       DATEDIFF(bb.borrow_return_date, bb.borrow_date) + 1\n" +
+                "                   WHEN bb.borrow_return_date IS NULL AND MONTH(bb.borrow_date) = MONTH(CURRENT_DATE) THEN\n" +
+                "                       DATEDIFF(CURRENT_DATE, bb.borrow_date)\n" +
+                "                   WHEN bb.borrow_return_date IS NULL AND MONTH(bb.borrow_date) <> MONTH(CURRENT_DATE) THEN\n" +
+                "                       DATEDIFF(CURRENT_DATE, DATE_FORMAT(CURRENT_DATE, '%Y-%m-01'))\n" +
+                "                   ELSE 0\n" +
+                "                   END\n" +
+                "       ) AS total_borrow_time\n" +
+                "FROM borrow_book bb\n" +
+                "         JOIN\n" +
+                "     copy_of_the_book cob ON bb.copy_id = cob.copy_id\n" +
+                "         JOIN\n" +
+                "     book b ON cob.book_id = b.book_id\n" +
+                "WHERE (bb.borrow_return_date IS NULL\n" +
+                "    OR MONTH(bb.borrow_date) = MONTH(CURRENT_DATE)\n" +
+                "    OR MONTH(bb.borrow_return_date) = MONTH(CURRENT_DATE))\n" +
+                "GROUP BY b.book_title;";
         Map<String, String> totalBorrowTimeMap = new HashMap<>();
 
         try (PreparedStatement stmt = connection.prepareStatement(query);
@@ -2341,30 +2344,42 @@ public class DbController
      */
     public Map<String, String> fetchLateBorrowTime()
     {
-        String query =
-                "SELECT " +
-                        "b.book_title, " +
-                        "SUM(" +
-                        "    CASE " +
-                        "        WHEN bb.borrow_return_date IS NOT NULL AND bb.borrow_return_date > bb.borrow_due_date THEN " +
-                        "		 	DATEDIFF(bb.borrow_return_date, bb.borrow_due_date) " +
-                        "        WHEN bb.borrow_return_date IS NULL AND CURRENT_DATE > bb.borrow_due_date THEN " +
-                        "		 	DATEDIFF(CURRENT_DATE, bb.borrow_due_date) " +
-                        "		 ELSE 0 " +
-                        "    END" +
-                        ") AS late_borrow_time " +
-                        "FROM " +
-                        "    borrow_book bb " +
-                        "JOIN " +
-                        "    copy_of_the_book cob ON bb.copy_id = cob.copy_id " +
-                        "JOIN " +
-                        "    book b ON cob.book_id = b.book_id " +
-                        "WHERE " +
-                        "    bb.borrow_date >= DATE_FORMAT(CURRENT_DATE, '%Y-%m-01') " +
-                        "    AND MONTH(bb.borrow_date) = MONTH(CURRENT_DATE) " +
-                        "    AND YEAR(bb.borrow_date) = YEAR(CURRENT_DATE) " +
-                        "GROUP BY " +
-                        "    b.book_title;";
+    	String query = "SELECT b.book_title,\n" +
+                "       SUM(\n" +
+                "               CASE\n" +
+                "                   -- Case 1: Book borrowed in the previous month and returned late in the current month\n" +
+                "                   WHEN bb.borrow_return_date IS NOT NULL AND MONTH(bb.borrow_date) <> MONTH(CURRENT_DATE)\n" +
+                "                       AND MONTH(bb.borrow_return_date) = MONTH(CURRENT_DATE)\n" +
+                "                       AND bb.borrow_return_date > bb.borrow_due_date THEN\n" +
+                "                       DATEDIFF(bb.borrow_return_date, DATE_FORMAT(CURRENT_DATE, '%Y-%m-01')) + 1\n" +
+                "\n" +
+                "                   -- Case 2: Book borrowed in the previous month and still not returned but late in the current month\n" +
+                "                   WHEN bb.borrow_return_date IS NULL AND MONTH(bb.borrow_date) <> MONTH(CURRENT_DATE)\n" +
+                "                       AND CURRENT_DATE > bb.borrow_due_date THEN\n" +
+                "                       DATEDIFF(CURRENT_DATE, DATE_FORMAT(CURRENT_DATE, '%Y-%m-01'))\n" +
+                "\n" +
+                "                   -- Case 3: Book borrowed in the current month and returned late in the current month\n" +
+                "                   WHEN bb.borrow_return_date IS NOT NULL AND MONTH(bb.borrow_date) = MONTH(CURRENT_DATE)\n" +
+                "                       AND bb.borrow_return_date > bb.borrow_due_date THEN\n" +
+                "                       DATEDIFF(bb.borrow_return_date, bb.borrow_due_date) + 1\n" +
+                "\n" +
+                "                   -- Case 4: Book borrowed in the current month and still not returned, but late\n" +
+                "                   WHEN bb.borrow_return_date IS NULL AND MONTH(bb.borrow_date) = MONTH(CURRENT_DATE)\n" +
+                "                       AND CURRENT_DATE > bb.borrow_due_date THEN\n" +
+                "                       DATEDIFF(CURRENT_DATE, bb.borrow_due_date)\n" +
+                "\n" +
+                "                   ELSE 0\n" +
+                "                   END\n" +
+                "       ) AS late_borrow_time\n" +
+                "FROM borrow_book bb\n" +
+                "         JOIN\n" +
+                "     copy_of_the_book cob ON bb.copy_id = cob.copy_id\n" +
+                "         JOIN\n" +
+                "     book b ON cob.book_id = b.book_id\n" +
+                "WHERE bb.borrow_return_date IS NULL\n" +
+                "   OR (MONTH(bb.borrow_date) = MONTH(CURRENT_DATE)\n" +
+                "    OR MONTH(bb.borrow_return_date) = MONTH(CURRENT_DATE))\n" +
+                "GROUP BY b.book_title;";
 
         Map<String, String> lateBorrowTimeMap = new HashMap<>();
 

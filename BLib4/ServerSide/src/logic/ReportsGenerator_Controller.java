@@ -4,6 +4,7 @@ import entities.logic.MessageType;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,8 +38,8 @@ public class ReportsGenerator_Controller {
         System.out.println("Updating daily subscriber status...");
         String activeCount = String.valueOf(dbController.fetchActiveSubscribersCount()); // Fetch active subscribers count
         String frozenCount = String.valueOf(dbController.fetchFrozenSubscribersCount()); // Fetch frozen subscribers count
-        String currentDate = LocalDate.now().toString(); // Get current date as string
-        updateAndFetchMonthlySubscribersStatusReport(currentDate, activeCount, frozenCount); // Update the monthly report
+        int currentDate = LocalDate.now().getDayOfMonth(); // Get current day date as string
+        updateAndFetchMonthlySubscribersStatusReport(Integer.toString(currentDate), activeCount, frozenCount); // Update the monthly report
         System.out.println("Daily subscriber status updated successfully.");
     }
 
@@ -97,9 +98,21 @@ public class ReportsGenerator_Controller {
 
 
     /**
+     * Generates an empty borrowing time report for the previous month.
+     * This method is triggered on the first day of the month.
      * Generates a borrowing report based on data from the database and saves it to monthly_reports.
      */
     public void autoGenerate_BorrowingReport() {
+    	//create new empty report for the previous month
+        int month = LocalDate.now().getMonthValue();
+        int year = LocalDate.now().getYear();
+        //check if the year number changed
+        if(month==1) {
+        	month=1;
+        	year--;
+        }
+    	generateEmptyReportForTheMonth("BorrowingReport", month, year);   	
+    	
         System.out.println("Generating borrowing report...");
 
         // Fetch borrowing report data
@@ -125,41 +138,51 @@ public class ReportsGenerator_Controller {
         }
 
         // Save the report to the database
-        String reportType = "BorrowingReport";
         try {
-            dbController.saveMonthlyReport(reportType, reportBlob);
+            dbController.saveMonthlyReport("BorrowingReport", reportBlob);
             System.out.println("Borrowing report generated and saved successfully.");
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to save borrowing report to the database");
         }
-
-
     }
 
-
     /**
-     * Generates an empty subscriber status report for the next month.
-     * This method is triggered on the last day of the current month.
+     * Generates an empty subscriber status report for the coming month.
+     * This method is triggered on the first day of the month.
      */
     public void autoGenerate_SubscribersStatusReport() {
-        System.out.println("Generating empty subscribers status report for the next month...");
+        int currentMonth = LocalDate.now().getMonthValue();
+        int year = LocalDate.now().getYear();
+        generateEmptyReportForTheMonth("SubscribersStatus",currentMonth,year);
+    }
+    
+    /**
+     * requests to add a new empty report the given month, year and report type.
+     * @param reportType the type of the generated report
+     * @param month month of the empty report
+     * @param year year of the empty report
+     */
+    private void generateEmptyReportForTheMonth(String reportType, int month, int year) {
+    	System.out.println("Generating "+reportType+" status report for the coming month...");
 
-        String reportType = "SubscribersStatus";
-        String nextMonth = LocalDate.now().plusMonths(1).withDayOfMonth(1).toString(); // First day of next month
-
-        // Insert an empty report for the next month
+        //format the year and month to string
+        String MonthStr = String.format("%02d", month); 
+        String YearStr = Integer.toString(year);
+     
+        // Insert an empty report for the coming month
         try {
             // Create a list of data of the requested report to send to the server
             ArrayList<String> dataOfReport = new ArrayList<>();
             dataOfReport.add(reportType);
-            dataOfReport.add(nextMonth);
+            dataOfReport.add(MonthStr);
+            dataOfReport.add(YearStr);
             // send message to server to get report id
             dbController.insertEmptyMonthlyReport((List<String>) dataOfReport);
-            System.out.println("Empty subscribers status report created for the next month.");
+            System.out.println("Empty "+reportType+" report created for the coming month.");
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Failed to generate the next month's subscribers status report.");
+            System.out.println("Failed to generate the coming month's "+reportType+" report.");
         }
     }
 }
