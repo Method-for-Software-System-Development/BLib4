@@ -397,6 +397,10 @@ public class ServerController extends AbstractServer
 
         // get connection to the db
         this.dbController = DbController.getInstance();
+
+        // start the schedulers
+        //ToDo: remove comment to run the schedulers
+        //SchedulerController.getInstance().startSchedulers();
     }
 
     /**

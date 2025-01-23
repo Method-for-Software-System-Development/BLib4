@@ -16,20 +16,37 @@ import java.util.concurrent.TimeUnit;
  */
 public class SchedulerController
 {
+    private volatile static SchedulerController instance;
 
     private ScheduledExecutorService scheduler;
     private DbController dbController; // Controller for database interactions
     private Notification_Controller notificationController;
 
+
+    public static SchedulerController getInstance()
+    {
+        if (instance == null)
+        {
+            synchronized (SchedulerController.class)
+            {
+                if (instance == null)
+                {
+                    instance = new SchedulerController();
+                }
+            }
+        }
+        return instance;
+    }
+
     /**
      * Constructor for SchedulerController.
      * Initializes the scheduler and database controller.
      */
-    public SchedulerController()
+    private SchedulerController()
     {
         this.scheduler = Executors.newScheduledThreadPool(1);
         this.dbController = DbController.getInstance();
-        this.notificationController = Notification_Controller.getInstance();
+        this.notificationController = Notification_Controller.getInstance();        //ToDo: error with the env check the path
     }
 
     /**
@@ -40,15 +57,11 @@ public class SchedulerController
      */
     public void startSchedulers()
     {
-        // trigger all the current tasks
-        //ToDo:
-
         // set schedule for each task
         scheduler.scheduleAtFixedRate(this::notifyDayBeforeReturnDate, 0, 1, TimeUnit.DAYS);
         scheduler.scheduleAtFixedRate(this::notifyDeleteUnfulfilledOrder, 0, 1, TimeUnit.DAYS);
         scheduler.scheduleAtFixedRate(this::triggerOneMonthFromFreezeDate, 0, 1, TimeUnit.DAYS);
-
-
+        System.out.println("Scheduler started successfully.");
     }
 
     /**
@@ -127,8 +140,22 @@ public class SchedulerController
         System.out.println("Checking for subscribers who have been frozen for more than one month...");
         dbController.handleOneMonthFromFreezeDate();
         System.out.println("Subscribers who were frozen exactly one month ago have now been successfully unfrozen. ");
+    }
 
+    /**
+     * The method trigger save daily data for the monthly report.
+     */
+    public void triggerDailyReportUpdate()
+    {
+        //ToDo: implement
+    }
 
+    /**
+     * The method trigger creation of the monthly report in the start of the month.
+     */
+    public void triggerMonthlyReportCreation()
+    {
+        //ToDo: implement
     }
 
 }
