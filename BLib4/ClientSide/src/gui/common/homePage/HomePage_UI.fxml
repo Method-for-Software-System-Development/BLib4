@@ -330,7 +330,7 @@
             </Button>
 
         </VBox>
-        <!-- ***************** End of VBox for logged in ***************** -->
+        <!-- ***************** End of VBox for librarian logged in ***************** -->
 
         <!-- Spacer Region -->
         <Region fx:id="menuButtonsSpacer" VBox.vgrow="ALWAYS"/>

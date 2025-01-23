@@ -166,7 +166,7 @@
     <VBox styleClass="main" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1"
           GridPane.vgrow="ALWAYS">
 
-        <Text styleClass="main-title" text="Activity History on My Reader Card:">
+        <Text styleClass="main-title" text="My Activity History (Reader Card):">
             <VBox.margin>
                 <Insets bottom="15.0"/>
             </VBox.margin>

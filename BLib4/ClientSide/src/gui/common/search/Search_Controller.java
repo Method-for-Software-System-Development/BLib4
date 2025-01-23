@@ -453,42 +453,43 @@ public class Search_Controller {
         }
     }
 
-    /**
-     * Prompts the user to enter a reader card ID in a custom Alert dialog,
-     * then automatically populates the login form fields if valid input is provided.
-     */
     @FXML
     private void validate_scanReaderCard_login() {
+        // Create a custom Alert
         Alert alert = new Alert(Alert.AlertType.NONE);
-        alert.setTitle("Scan Reader Card");
-        alert.setHeaderText("Enter the Reader Card ID");
+        alert.initOwner(SceneManager.getStage());
+        alert.setTitle("Scan Reader Card (Simulation)");
+        alert.setHeaderText("Enter a reader card number to simulate scanning a card");
 
+        // Create a TextField for input
         TextField inputField = new TextField();
-        inputField.setPromptText("Enter ID");
+        inputField.setPromptText("Enter reader card number (equivalent to User ID)");
 
+        // Add the TextField to the Alert
         VBox content = new VBox();
         content.setSpacing(10);
         content.getChildren().add(inputField);
         alert.getDialogPane().setContent(content);
 
+        // Add buttons
         ButtonType confirmButton = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
         ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
         alert.getButtonTypes().addAll(confirmButton, cancelButton);
 
+        // Show the Alert and wait for a response
         alert.showAndWait().ifPresent(response -> {
             if (response == confirmButton) {
                 String enteredId = inputField.getText();
-
+                // Check if the ID is not empty
                 if (enteredId != null && !enteredId.trim().isEmpty()) {
-                    idTextField.setText(enteredId);
-                    passwordTextField.setText("readerCard");
+                    Subscriber subscriber = subscriberController.attemptSubscriberLogInByCard(enteredId);
+                    if (subscriber != null) {
+                        SceneManager.switchScene("/gui/user/subscriberUI/SubscriberUI_UI.fxml", "BLib.4 - Braude Library Management");
+                    } else {
+                        showErrorAlert("Login By Reader Card Failed", "The account was not found. Please scan again. If the problem persists, please contact the librarian.");
+                    }
                 } else {
-                    Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-                    errorAlert.setTitle("Error");
-                    errorAlert.setHeaderText("Invalid ID");
-                    errorAlert.setContentText("Please enter a valid Reader Card ID.");
-                    alert.initOwner(SceneManager.getStage());
-                    errorAlert.showAndWait();
+                    showErrorAlert("Invalid Input", "Please enter a valid User ID.");
                 }
             }
         });

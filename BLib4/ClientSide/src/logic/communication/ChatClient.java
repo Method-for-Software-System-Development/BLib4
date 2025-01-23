@@ -44,7 +44,7 @@ public class ChatClient extends AbstractClient
     public static boolean awaitResponse = false;
     public static Date todayDate;
     public static Librarian librarian;
-    public static ArrayList<Boolean> array;
+    public static ArrayList<Boolean> returnOutcome;
     public static ArrayList<ArrayList<String>> listOfBorrows;
     public static ArrayList<ArrayList<String>> listOfActivities;
     public static ArrayList<ArrayList<String>> listOfMessages;
@@ -135,8 +135,7 @@ public class ChatClient extends AbstractClient
             	break;
 
             case "209":
-                //ToDo: implement
-            	array = (ArrayList<Boolean>) receiveMsg.getData();
+            	returnOutcome = (ArrayList<Boolean>) receiveMsg.getData();
                 break;
 
             case "210":
@@ -204,7 +203,8 @@ public class ChatClient extends AbstractClient
                 break;
 
             case "217":
-                //ToDo: implement
+                // status of update in the db, in format boolean
+                serverResponse = (boolean) receiveMsg.getData();
                 break;
 
             case "218":

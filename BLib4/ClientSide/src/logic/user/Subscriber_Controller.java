@@ -125,7 +125,7 @@ public class Subscriber_Controller {
     		loggedSubscriber=ChatClient.subscribers.get(0);
     		return ChatClient.subscribers.get(0);
     	}
-    	return null;    
+    	return null;
     }
     
     /**
