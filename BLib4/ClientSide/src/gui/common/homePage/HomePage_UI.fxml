@@ -273,7 +273,7 @@
                 </VBox.margin>
             </Button>
 
-            <Button fx:id="newBorrowButton" maxWidth="Infinity" prefHeight="50.0" styleClass="transparent-button"
+            <Button fx:id="newBorrowButton" maxWidth="Infinity" onAction="#goToNewBorrow" prefHeight="50.0" styleClass="transparent-button"
                     text="New Borrow">
                 <graphic>
                     <ImageView fx:id="newBorrowImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">

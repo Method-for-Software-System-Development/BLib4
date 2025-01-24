@@ -660,6 +660,11 @@ public class ViewOrderBook_Controller implements DataReceiver {
     }
 
     @FXML
+    private void goToNewBorrow() {
+        SceneManager.switchScene("/gui/librarian/newBorrow/NewBorrow_UI.fxml", "BLib.4 - Braude Library Management");
+    }
+
+    @FXML
     private void goToAddSubscriber() {
         SceneManager.switchScene("/gui/librarian/addSubscriber/AddSubscriber_UI.fxml", "BLib.4 - Braude Library Management");
     }

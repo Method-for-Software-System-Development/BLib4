@@ -33,27 +33,20 @@ public class BorrowController {
         return instance;
     }
 
-    /**
-     * Creating a new borrow for subscriber
-     *
-     * @param enteredSubscriberID Subscriber ID input via the librarian in GUI
-     * @param enteredCopyBookID   Copy ID input via librarian in GUI for the book to borrow
-     * @return Return value return from query in DB
-     */
-    public int createNewBorrow(String enteredSubscriberID, String enteredCopyBookID) {
+    public boolean createNewBorrow(String enteredSubscriberID, String enteredCopyBookID, String enteredReturnDate) {
+        // Building an ArrayList in order to send a MessageType Object in order to send to server
+        ArrayList<String> detailsOfBorrow = new ArrayList<>();
+        detailsOfBorrow.add(enteredSubscriberID);
+        detailsOfBorrow.add(enteredCopyBookID);
+        detailsOfBorrow.add(enteredReturnDate);
         try {
-            // Create a list to be sent in the message to the server
-            ArrayList<String> detailsOfBorrow = new ArrayList<>();
-            detailsOfBorrow.add(enteredSubscriberID);
-            detailsOfBorrow.add(enteredCopyBookID);
-
             // Sending the server subscriberID and bookID
             ClientUI.chat.accept(new MessageType("107", detailsOfBorrow));
         } catch (Exception e) {
             System.out.println(e.toString());
         }
         // Returning query return value
-        return ChatClient.borrowHandle;
+        return ChatClient.serverResponse;
     }
 
     /**

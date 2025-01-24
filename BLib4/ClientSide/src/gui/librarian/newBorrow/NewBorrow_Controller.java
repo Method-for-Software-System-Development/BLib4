@@ -1,29 +1,20 @@
 package gui.librarian.newBorrow;
 
 import entities.logic.MessageType;
-import entities.user.Librarian;
-import entities.user.Subscriber;
-import gui.user.subscriberUI.BorrowEntry;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import logic.communication.ChatClient;
 import logic.communication.ClientUI;
 import logic.communication.SceneManager;
 import logic.librarian.BorrowController;
+import logic.user.BooksController;
 import logic.user.Subscriber_Controller;
 
-import java.sql.Date;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.regex.Pattern;
 
 public class NewBorrow_Controller {
 
@@ -61,28 +52,44 @@ public class NewBorrow_Controller {
 
     // Form FXML fields
     @FXML
+    private Text copyIdText;
+    @FXML
+    private TextField copyIdField;
+    @FXML
+    private Button scanBarcodeButton;
+    @FXML
+    private Button nextButton1;
+    @FXML
+    private Text userIdText;
+    @FXML
     private TextField userIdField;
     @FXML
-    private TextField firstNameField;
+    private Button checkButton;
     @FXML
-    private TextField lastNameField;
+    private Button nextButton2;
     @FXML
-    private TextField phoneNumberField;
+    private Text returnDateText;
     @FXML
-    private TextField emailField;
+    private DatePicker returnDatePicker;
     @FXML
-    private PasswordField passwordField;
+    private Button twoWeeksButton;
     @FXML
-    private PasswordField confirmPasswordField;
+    private Button submitButton;
+    @FXML
+    private Button resetButton;
 
     // Fields
     private Subscriber_Controller subscriberController;
+    private BooksController booksController;
     private BorrowController borrowController;
+    private int availability;
 
     @FXML
     public void initialize() {
         // Get the singleton instance of Subscriber_Controller
         subscriberController = Subscriber_Controller.getInstance();
+        // Get the singleton instance of BooksController
+        booksController = BooksController.getInstance();
         // Get the singleton instance of BorrowController
         borrowController = BorrowController.getInstance();
 
@@ -138,6 +145,226 @@ public class NewBorrow_Controller {
         exitButton.setOnMouseExited(event -> {
             exitImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/close_24dp_FFFFFF.png")));
         });
+
+        // Set the factory for customizing day cells
+        returnDatePicker.setDayCellFactory(datePicker -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate item, boolean empty) {
+                super.updateItem(item, empty);
+
+                // Disable dates before today and two weeks from now
+                if (item.isBefore(LocalDate.now()) || item.isAfter(LocalDate.now().plusWeeks(2))) {
+                    setDisable(true);
+                    setStyle("-fx-background-color: #EEEEEE; -fx-text-fill: #999999;");
+                }
+            }
+        });
+    }
+
+    @FXML
+    private void scanBarcode() {
+        // Create a custom Alert
+        Alert alert = new Alert(Alert.AlertType.NONE);
+        alert.initOwner(SceneManager.getStage());
+        alert.setTitle("Scan Copy's Barcode (Simulation)");
+        alert.setHeaderText("Enter a book copy number to simulate scanning a barcode");
+
+        // Create a TextField for input
+        TextField inputField = new TextField();
+        inputField.setPromptText("Enter book copy number (equivalent to Copy ID)");
+
+        // Add the TextField to the Alert
+        VBox content = new VBox();
+        content.setSpacing(10);
+        content.getChildren().add(inputField);
+        alert.getDialogPane().setContent(content);
+
+        // Add buttons
+        ButtonType confirmButton = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().addAll(confirmButton, cancelButton);
+
+        // Show the Alert and wait for a response
+        alert.showAndWait().ifPresent(response -> {
+            if (response == confirmButton) {
+                String enteredId = inputField.getText();
+                // Check if the ID is not empty
+                if (enteredId != null && !enteredId.trim().isEmpty()) {
+                    copyIdField.setText(enteredId);
+                } else {
+                    showErrorAlert("Invalid Input", "Please enter a valid Copy ID.");
+                }
+            }
+        });
+    }
+
+    @FXML
+    private void step1() {
+        // Reset styles before validation
+        copyIdField.getStyleClass().remove("error-text-field");
+
+        // Store values in variables
+        String copyID = copyIdField.getText();
+
+        // Validate copy ID
+        if (copyID == null || copyID.trim().isEmpty()) {
+            copyIdField.setPromptText("Copy ID is required");
+            copyIdField.getStyleClass().add("error-text-field");
+        } else if (!copyID.matches("\\d+")) {
+            copyIdField.clear();
+            copyIdField.setPromptText("Copy ID must contain only digits");
+            copyIdField.getStyleClass().add("error-text-field");
+        } else {
+            availability = booksController.checkAvailability(copyID);
+
+            if (availability == 0) {
+                userIdText.setVisible(true);
+                userIdText.setManaged(true);
+                userIdField.setVisible(true);
+                userIdField.setManaged(true);
+                checkButton.setVisible(true);
+                checkButton.setManaged(true);
+                nextButton2.setVisible(true);
+                nextButton2.setManaged(true);
+                copyIdText.setDisable(true);
+                copyIdField.setDisable(true);
+                scanBarcodeButton.setDisable(true);
+                scanBarcodeButton.getStyleClass().add("disabled-button");
+                nextButton1.setDisable(true);
+                nextButton1.getStyleClass().add("disabled-button");
+            } else if (availability == 1) {
+                showInformationAlert("Book Reserved", "Notice: All copies of the book are reserved. Only a subscriber who has received a notification that the copy is ready for borrowing at the library will be allowed to proceed with the process.");
+                userIdText.setVisible(true);
+                userIdText.setManaged(true);
+                userIdField.setVisible(true);
+                userIdField.setManaged(true);
+                checkButton.setVisible(true);
+                checkButton.setManaged(true);
+                nextButton2.setVisible(true);
+                nextButton2.setManaged(true);
+                copyIdText.setDisable(true);
+                copyIdField.setDisable(true);
+                scanBarcodeButton.setDisable(true);
+                scanBarcodeButton.getStyleClass().add("disabled-button");
+                nextButton1.setDisable(true);
+                nextButton1.getStyleClass().add("disabled-button");
+            } else if (availability == 2) {
+                showErrorAlert("Error", "The book copy does not exist in the database.");
+            }
+        }
+    }
+
+    @FXML
+    private void checkUser() {
+        // Reset styles before validation
+        userIdField.getStyleClass().remove("error-text-field");
+
+        // Store values in variables
+        String userID = userIdField.getText();
+
+        // Validate user ID
+        if (userID == null || userID.trim().isEmpty()) {
+            userIdField.setPromptText("User ID is required");
+            userIdField.getStyleClass().add("error-text-field");
+        } else if (!userID.matches("\\d{9}")) {
+            userIdField.clear();
+            userIdField.setPromptText("User ID must be 9 digits");
+            userIdField.getStyleClass().add("error-text-field");
+        } else {
+            ClientUI.chat.accept(new MessageType("116", userID));
+            int subscriberStatus = ChatClient.subscriberStatus;
+            if (subscriberStatus == 0) {
+                showInformationAlert("Success", "The subscriber is in the database and active.");
+            } else if (subscriberStatus == 1) {
+                showErrorAlert("Error", "The subscriber is not in the database.");
+            } else if (subscriberStatus == 2) {
+                showErrorAlert("Subscriber is Frozen", "The subscriber is in the database but is frozen.");
+            } else {
+                showErrorAlert("Error", "An error occurred while checking the subscriber.");
+            }
+        }
+    }
+
+    @FXML
+    private void step2() {
+        // Reset styles before validation
+        userIdField.getStyleClass().remove("error-text-field");
+
+        // Store values in variables
+        String userID = userIdField.getText();
+
+        // Validate user ID
+        if (userID == null || userID.trim().isEmpty()) {
+            userIdField.setPromptText("User ID is required");
+            userIdField.getStyleClass().add("error-text-field");
+        } else if (!userID.matches("\\d{9}")) {
+            userIdField.clear();
+            userIdField.setPromptText("User ID must be 9 digits");
+            userIdField.getStyleClass().add("error-text-field");
+        } else {
+            ClientUI.chat.accept(new MessageType("116", userID));
+            int subscriberStatus = ChatClient.subscriberStatus;
+            if (subscriberStatus == 0) {
+                if (availability == 0 || (availability == 1 && borrowController.isSubscriberInWaitList(userID))) {
+                    returnDateText.setVisible(true);
+                    returnDateText.setManaged(true);
+                    returnDatePicker.setVisible(true);
+                    returnDatePicker.setManaged(true);
+                    twoWeeksButton.setVisible(true);
+                    twoWeeksButton.setManaged(true);
+                    submitButton.setVisible(true);
+                    submitButton.setManaged(true);
+                    userIdText.setDisable(true);
+                    userIdField.setDisable(true);
+                    checkButton.setDisable(true);
+                    checkButton.getStyleClass().add("disabled-button");
+                    nextButton2.setDisable(true);
+                    nextButton2.getStyleClass().add("disabled-button");
+                } else {
+                    showErrorAlert("Unable to Proceed", "The subscriber has not reserved the book or his turn in the waiting list hasn't arrived yet.");
+                }
+            } else if (subscriberStatus == 1) {
+                showErrorAlert("Unable to proceed", "The subscriber is not in the database. Unable to proceed.");
+            } else if (subscriberStatus == 2) {
+                showErrorAlert("Unable to proceed", "The subscriber is frozen. Unable to proceed.");
+            } else {
+                showErrorAlert("Error", "An error occurred while checking the subscriber.");
+            }
+        }
+    }
+
+    @FXML
+    private void setInTwoWeeks() {
+        returnDatePicker.setValue(LocalDate.now().plusWeeks(2));
+    }
+
+    @FXML
+    private void submitNewBorrow() {
+        // Reset styles before validation
+        returnDatePicker.getStyleClass().remove("error-text-field");
+
+        // Store values in variables
+        LocalDate returnDate = returnDatePicker.getValue();
+
+        // Validate return date
+        if (returnDate == null) {
+            returnDatePicker.setPromptText("Return date is required");
+            returnDatePicker.getStyleClass().add("error-text-field");
+        } else {
+            String copyID = copyIdField.getText();
+            String userID = userIdField.getText();
+
+            if (borrowController.createNewBorrow(userID, copyID, returnDate.toString()))
+                showInformationAlert("Success", "The borrow has been successfully created.");
+            else
+                showErrorAlert("Error", "Failed to create the borrow. Please try again.");
+        }
+    }
+
+    @FXML
+    private void reset_form() {
+        // Reset the form by reloading the scene
+        SceneManager.switchScene("/gui/librarian/newBorrow/NewBorrow_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
     /**
@@ -157,132 +384,6 @@ public class NewBorrow_Controller {
         } else {
             return "Good Night";
         }
-    }
-
-    @FXML
-    public void validate_addSubscriber_form() {
-        // Reset styles before validation
-        userIdField.getStyleClass().remove("error-text-field");
-        firstNameField.getStyleClass().remove("error-text-field");
-        lastNameField.getStyleClass().remove("error-text-field");
-        phoneNumberField.getStyleClass().remove("error-text-field");
-        emailField.getStyleClass().remove("error-text-field");
-        passwordField.getStyleClass().remove("error-text-field");
-        confirmPasswordField.getStyleClass().remove("error-text-field");
-
-        boolean isValid = true;
-
-        // Store values in variables
-        String userID = userIdField.getText();
-        String firstName = firstNameField.getText();
-        String lastName = lastNameField.getText();
-        String phoneNumber = phoneNumberField.getText();
-        String email = emailField.getText();
-        String password = passwordField.getText();
-
-        // Validate user ID
-        if (userID == null || userID.trim().isEmpty()) {
-            userIdField.setPromptText("ID is required");
-            userIdField.getStyleClass().add("error-text-field");
-            isValid = false;
-        } else if (!userID.matches("\\d{9}")) {
-            userIdField.clear();
-            userIdField.setPromptText("ID must be 9 digits");
-            userIdField.getStyleClass().add("error-text-field");
-            isValid = false;
-        }
-
-        // Validate first name
-        if (firstName == null || firstName.trim().isEmpty()) {
-            firstNameField.setPromptText("First name is required");
-            firstNameField.getStyleClass().add("error-text-field");
-            isValid = false;
-        } else if (!firstName.matches("[a-zA-Z]+")) {
-            firstNameField.clear();
-            firstNameField.setPromptText("First name must contain only letters");
-            firstNameField.getStyleClass().add("error-text-field");
-            isValid = false;
-        }
-
-        // Validate last name
-        if (lastName == null || lastName.trim().isEmpty()) {
-            lastNameField.setPromptText("Last name is required");
-            lastNameField.getStyleClass().add("error-text-field");
-            isValid = false;
-        } else if (!lastName.matches("[a-zA-Z]+")) {
-            lastNameField.clear();
-            lastNameField.setPromptText("Last name must contain only letters");
-            lastNameField.getStyleClass().add("error-text-field");
-            isValid = false;
-        }
-
-        // Validate phone number
-        if (phoneNumber == null || phoneNumber.trim().isEmpty()) {
-            phoneNumberField.setPromptText("Phone number is required");
-            phoneNumberField.getStyleClass().add("error-text-field");
-            isValid = false;
-        } else if (!phoneNumber.matches("\\d{10}")) {
-            phoneNumberField.clear();
-            phoneNumberField.setPromptText("Phone number must be 10 digits");
-            phoneNumberField.getStyleClass().add("error-text-field");
-            isValid = false;
-        }
-
-        // Validate email
-        if (email == null || email.trim().isEmpty()) {
-            emailField.setPromptText("Email is required");
-            emailField.getStyleClass().add("error-text-field");
-            isValid = false;
-        } else if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
-            emailField.clear();
-            emailField.setPromptText("Invalid email format");
-            emailField.getStyleClass().add("error-text-field");
-            isValid = false;
-        }
-
-        // Validate password
-        if (password == null || password.trim().isEmpty()) {
-            passwordField.setPromptText("Password is required");
-            passwordField.getStyleClass().add("error-text-field");
-            isValid = false;
-        } else if (!password.equals(confirmPasswordField.getText())) {
-            passwordField.clear();
-            confirmPasswordField.clear();
-            passwordField.setPromptText("Passwords do not match");
-            passwordField.getStyleClass().add("error-text-field");
-            confirmPasswordField.setPromptText("Passwords do not match");
-            confirmPasswordField.getStyleClass().add("error-text-field");
-            isValid = false;
-        }
-
-        if (isValid) {
-            boolean successful = subscriberController.addNewSubscriber(userID, firstName, lastName, phoneNumber, email, password);
-
-            if (successful) {
-                showInformationAlert("Success", "Subscriber added successfully.");
-                clear_form();
-            } else {
-                showErrorAlert("Error", "Failed to add subscriber. Please try again.");
-            }
-        }
-    }
-
-    @FXML
-    public void clear_form() {
-        userIdField.clear();
-        firstNameField.clear();
-        lastNameField.clear();
-        phoneNumberField.clear();
-        emailField.clear();
-        passwordField.clear();
-        confirmPasswordField.clear();
-        userIdField.getStyleClass().remove("error-text-field");
-        firstNameField.getStyleClass().remove("error-text-field");
-        lastNameField.getStyleClass().remove("error-text-field");
-        phoneNumberField.getStyleClass().remove("error-text-field");
-        emailField.getStyleClass().remove("error-text-field");
-        passwordField.getStyleClass().remove("error-text-field");
-        confirmPasswordField.getStyleClass().remove("error-text-field");
     }
 
     /**

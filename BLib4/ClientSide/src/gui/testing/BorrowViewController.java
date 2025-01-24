@@ -45,8 +45,6 @@ public class BorrowViewController {
 	        alert.showAndWait();
 	        return;
 	    }
-
-	    instance.createNewBorrow(subscriberID,bookID);
 	}
 	
 

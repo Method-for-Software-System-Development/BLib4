@@ -52,7 +52,8 @@ public class ChatClient extends AbstractClient
     public static int reportID;
     public static List<String[]> blobData;
     public static List<String> smsData;
-    public static int borrowHandle;
+    public static int subscriberStatus;
+    public static String messageData;
 
     //Constructors ****************************************************
 
@@ -126,8 +127,7 @@ public class ChatClient extends AbstractClient
                 break;
 
             case "207":
-                // State of borrow 
-            	borrowHandle = (int) receiveMsg.getData();
+                serverResponse = (boolean) receiveMsg.getData();
                 break;
 
             case "208":
@@ -143,6 +143,16 @@ public class ChatClient extends AbstractClient
             case "211":
                 //response from server for borrow extension
                 serverResponse = (boolean) receiveMsg.getData();
+                break;
+
+            case "2111":
+                messageData = (String)receiveMsg.data;
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("New Message From Subscriber");
+                alert.setHeaderText(null);
+                alert.setContentText(messageData);
+                alert.initOwner(SceneManager.getStage());
+                alert.showAndWait();
                 break;
 
             case "212":
@@ -195,6 +205,10 @@ public class ChatClient extends AbstractClient
                 }
                 break;
 
+            case "216":
+                subscriberStatus = (int) receiveMsg.getData();
+                break;
+
             case "217":
                 // status of update in the db, in format boolean
                 serverResponse = (boolean) receiveMsg.getData();
@@ -209,12 +223,12 @@ public class ChatClient extends AbstractClient
                 smsData = (List<String>)receiveMsg.data;
                 for (int i = 0; i < smsData.size(); i++)
                 {
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("SMS Simulation");
-                    alert.setHeaderText(null);
-                    alert.setContentText(smsData.get(i));
-                    alert.initOwner(SceneManager.getStage());
-                    alert.showAndWait();
+                    Alert SMSalert = new Alert(Alert.AlertType.INFORMATION);
+                    SMSalert.setTitle("SMS Simulation");
+                    SMSalert.setHeaderText(null);
+                    SMSalert.setContentText(smsData.get(i));
+                    SMSalert.initOwner(SceneManager.getStage());
+                    SMSalert.showAndWait();
                 }
                 break;
 

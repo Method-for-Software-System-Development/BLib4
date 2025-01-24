@@ -179,55 +179,54 @@
     <VBox styleClass="main" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1"
           GridPane.vgrow="ALWAYS">
 
-        <Text styleClass="main-title" text="CHANGE">
+        <Text styleClass="main-title" text="Add New Borrow:">
             <VBox.margin>
                 <Insets bottom="15.0" />
             </VBox.margin>
         </Text>
 
         <TextFlow>
-            <Text text="Below is a form for creating a new library subscriber account. "/>
-            <Text style="-fx-fill: #E74C3C" text="All fields are mandatory.&#10;"/>
-            <Text text="Please ensure the accuracy of the ID number, first name, and last name, as these cannot be changed later.&#10;Other details can be updated by the subscriber."/>
+            <Text text="Below is a form for creating a new borrow. The process steps are as follows:&#10;"/>
+            <Text style="-fx-fill: #E74C3C" text="&#10;1. "/>
+            <Text text="Scanning the barcode of the copy to be borrowed (or manual input).&#10;"/>
+            <Text style="-fx-fill: #E74C3C" text="2. "/>
+            <Text text="Entering the user's ID.&#10;&#10;If all copies currently in the library are reserved, the borrow will only be approved for a subscriber who reserved the book in advance on a &quot;first-come, first-served&quot; basis and has already received a notification that a copy is waiting for him at the library.&#10;&#10;"/>
+            <Text style="-fx-fill: #E74C3C" text="3. "/>
+            <Text text="Entering the return date.&#10;"/>
+            <Text style="-fx-fill: #E74C3C" text="4. "/>
+            <Text text="Submitting the form."/>
             <VBox.margin>
                 <Insets bottom="50.0" />
             </VBox.margin>
         </TextFlow>
 
         <!-- Add Subscriber Form -->
-        <GridPane fx:id="addSubscriberForm" alignment="CENTER" hgap="15" vgap="20">
+        <GridPane fx:id="addNewBorrowForm" alignment="CENTER" hgap="15" vgap="20">
+
+            <!-- Copy ID -->
+            <Text fx:id="copyIdText" text="Book's Copy ID:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+            <TextField fx:id="copyIdField" prefHeight="50.0" prefWidth="350.0" promptText="Enter Copy ID" styleClass="grey-text-field" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+            <Pane GridPane.columnIndex="2" GridPane.rowIndex="0" />
+            <Button fx:id="scanBarcodeButton" prefHeight="50.0" prefWidth="350.0" styleClass="grey-transparent-button" text="Scan Barcode" onAction="#scanBarcode" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+            <Button fx:id="nextButton1" prefHeight="50.0" prefWidth="150.0" styleClass="orange-orange-button" text="Next >" onAction="#step1" GridPane.columnIndex="4" GridPane.rowIndex="0" />
 
             <!-- User ID -->
-            <Text text="User ID:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-            <TextField fx:id="userIdField" prefHeight="50.0" prefWidth="350.0" promptText="Enter User ID" styleClass="grey-text-field" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-            <Pane GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.columnSpan="2" />
-
-            <!-- First Name and Last Name -->
-            <Text text="First Name:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-            <TextField fx:id="firstNameField" prefHeight="50.0" prefWidth="350.0" promptText="Enter First Name" styleClass="grey-text-field" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <Text fx:id="userIdText" text="User ID:" GridPane.columnIndex="0" GridPane.rowIndex="1" visible="false" managed="false" />
+            <TextField fx:id="userIdField" prefHeight="50.0" prefWidth="350.0" promptText="Enter User ID" styleClass="grey-text-field" GridPane.columnIndex="1" GridPane.rowIndex="1" visible="false" managed="false" />
             <Pane prefWidth="30.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-            <Text text="Last Name:" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-            <TextField fx:id="lastNameField" prefHeight="50.0" prefWidth="350.0" promptText="Enter Last Name" styleClass="grey-text-field" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+            <Button fx:id="checkButton" prefHeight="50.0" prefWidth="350.0" styleClass="grey-transparent-button" text="Check Validation" onAction="#checkUser" GridPane.columnIndex="3" GridPane.rowIndex="1" visible="false" managed="false" />
+            <Button fx:id="nextButton2" prefHeight="50.0" prefWidth="150.0" styleClass="orange-orange-button" text="Next >" onAction="#step2" GridPane.columnIndex="4" GridPane.rowIndex="1" visible="false" managed="false" />
 
-            <!-- Phone Number and Email -->
-            <Text text="Phone Number:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-            <TextField fx:id="phoneNumberField" prefHeight="50.0" prefWidth="350.0" promptText="Enter Phone Number (05XXXXXXXX)" styleClass="grey-text-field" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-            <Pane GridPane.columnIndex="2" GridPane.rowIndex="2" />
-            <Text text="Email:" GridPane.columnIndex="3" GridPane.rowIndex="2" />
-            <TextField fx:id="emailField" prefHeight="50.0" prefWidth="350.0" promptText="Enter Email Address" styleClass="grey-text-field" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+            <!-- Return Date and Submit -->
+            <Text fx:id="returnDateText" text="Return Date:" GridPane.columnIndex="0" GridPane.rowIndex="2" visible="false" managed="false" />
+            <DatePicker fx:id="returnDatePicker" prefHeight="50.0" prefWidth="350.0" promptText="Select Date" styleClass="grey-date-picker" GridPane.columnIndex="1" GridPane.rowIndex="2" visible="false" managed="false" />
+            <Pane prefWidth="30.0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+            <Button fx:id="twoWeeksButton" prefHeight="50.0" prefWidth="350.0" styleClass="grey-transparent-button" text="In 2 Weeks" onAction="#setInTwoWeeks" GridPane.columnIndex="3" GridPane.rowIndex="2" visible="false" managed="false" />
+            <Button fx:id="submitButton" prefHeight="50.0" prefWidth="150.0" styleClass="orange-orange-button" text="Submit" onAction="#submitNewBorrow" GridPane.columnIndex="4" GridPane.rowIndex="2" visible="false" managed="false" />
 
-            <!-- Password and Confirm Password -->
-            <Text text="Password:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-            <PasswordField fx:id="passwordField" prefHeight="50.0" prefWidth="350.0" promptText="Enter Password" styleClass="grey-text-field" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-            <Pane GridPane.columnIndex="2" GridPane.rowIndex="3" />
-            <Text text="Confirm Password:" GridPane.columnIndex="3" GridPane.rowIndex="3" />
-            <PasswordField fx:id="confirmPasswordField" prefHeight="50.0" prefWidth="350.0" promptText="Re-enter Password" styleClass="grey-text-field" GridPane.columnIndex="4" GridPane.rowIndex="3" />
-
-            <!-- Buttons -->
-            <HBox alignment="CENTER_RIGHT" spacing="20" GridPane.columnIndex="0" GridPane.columnSpan="5" GridPane.rowIndex="4">
-                <Button fx:id="clearButton" prefHeight="50.0" prefWidth="150.0" styleClass="grey-transparent-button" text="Clear" onAction="#clear_form" />
-                <Button fx:id="submitButton" prefHeight="50.0" prefWidth="150.0" styleClass="orange-orange-button" text="Submit" onAction="#validate_addSubscriber_form" />
-            </HBox>
+            <!-- Reset Button -->
+            <Pane prefWidth="30.0" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.columnSpan="4" />
+            <Button fx:id="resetButton" prefHeight="50.0" prefWidth="150.0" styleClass="grey-transparent-button" text="Reset" onAction="#reset_form" GridPane.columnIndex="4" GridPane.rowIndex="3" />
 
         </GridPane>
 
