@@ -28,7 +28,7 @@ public class ReportsGenerator_Controller {
 	{
 		if(instance == null) 
 		{
-			 synchronized (BooksController.class)
+			 synchronized (ReportsGenerator_Controller.class)
 	            {
 	                if (instance == null)
 	                {
