@@ -207,12 +207,9 @@
 
         </VBox>
 
-        <!-- Spacer Region -->
-        <Region VBox.vgrow="ALWAYS"/>
-
         <Text styleClass="main-title" text="Library Subscribers:">
             <VBox.margin>
-                <Insets bottom="15.0" />
+                <Insets top="25.0" bottom="15.0" />
             </VBox.margin>
         </Text>
 

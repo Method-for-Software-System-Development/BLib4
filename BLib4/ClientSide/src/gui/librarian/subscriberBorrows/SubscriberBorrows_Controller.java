@@ -403,13 +403,8 @@ public class SubscriberBorrows_Controller implements DataReceiver {
      * Refreshes the borrow table with updated data.
      */
     private void refreshBorrowsTable() {
-        // Clear existing data
-        borrowEntries.clear();
-        // Fetch updated borrow data from the server
-        ClientUI.chat.accept(new MessageType("110", userId));
-        subscriberBorrows = ChatClient.listOfBorrows;
-        // Load the updated data into the table
-        loadBorrowsData(userId);
+        // Refresh the messages table by reloading the scene
+        SceneManager.switchScene("/gui/librarian/subscriberBorrows/SubscriberBorrows_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
     /**

@@ -330,9 +330,7 @@ public class SubscriberUI_Controller {
         if (isExtended) {
             // Show a success message if the extension is approved
             showInformationAlert("Extension Approved", "The extension has been approved.");
-            borrowsTable.refresh(); // NEED TO TEST IF WORKING. IF NOT, USE refreshBorrowsTable();
-//            // Refresh the table or perform other necessary updates
-//            refreshBorrowsTable();
+            refreshBorrowsTable();
         } else {
             // Show an error message if the extension is denied
             showErrorAlert("Extension Denied", "The extension cannot be processed as there are previous reservations for the book. Please return the copy on the due date.");
@@ -345,13 +343,8 @@ public class SubscriberUI_Controller {
      * Refreshes the borrow table with updated data.
      */
     private void refreshBorrowsTable() {
-        // Clear existing data
-        borrowEntries.clear();
-        // Fetch updated borrow data from the server
-        ClientUI.chat.accept(new MessageType("110", subscriberController.getLoggedSubscriber().getId()));
-        subscriberBorrows = ChatClient.listOfBorrows;
-        // Load the updated data into the table
-        loadBorrowsData();
+        // Refresh the messages table by reloading the scene
+        SceneManager.switchScene("/gui/user/subscriberUI/SubscriberUI_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
     /**
