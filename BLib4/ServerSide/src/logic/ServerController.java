@@ -85,6 +85,11 @@ public class ServerController extends AbstractServer
                 {
                     activeSubscribers.put((String) receiveMsg.data, client);
                 }
+                else
+                {
+                    // failed to log in
+                    responseMsg = new MessageType("203", null);
+                }
 
                 break;
 
@@ -277,6 +282,11 @@ public class ServerController extends AbstractServer
                 responseMsg = new MessageType("215", dbController.handleGetAllSubscribers());
                 break;
 
+            case "116":
+                // Request to check if the subscriber in the DB
+                responseMsg = new MessageType("216", dbController.handleCheckSubscriberExistence((String) receiveMsg.data));
+                break;
+
             case "117":
                 // Request by the librarian to manually extend book borrow
                 responseMsg = new MessageType("217", dbController.handleLibrarianExtendBorrow((List<String>) receiveMsg.data));
@@ -458,7 +468,7 @@ public class ServerController extends AbstractServer
     }
 
     /**
-     * This method handles the received "101" message and updates the active subscribers/librarians list
+     * This method handles the received "1002" message and updates the active subscribers/librarians list
      *
      * @param receiveMsg - received message from the client
      * @param client     - the client connection

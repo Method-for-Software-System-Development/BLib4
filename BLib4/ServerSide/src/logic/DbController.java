@@ -630,7 +630,10 @@ public class DbController
     /**
      * The method run SQL query to handle the borrow of a book
      *
-     * @param borrowDetails - the details of the borrow (subscriber id and copy id)
+     * @param borrowDetails - the details of the borrow
+     *                      [0] the subscriber id
+     *                      [1] the copy id
+     *                      [2] the due date
      * @return - 0 if the borrow succeeds, 1 if the subscriber not found,
      * 2 if the subscriber is frozen, 3 if the borrow failed due to db error
      */
@@ -639,25 +642,8 @@ public class DbController
         PreparedStatement stmt;
         String subscriberId = borrowDetails.get(0);
         String copyId = borrowDetails.get(1);
+        String dueDate = borrowDetails.get(2);
         ResultSet rs;
-
-        // check if the subscriber in the DB
-        try
-        {
-            stmt = connection.prepareStatement("SELECT * from subscriber WHERE subscriber_id = ?;");
-            stmt.setString(1, subscriberId);
-            rs = stmt.executeQuery();
-
-            if (!rs.next())
-            {
-                return 1;
-            }
-        }
-        catch (SQLException e)
-        {
-            System.out.println("Error! borrow book failed - cant check if the subscriber is in the db");
-            return 3;
-        }
 
 
         // Check that the subscriber not frozen
@@ -696,10 +682,11 @@ public class DbController
             int borrowId = rs.getInt(1) + 1;
 
             // create a new row in the borrow table
-            stmt = connection.prepareStatement("INSERT INTO borrow_book (borrow_id, subscriber_id, copy_id, borrow_date, borrow_due_date, is_active) VALUES (?,?, ?, CURDATE(), CURDATE() + 14, true);");
+            stmt = connection.prepareStatement("INSERT INTO borrow_book (borrow_id, subscriber_id, copy_id, borrow_date, borrow_due_date, is_active) VALUES (?,?, ?, CURDATE(), ?, true);");
             stmt.setString(1, String.valueOf(borrowId));
             stmt.setString(2, subscriberId);
             stmt.setString(3, copyId);
+            stmt.setString(4, dueDate);
             stmt.executeUpdate();
         }
         catch (SQLException e)
@@ -1179,6 +1166,37 @@ public class DbController
 
         return returnValue;
     }
+
+    /**
+     * The method run SQL query to check if the subscriber exists in the db
+     * @param subscriberId - the id of the subscriber to check
+     * @return - true if the subscriber exists, else false
+     */
+    public boolean handleCheckSubscriberExistence(String subscriberId)
+    {
+        PreparedStatement stmt;
+        boolean returnValue = true;
+
+        try
+        {
+            stmt = connection.prepareStatement("SELECT * from subscriber WHERE subscriber_id = ?;");
+            stmt.setString(1, subscriberId);
+
+            ResultSet rs = stmt.executeQuery();
+            if (!rs.next())
+            {
+                returnValue = false;
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! check subscriber existence failed");
+            returnValue = false;
+        }
+
+        return returnValue;
+    }
+
 
     /**
      * The method run SQL query to extend the borrow period of a book by the librarian
