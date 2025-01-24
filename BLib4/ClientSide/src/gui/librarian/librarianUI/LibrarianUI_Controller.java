@@ -220,7 +220,7 @@ public class LibrarianUI_Controller {
 
         // Populate the table
         loadMessagesData();
-        messagesTable.setItems(messageEntries);
+
 
         // Ensure the messageContentColumn fills the remaining space
         messageContentColumn.prefWidthProperty().bind(
@@ -332,6 +332,7 @@ public class LibrarianUI_Controller {
             );
             messageEntries.add(entry);
         }
+        messagesTable.setItems(messageEntries);
     }
 
     private void loadSubscribersData() {
@@ -348,7 +349,7 @@ public class LibrarianUI_Controller {
 
     public void refreshMessagesTable() {
         // Refresh the messages table by reloading the scene
-        SceneManager.switchScene("/gui/librarian/librarianUI/LibrarianUI.fxml", "BLib.4 - Braude Library Management");
+        SceneManager.switchScene("/gui/librarian/librarianUI/LibrarianUI_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
     /**

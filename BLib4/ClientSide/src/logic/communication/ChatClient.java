@@ -157,12 +157,12 @@ public class ChatClient extends AbstractClient
                     alert.setContentText(messageData);
                     alert.initOwner(SceneManager.getStage());
                     alert.showAndWait();
-                    System.out.println("Alert shown");
                 });
 
                 Object controller = SceneManager.getCurrentController();
+
                 if (controller instanceof LibrarianUI_Controller) {
-                    ((LibrarianUI_Controller) controller).refreshMessagesTable();
+                    Platform.runLater(() -> ((LibrarianUI_Controller) controller).refreshMessagesTable());
                 }
 
                 break;
@@ -231,15 +231,27 @@ public class ChatClient extends AbstractClient
 
             case "222":
                 smsData = (List<String>) receiveMsg.data;
+                StringBuilder smsText = new StringBuilder();
                 for (int i = 0; i < smsData.size(); i++)
                 {
-                    String sms = smsData.get(i);
+                    if (i == 0)
+                    {
+                        smsText.append(smsData.get(i));
+                    }
+                    else
+                    {
+                        smsText.append("\n\n").append(smsData.get(i));
+                    }
+                }
+
+                if (smsData.size() != 0)
+                {
                     Platform.runLater(() ->
                     {
                         Alert SMSalert = new Alert(Alert.AlertType.INFORMATION);
                         SMSalert.setTitle("SMS Simulation");
                         SMSalert.setHeaderText(null);
-                        SMSalert.setContentText(sms);
+                        SMSalert.setContentText(smsText.toString());
                         SMSalert.initOwner(SceneManager.getStage());
                         SMSalert.showAndWait();
                     });

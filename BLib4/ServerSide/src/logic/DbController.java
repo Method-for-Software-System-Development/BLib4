@@ -2631,7 +2631,7 @@ public class DbController
 
         try
         {
-            stmt = connection.prepareStatement("SELECT * FROM notification WHERE notification_type = 'Subscriber'  AND user_id = ?;");
+            stmt = connection.prepareStatement("SELECT * FROM notification WHERE notification_type = 'Subscriber'  AND user_id = ? AND is_confirmed = 0;");
             stmt.setString(1, subscriberId);
             ResultSet rs = stmt.executeQuery();
 
