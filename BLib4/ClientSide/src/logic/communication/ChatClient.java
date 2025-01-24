@@ -5,6 +5,7 @@
 package logic.communication;
 
 import entities.book.Book;
+import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import logic.communication.ChatIF;
 import gui.common.*;
@@ -88,8 +89,8 @@ public class ChatClient extends AbstractClient
         switch (receiveMsg.getId())
         {
             case "201":
-            	// log in succeed, save subscriber details
-            	serverResponse=true;
+                // log in succeed, save subscriber details
+                serverResponse = true;
                 subscriber = (Subscriber) receiveMsg.getData();
                 subscribers.clear();
                 if (subscriber != null)
@@ -99,9 +100,9 @@ public class ChatClient extends AbstractClient
                 break;
 
             case "202":
-            	// log in succeed, save librarian details
-            	serverResponse=true;
-                librarian= (Librarian) receiveMsg.getData();
+                // log in succeed, save librarian details
+                serverResponse = true;
+                librarian = (Librarian) receiveMsg.getData();
                 break;
 
             case "2002":
@@ -109,21 +110,21 @@ public class ChatClient extends AbstractClient
                 break;
 
             case "203":
-            	// log in failed 
-            	serverResponse=false;
-            	break;
+                // log in failed
+                serverResponse = false;
+                break;
 
             case "204":
-            	// status of sign up in the db, in format boolean
+                // status of sign up in the db, in format boolean
                 serverResponse = (boolean) receiveMsg.getData();
                 break;
 
             case "205":
-                books = (List<Book>)receiveMsg.data;
+                books = (List<Book>) receiveMsg.data;
                 break;
 
             case "206":
-            	availability = (List<String>) receiveMsg.getData();
+                availability = (List<String>) receiveMsg.getData();
                 break;
 
             case "207":
@@ -132,13 +133,13 @@ public class ChatClient extends AbstractClient
 
             case "208":
             case "209":
-            	returnOutcome = (ArrayList<Boolean>) receiveMsg.getData();
+                returnOutcome = (ArrayList<Boolean>) receiveMsg.getData();
                 break;
 
             case "210":
-            	//list of borrows of subscriber
-            	listOfBorrows=(ArrayList<ArrayList<String>>) receiveMsg.getData(); 
-            	break;
+                //list of borrows of subscriber
+                listOfBorrows = (ArrayList<ArrayList<String>>) receiveMsg.getData();
+                break;
 
             case "211":
                 //response from server for borrow extension
@@ -146,13 +147,18 @@ public class ChatClient extends AbstractClient
                 break;
 
             case "2111":
-                messageData = (String)receiveMsg.data;
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("New Message From Subscriber");
-                alert.setHeaderText(null);
-                alert.setContentText(messageData);
-                alert.initOwner(SceneManager.getStage());
-                alert.showAndWait();
+                Platform.runLater(() ->
+                {
+                    messageData = (String) receiveMsg.data;
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("New Message From Subscriber");
+                    alert.setHeaderText("");
+                    alert.setContentText(messageData);
+                    alert.initOwner(SceneManager.getStage());
+                    alert.showAndWait();
+                    System.out.println("Alert shown");
+                });
+
                 break;
 
             case "212":
@@ -160,7 +166,8 @@ public class ChatClient extends AbstractClient
                 List<String[]> rawData = (List<String[]>) receiveMsg.getData();
                 listOfActivities = new ArrayList<>();
 
-                for (String[] array : rawData) {
+                for (String[] array : rawData)
+                {
                     // Create a new ArrayList and reorder elements
                     ArrayList<String> activity = new ArrayList<>();
                     activity.add(array[2]); // Move index 2 to position 0
@@ -172,7 +179,7 @@ public class ChatClient extends AbstractClient
                 break;
 
             case "213":
-            	// status of update in the db, in format boolean
+                // status of update in the db, in format boolean
                 serverResponse = (boolean) receiveMsg.getData();
                 break;
 
@@ -213,24 +220,28 @@ public class ChatClient extends AbstractClient
 
             case "220":
             case "221":
-                books = (List<Book>)receiveMsg.data;
+                books = (List<Book>) receiveMsg.data;
                 break;
 
             case "222":
-                smsData = (List<String>)receiveMsg.data;
+                smsData = (List<String>) receiveMsg.data;
                 for (int i = 0; i < smsData.size(); i++)
                 {
-                    Alert SMSalert = new Alert(Alert.AlertType.INFORMATION);
-                    SMSalert.setTitle("SMS Simulation");
-                    SMSalert.setHeaderText(null);
-                    SMSalert.setContentText(smsData.get(i));
-                    SMSalert.initOwner(SceneManager.getStage());
-                    SMSalert.showAndWait();
+                    String sms = smsData.get(i);
+                    Platform.runLater(() ->
+                    {
+                        Alert SMSalert = new Alert(Alert.AlertType.INFORMATION);
+                        SMSalert.setTitle("SMS Simulation");
+                        SMSalert.setHeaderText(null);
+                        SMSalert.setContentText(sms);
+                        SMSalert.initOwner(SceneManager.getStage());
+                        SMSalert.showAndWait();
+                    });
                 }
                 break;
 
             case "223":
-                availability = (List<String>)receiveMsg.data;
+                availability = (List<String>) receiveMsg.data;
                 break;
 
             case "224":
@@ -238,18 +249,18 @@ public class ChatClient extends AbstractClient
                 break;
 
             case "225":
-            	//response for report id request
-            	reportID=(int) receiveMsg.data;
+                //response for report id request
+                reportID = (int) receiveMsg.data;
                 break;
 
             case "226":
-            	//response for blob data of report request
-            	blobData=(List<String[]>) receiveMsg.data;
+                //response for blob data of report request
+                blobData = (List<String[]>) receiveMsg.data;
                 break;
 
             case "228":
                 // list of unread librarian messages
-                listOfMessages=(ArrayList<ArrayList<String>>) receiveMsg.getData();
+                listOfMessages = (ArrayList<ArrayList<String>>) receiveMsg.getData();
                 break;
 
             case "229":

@@ -71,7 +71,7 @@ public class Subscriber_Controller {
         // check server response
     	if(ChatClient.serverResponse) {
     		loggedSubscriber=ChatClient.subscribers.get(0);
-            ClientUI.chat.accept(new MessageType("121",loggedSubscriber.getId()));
+            ClientUI.chat.accept(new MessageType("122",loggedSubscriber.getId()));
     		return ChatClient.subscribers.get(0);
     	}
     	return null;
@@ -123,6 +123,7 @@ public class Subscriber_Controller {
         // check server response
         if(ChatClient.serverResponse) {
     		loggedSubscriber=ChatClient.subscribers.get(0);
+            ClientUI.chat.accept(new MessageType("122",loggedSubscriber.getId()));
     		return ChatClient.subscribers.get(0);
     	}
     	return null;
