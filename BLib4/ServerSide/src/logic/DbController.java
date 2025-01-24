@@ -527,7 +527,7 @@ public class DbController
         // check if the copy exists
         try
         {
-            stmt = connection.prepareStatement("SELECT * from copy_of_the_book where copy_id = ?;");
+            stmt = connection.prepareStatement("SELECT * from copy_of_the_book where copy_id = ? AND is_available <> 2;");
             stmt.setString(1, copyId);
             rs = stmt.executeQuery();
 
@@ -557,7 +557,7 @@ public class DbController
                 // save the book id for the next query
                 bookId = rs.getString("book_id");
 
-                if (!rs.getBoolean("is_available"))
+                if (rs.getInt("is_available") == 0)
                 {
                     returnValue = false;
                 }
@@ -579,7 +579,7 @@ public class DbController
             try
             {
                 // count the number of copies of the book in the library that available to borrow
-                stmt = connection.prepareStatement("SELECT COUNT(*) from copy_of_the_book WHERE book_id = ? AND is_available = true;");
+                stmt = connection.prepareStatement("SELECT COUNT(*) from copy_of_the_book WHERE book_id = ? AND is_available = 1;");
                 stmt.setString(1, bookId);
 
                 rs = stmt.executeQuery();
@@ -650,7 +650,7 @@ public class DbController
         try
         {
             // update the copy of the book to be borrowed
-            stmt = connection.prepareStatement("UPDATE copy_of_the_book SET is_available = false WHERE copy_id = ?;");
+            stmt = connection.prepareStatement("UPDATE copy_of_the_book SET is_available = 0 WHERE copy_id = ?;");
             stmt.setString(1, copyId);
             stmt.executeUpdate();
 
@@ -750,7 +750,7 @@ public class DbController
             try
             {
                 // count the number of copies of the book in the library
-                stmt = connection.prepareStatement("SELECT COUNT(*) from copy_of_the_book WHERE book_id = ?");
+                stmt = connection.prepareStatement("SELECT COUNT(*) from copy_of_the_book WHERE book_id = ? AND is_available <> 2");
                 stmt.setString(1, orderDetails.get(1));
 
                 ResultSet rs = stmt.executeQuery();
@@ -875,7 +875,7 @@ public class DbController
                 String copyId = rs.getString(1);
 
                 // update the copy of the book to be available
-                stmt = connection.prepareStatement("UPDATE copy_of_the_book SET is_available = true WHERE copy_id = ?;");
+                stmt = connection.prepareStatement("UPDATE copy_of_the_book SET is_available = 1 WHERE copy_id = ?;");
                 stmt.setString(1, copyId);
                 stmt.executeUpdate();
 
@@ -1317,6 +1317,60 @@ public class DbController
         return returnValue;
     }
 
+    /**
+     * The method run SQL query to handle update book copy to lost status
+     * @param copyId - the id of the copy
+     * @return - true if the update succeeds, else false
+     */
+    public boolean handleUpdateBookCopyToLost(String copyId)
+    {
+        PreparedStatement stmt;
+        boolean returnValue = true;
+
+        // check if the copy exists
+        try
+        {
+            stmt = connection.prepareStatement("SELECT * from copy_of_the_book WHERE copy_id = ?;");
+            stmt.setString(1, copyId);
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next())
+            {
+                if (rs.getInt("is_available") == 2)
+                {
+                    returnValue = false;
+                }
+            }
+            else
+            {
+                // the copy not found
+                returnValue = false;
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! update book copy to lost failed - cant check if the copy is available");
+            returnValue = false;
+        }
+
+        if (returnValue)
+        {
+            // update the copy to be lost
+            try
+            {
+                stmt = connection.prepareStatement("UPDATE copy_of_the_book SET is_available = 2 WHERE copy_id = ?;");
+                stmt.setString(1, copyId);
+                stmt.executeUpdate();
+            }
+            catch (SQLException e)
+            {
+                System.out.println("Error! update book copy to lost failed - cant update the copy in the db");
+                returnValue = false;
+            }
+        }
+
+        return returnValue;
+    }
 
     /**
      * The method run SQL query to get the five newest books in the library
@@ -1344,6 +1398,7 @@ public class DbController
                     "FROM book B\n" +
                     "         JOIN (SELECT book_id, MAX(purchase_date) AS latest_purchase_date\n" +
                     "               FROM copy_of_the_book\n" +
+                    "               WHERE is_available <> 2\n" +
                     "               GROUP BY book_id) C ON B.book_id = C.book_id\n" +
                     "ORDER BY C.latest_purchase_date DESC\n" +
                     "LIMIT 5;");
@@ -1378,6 +1433,7 @@ public class DbController
                     "FROM book B\n" +
                     "         JOIN copy_of_the_book C ON B.book_id = C.book_id\n" +
                     "         JOIN borrow_book BB ON C.copy_id = BB.copy_id\n" +
+                    "WHERE C.is_available <> 2\n" +
                     "GROUP BY B.book_id, B.book_title, B.edition_number, B.print_date, B.book_subject, B.description, B.book_cover\n" +
                     "ORDER BY borrow_count DESC\n" +
                     "LIMIT 5;");
@@ -1997,7 +2053,7 @@ public class DbController
         try
         {
             // count the number of copies of the book in the library that available to borrow
-            stmt = connection.prepareStatement("SELECT COUNT(*) from copy_of_the_book WHERE book_id = ? AND is_available = true;");
+            stmt = connection.prepareStatement("SELECT COUNT(*) from copy_of_the_book WHERE book_id = ? AND is_available = 1;");
             stmt.setString(1, bookId);
 
             ResultSet rs = stmt.executeQuery();
@@ -2034,7 +2090,7 @@ public class DbController
             // find the location of the book in the library
             try
             {
-                stmt = connection.prepareStatement("SELECT location_on_shelf FROM copy_of_the_book WHERE book_id = ? AND is_available = true;");
+                stmt = connection.prepareStatement("SELECT location_on_shelf FROM copy_of_the_book WHERE book_id = ? AND is_available = 1;");
                 stmt.setString(1, bookId);
                 stmt.executeQuery();
 
@@ -2055,7 +2111,7 @@ public class DbController
             // check how much copies of the book exists
             try
             {
-                stmt = connection.prepareStatement("SELECT COUNT(*) from copy_of_the_book WHERE book_id = ?;");
+                stmt = connection.prepareStatement("SELECT COUNT(*) from copy_of_the_book WHERE book_id = ? AND is_available <> 2;");
                 stmt.setString(1, bookId);
 
                 ResultSet rs = stmt.executeQuery();
@@ -2065,7 +2121,7 @@ public class DbController
                 if (copies == ordered)
                 {
                     // we need to check the closest return date and add 2 weeks
-                    stmt = connection.prepareStatement("SELECT MIN(borrow_due_date) from borrow_book WHERE copy_id IN (SELECT copy_id from copy_of_the_book WHERE book_id = ?);");
+                    stmt = connection.prepareStatement("SELECT MIN(borrow_due_date) from borrow_book WHERE copy_id IN (SELECT copy_id from copy_of_the_book WHERE book_id = ? AND is_available <> 2);");
                     stmt.setString(1, bookId);
                     stmt.executeQuery();
 
@@ -2078,7 +2134,7 @@ public class DbController
                 else
                 {
                     // get all the active borrow due date ordered by the due date
-                    stmt = connection.prepareStatement("SELECT borrow_due_date from borrow_book WHERE copy_id IN (SELECT copy_id from copy_of_the_book WHERE book_id = ?) ORDER BY borrow_due_date DESC LIMIT 1;");
+                    stmt = connection.prepareStatement("SELECT borrow_due_date from borrow_book WHERE copy_id IN (SELECT copy_id from copy_of_the_book WHERE book_id = ? AND is_available <> 2) ORDER BY borrow_due_date DESC LIMIT 1;");
                     stmt.setString(1, bookId);
                     stmt.executeQuery();
 
@@ -2116,7 +2172,7 @@ public class DbController
         try
         {
             // count the number of copies of the book in the library
-            stmt = connection.prepareStatement("SELECT COUNT(*) from copy_of_the_book WHERE book_id = ?;");
+            stmt = connection.prepareStatement("SELECT COUNT(*) from copy_of_the_book WHERE book_id = ? AND is_available <> 2;");
             stmt.setString(1, bookId);
             rs = stmt.executeQuery();
 
@@ -2149,7 +2205,7 @@ public class DbController
             try
             {
                 // check if there is a copy that is available to borrow -> we cant make an order
-                stmt = connection.prepareStatement("SELECT COUNT(*) from copy_of_the_book WHERE book_id = ? AND is_available = true;");
+                stmt = connection.prepareStatement("SELECT COUNT(*) from copy_of_the_book WHERE book_id = ? AND is_available = 1;");
                 stmt.setString(1, bookId);
                 rs = stmt.executeQuery();
 
@@ -2319,7 +2375,7 @@ public class DbController
                 "     copy_of_the_book cob ON bb.copy_id = cob.copy_id\n" +
                 "         JOIN\n" +
                 "     book b ON cob.book_id = b.book_id\n" +
-                "WHERE (bb.borrow_return_date IS NULL\n" +
+                "WHERE (cob.is_available <> 2) AND (bb.borrow_return_date IS NULL\n" +
                 "    OR MONTH(bb.borrow_date) = MONTH(CURRENT_DATE)\n" +
                 "    OR MONTH(bb.borrow_return_date) = MONTH(CURRENT_DATE))\n" +
                 "GROUP BY b.book_title;";
@@ -2382,9 +2438,9 @@ public class DbController
                 "     copy_of_the_book cob ON bb.copy_id = cob.copy_id\n" +
                 "         JOIN\n" +
                 "     book b ON cob.book_id = b.book_id\n" +
-                "WHERE bb.borrow_return_date IS NULL\n" +
+                "WHERE (cob.is_available <> 2) AND (bb.borrow_return_date IS NULL\n" +
                 "   OR (MONTH(bb.borrow_date) = MONTH(CURRENT_DATE)\n" +
-                "    OR MONTH(bb.borrow_return_date) = MONTH(CURRENT_DATE))\n" +
+                "    OR MONTH(bb.borrow_return_date) = MONTH(CURRENT_DATE)))\n" +
                 "GROUP BY b.book_title;";
 
         Map<String, String> lateBorrowTimeMap = new HashMap<>();

@@ -309,6 +309,11 @@ public class ServerController extends AbstractServer
                 }
                 break;
 
+            case "118":
+                // Request to update copy of the book to lost status
+                responseMsg = new MessageType("218", dbController.handleUpdateBookCopyToLost((String) receiveMsg.data));
+                break;
+
             case "120":
                 // Request from the client to get 5 newest books in the library
                 responseMsg = new MessageType("220", dbController.handleGetFiveNewestBooks());
@@ -552,9 +557,12 @@ public class ServerController extends AbstractServer
         }
     }
 
+    /**
+     * The method handle send notification to librarian in the system
+     * @param message - the message to send
+     */
     private void HandleSendExtensionNotificationToLibrarian(String message)
     {
-        System.out.println("Message to send to librarian: " + message);
         // check if there is a connected librarian
         if (!activeLibrarians.isEmpty())
         {
