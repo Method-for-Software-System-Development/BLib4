@@ -19,11 +19,11 @@ import ocsf.server.*;
  */
 public class ServerController extends AbstractServer
 {
-    private ServerMonitorFrameController monitorController;
+    private final ServerMonitorFrameController monitorController;
 
     //Class variables *************************************************
     private static DbController dbController;
-    private DocumentationController documantaionController;
+    private final DocumentationController documantaionController;
     private static Map<String, ConnectionToClient> activeSubscribers;
     private static Map<String, ConnectionToClient> activeLibrarians;
     //Constructors ****************************************************
@@ -67,7 +67,7 @@ public class ServerController extends AbstractServer
                 }
                 catch (IOException e)
                 {
-                    e.printStackTrace();
+                    System.out.println("Error disconnecting client");
                 }
                 return;
 
@@ -128,27 +128,20 @@ public class ServerController extends AbstractServer
                 // Borrow book request - create new borrow in the system
                 responseMsg = new MessageType("207", dbController.handleBorrowBook((List<String>) receiveMsg.data));
 
-                // If query to sign a new subscriber returns true - document on reader card
+                // If a query to sign a new subscriber returns true - document on reader card
                 if ((boolean) responseMsg.getData())
                 {
-                    // Getting book by copyID for DB
+                    // Getting a book by copyID for DB
                     Book book = dbController.getBookByCopyId(((List<String>) receiveMsg.getData()).get(1));
                     // Getting the history file of the subscriber by his id
                     List<String[]> historyList = dbController.getHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0));
-                    // Get the current date
-                    Date today = new Date(System.currentTimeMillis());
-                    // Use Calendar to add 14 days
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.setTime(today);
-                    // Add 14 days
-                    calendar.add(Calendar.DATE, 14);
-                    // Get the new date
-                    Date futureDate = (Date) calendar.getTime();
-                    // Convert to String
-                    String futureDateString = futureDate.toString();
+                    // get the due date
+                    String futureDateString = ((List<String>) receiveMsg.getData()).get(2);
+
                     // Document book borrow on subscriber card
                     List<String[]> newHistoryList = documantaionController.documentOnReaderCard("107", historyList, book.getTitle(), futureDateString);
-                    // Updating subscriber history file in DB
+
+                    // Updating a subscriber history file in DB
                     dbController.handleUpdateHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0), newHistoryList);
                 }
                 break;
@@ -164,7 +157,7 @@ public class ServerController extends AbstractServer
                     List<String[]> historyList = dbController.getHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0));
                     // Document book order on subscriber card
                     List<String[]> newHistoryList = documantaionController.documentOnReaderCard("108", historyList, book.getTitle(), "");
-                    // Updating subscriber history file in DB
+                    // Updating a subscriber history file in DB
                     dbController.handleUpdateHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0), newHistoryList);
                 }
                 break;
@@ -178,11 +171,11 @@ public class ServerController extends AbstractServer
                     String bookName = (dbController.getBookDetailsByBorrowId((String) receiveMsg.data)).getTitle();
                     // Getting subscriber ID from DB using borrow ID
                     String subscriberID = dbController.getSubscriberIdFromBorrowId((String) receiveMsg.data);
-                    // Getting history file of subscriber
+                    // Getting a history file of subscriber
                     List<String[]> historyList = dbController.getHistoryFileBySubscriberId(subscriberID);
                     // Document return of a book
                     List<String[]> newHistoryList = documantaionController.documentOnReaderCard("109", historyList, bookName, null);
-                    // Updating subscriber history file in DB
+                    // Updating a subscriber history file in DB
                     dbController.handleUpdateHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0), newHistoryList);
                 }
                 break;
@@ -205,12 +198,12 @@ public class ServerController extends AbstractServer
                 {
                     // Getting subscriber ID by borrow ID
                     String subscriberID = dbController.getSubscriberIdFromBorrowId(borrowId);
-                    // Getting history file of subscriber
+                    // Getting a history file of subscriber
                     List<String[]> historyList = dbController.getHistoryFileBySubscriberId(subscriberID);
                     // Document extend granted
                     List<String[]> newHistoryList = documantaionController.documentOnReaderCard("111-1", historyList, bookName, ((List<String>) receiveMsg.getData()).get(1));
-                    // Updating subscriber history file in DB
-                    dbController.handleUpdateHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0), newHistoryList);
+                    // Updating a subscriber history file in DB
+                    dbController.handleUpdateHistoryFileBySubscriberId(subscriberID, newHistoryList);
                 }
                 else
                 {
@@ -221,8 +214,11 @@ public class ServerController extends AbstractServer
                     // Updating subscriber history file 
                     List<String[]> newHistoryList = documantaionController.documentOnReaderCard("111-2", historyList, bookName, null);
                     // Updating subscriber history file in DB
-                    dbController.handleUpdateHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0), newHistoryList);
+                    dbController.handleUpdateHistoryFileBySubscriberId(subscriberID, newHistoryList);
                 }
+
+                // send notification to the librarian
+                //ToDo:
                 break;
 
             case "112":
@@ -284,7 +280,7 @@ public class ServerController extends AbstractServer
 
             case "116":
                 // Request to check if the subscriber in the DB
-                responseMsg = new MessageType("216", dbController.handleCheckSubscriberExistence((String) receiveMsg.data));
+                responseMsg = new MessageType("216", dbController.handleCheckSubscriberStatus((String) receiveMsg.data));
                 break;
 
             case "117":

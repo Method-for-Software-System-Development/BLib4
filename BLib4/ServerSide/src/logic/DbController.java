@@ -637,7 +637,7 @@ public class DbController
      * @return - 0 if the borrow succeeds, 1 if the subscriber not found,
      * 2 if the subscriber is frozen, 3 if the borrow failed due to db error
      */
-    public int handleBorrowBook(List<String> borrowDetails)
+    public Boolean handleBorrowBook(List<String> borrowDetails)
     {
         PreparedStatement stmt;
         String subscriberId = borrowDetails.get(0);
@@ -645,35 +645,12 @@ public class DbController
         String dueDate = borrowDetails.get(2);
         ResultSet rs;
 
-
-        // Check that the subscriber not frozen
-        try
-        {
-            stmt = connection.prepareStatement("SELECT * from subscriber WHERE subscriber_id = ?;");
-            stmt.setString(1, subscriberId);
-
-            rs = stmt.executeQuery();
-            if (rs.next())
-            {
-                if (!rs.getBoolean("is_active"))
-                {
-                    return 2;
-                }
-            }
-        }
-        catch (SQLException e)
-        {
-            System.out.println("Error! borrow book failed - the subscriber is frozen");
-            return 3;
-        }
-
         try
         {
             // update the copy of the book to be borrowed
             stmt = connection.prepareStatement("UPDATE copy_of_the_book SET is_available = false WHERE copy_id = ?;");
             stmt.setString(1, copyId);
             stmt.executeUpdate();
-
 
             // get the last borrow id
             stmt = connection.prepareStatement("SELECT MAX(borrow_id) FROM borrow_book;");
@@ -692,11 +669,11 @@ public class DbController
         catch (SQLException e)
         {
             System.out.println("Error! borrow book failed - cant add the borrow to the db");
-            return 3;
+            return false;
         }
 
         // the borrow succeeded
-        return 0;
+        return true;
     }
 
     /**
@@ -1172,11 +1149,12 @@ public class DbController
      * @param subscriberId - the id of the subscriber to check
      * @return - true if the subscriber exists, else false
      */
-    public boolean handleCheckSubscriberExistence(String subscriberId)
+    public int handleCheckSubscriberStatus(String subscriberId)
     {
         PreparedStatement stmt;
-        boolean returnValue = true;
+        int returnValue = 0;
 
+        // check if the subscriber in the DB
         try
         {
             stmt = connection.prepareStatement("SELECT * from subscriber WHERE subscriber_id = ?;");
@@ -1185,14 +1163,23 @@ public class DbController
             ResultSet rs = stmt.executeQuery();
             if (!rs.next())
             {
-                returnValue = false;
+                returnValue = 1;
+            }
+            else
+            {
+                // we have the subscriber, check if he is frozen
+                if (!rs.getBoolean("is_active"))
+                {
+                    returnValue = 2;
+                }
             }
         }
         catch (SQLException e)
         {
             System.out.println("Error! check subscriber existence failed");
-            returnValue = false;
+            returnValue = 3;
         }
+
 
         return returnValue;
     }

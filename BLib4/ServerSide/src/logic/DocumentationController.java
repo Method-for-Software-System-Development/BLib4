@@ -86,12 +86,12 @@ public class DocumentationController
 
             case "111-1":
                 // Extension of a book granted a document on reader card
-                addToReaderCard[0] = "Subscriber extended borrow time for book: " + obj + " was granted, new reutrn date: " + obj2;
+                addToReaderCard[0] = "Subscriber extended borrow time for book: " + obj + " was granted. new return date: " + obj2;
                 break;
 
             case "111-2":
                 // Extension of a book denied a document on reader card
-                addToReaderCard[0] = "Subscriber denied extention borrow time for book: " + obj;
+                addToReaderCard[0] = "Subscriber denied extension borrow time for book: " + obj;
                 break;
 
             case "113-1":
@@ -116,7 +116,7 @@ public class DocumentationController
 
             case "117":
                 // Manual extension document on reader card
-                addToReaderCard[0] = "Manual extention granted by librarian to the book: " + obj;
+                addToReaderCard[0] = "Manual extension granted by librarian to the book: " + obj;
                 break;
 
             default:
