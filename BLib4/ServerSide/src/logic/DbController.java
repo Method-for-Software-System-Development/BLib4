@@ -667,6 +667,23 @@ public class DbController
             stmt.setString(3, copyId);
             stmt.setString(4, dueDate);
             stmt.executeUpdate();
+            
+            //check if a matching book order exists
+            stmt = connection.prepareStatement("SELECT order_id FROM subscriber_order WHERE subscriber_id= ? AND is_his_turn = 1 AND book_id=(SELECT book_id from copy_of_the_book WHERE copy_id = ?);");
+            stmt.setString(1, subscriberId);
+            stmt.setString(2, copyId);
+            rs = stmt.executeQuery();
+            
+            //if a matching order exists - change the order's is_active to 0
+            if (rs.next())
+            {
+                // save the order id for the next query
+                String orderId = rs.getString("order_id");
+                stmt = connection.prepareStatement("UPDATE subscriber_order SET is_active =0 WHERE order_id = ?;");
+                stmt.setString(1, orderId);
+                stmt.executeUpdate();
+            }
+
         }
         catch (SQLException e)
         {
