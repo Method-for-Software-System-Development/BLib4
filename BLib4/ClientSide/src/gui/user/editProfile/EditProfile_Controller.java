@@ -151,10 +151,10 @@ public class EditProfile_Controller {
 
         // Validate phone number
         if (phoneNumberField != null && phoneNumberField.getText() != null && !phoneNumberField.getText().isEmpty()) {
-            if (phoneNumberField.getText().matches("\\d{10}")) {
+            if (phoneNumberField.getText().matches("\\d{10}") && (((String) phoneNumberField.getText()).startsWith("05"))) {
                 phoneNumber = phoneNumberField.getText();
             } else {
-                showErrorAlert("Validation Error", "Please enter a valid phone number (10 digits).");
+                showErrorAlert("Validation Error", "Please enter a valid phone number (10 digits).\n The number must start at 05-.");
                 clear_form();
                 return;
             }
