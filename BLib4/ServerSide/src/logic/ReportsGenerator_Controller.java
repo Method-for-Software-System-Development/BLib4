@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class ReportsGenerator_Controller {
 
-    private static ReportsGenerator_Controller instance;
+    private static volatile ReportsGenerator_Controller instance=null;
 
 
     private final DbController dbController;
@@ -22,9 +22,12 @@ public class ReportsGenerator_Controller {
     }
     public static ReportsGenerator_Controller getInstance()
     {
-        if (instance == null)
+    	synchronized (ReportsGenerator_Controller.class)
         {
-            instance = new ReportsGenerator_Controller();
+            if (instance == null)
+            {
+                instance = new ReportsGenerator_Controller();
+            }
         }
         return instance;
     }

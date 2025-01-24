@@ -21,7 +21,7 @@ public class SchedulerController
     private ScheduledExecutorService scheduler;
     private DbController dbController; // Controller for database interactions
     private Notification_Controller notificationController;
-
+    private ReportsGenerator_Controller reportsGeneratorController;
 
     public static SchedulerController getInstance()
     {
@@ -46,13 +46,13 @@ public class SchedulerController
     {
         this.scheduler = Executors.newScheduledThreadPool(1);
         this.dbController = DbController.getInstance();
-        this.notificationController = Notification_Controller.getInstance();        //ToDo: error with the env check the path
+        this.notificationController = Notification_Controller.getInstance();
+        this.reportsGeneratorController = ReportsGenerator_Controller.getInstance();       //ToDo: error with the env check the path
     }
 
     /**
      * Starts scheduling all tasks.
      * Each task runs at a specified interval using ScheduledExecutorService.
-     *
      * @see ScheduledExecutorService
      */
     public void startSchedulers()
@@ -61,13 +61,15 @@ public class SchedulerController
         scheduler.scheduleAtFixedRate(this::notifyDayBeforeReturnDate, 0, 1, TimeUnit.DAYS);
         scheduler.scheduleAtFixedRate(this::notifyDeleteUnfulfilledOrder, 0, 1, TimeUnit.DAYS);
         scheduler.scheduleAtFixedRate(this::triggerOneMonthFromFreezeDate, 0, 1, TimeUnit.DAYS);
+        scheduler.scheduleAtFixedRate(reportsGeneratorController::DBdailyUpdate_SubscriberStatus, 0, 1, TimeUnit.DAYS);
+        scheduler.scheduleAtFixedRate(reportsGeneratorController::autoGenerate_BorrowingReport, 0, 1, TimeUnit.DAYS);
+        scheduler.scheduleAtFixedRate(reportsGeneratorController::autoGenerate_SubscribersStatusReport, 0, 1, TimeUnit.DAYS);
         System.out.println("Scheduler started successfully.");
     }
 
     /**
      * Stops all scheduled tasks.
      * Ensures a graceful shutdown of the scheduler.
-     *
      * @see ScheduledExecutorService#shutdown()
      */
     public void stopSchedulers()
@@ -131,7 +133,6 @@ public class SchedulerController
 
     /**
      * Sends a request to the server to check for subscribers who have been frozen for more than one calendar month.
-     *
      * @return List of subscribers who have been frozen for more than one calendar month.
      */
     public void triggerOneMonthFromFreezeDate()

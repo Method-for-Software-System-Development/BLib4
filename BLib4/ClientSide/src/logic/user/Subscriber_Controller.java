@@ -5,29 +5,48 @@ import java.util.ArrayList;
 import entities.logic.MessageType;
 import entities.user.Librarian;
 import entities.user.Subscriber;
-import javafx.scene.control.Alert;
 import logic.communication.ChatClient;
 import logic.communication.ClientUI;
 import logic.communication.SceneManager;
 
 public class Subscriber_Controller {   
 
-    private static Subscriber_Controller instance = null;
+    private static volatile Subscriber_Controller instance = null;
     public static Subscriber loggedSubscriber=null;
     public static Librarian loggedLibrarian=null;
-    
-	public static Subscriber_Controller getInstance() {
-	    if(instance == null) {
-	    	instance = new Subscriber_Controller();
-	    	return instance;
-	    }
-	    return instance;
-	}
+	
+	 /**
+     * get the instance of the Subscriber_Controller for singleton
+     *
+     * @return the instance of the Subscriber_Controller
+     */
+    public static Subscriber_Controller getInstance()
+    {
+        if (instance == null)
+        {
+            synchronized (Subscriber_Controller.class)
+            {
+                if (instance == null)
+                {
+                    instance = new Subscriber_Controller();
+                }
+            }
+        }
+        return instance;
+    }
 
+    /**
+     * getter for the logged in subscriber
+     * @return logged in subscriber
+     */
     public Subscriber getLoggedSubscriber() {
         return loggedSubscriber;
     }
 
+    /**
+     * getter for the logged in librarian
+     * @return logged in librarian
+     */
     public Librarian getLoggedLibrarian() {
         return loggedLibrarian;
     }
@@ -41,6 +60,7 @@ public class Subscriber_Controller {
      * @param phoneNumber phone number of the user.
      * @param email email of the user.
      * @param password	password of the user.
+     * @return boolean response of the server for adding new subscriber
      */
 	public boolean addNewSubscriber(String userID, String firstName, String lastName, String phoneNumber, String email,String password) {
         // Create a list of data of the new subscriber to send to the server
@@ -156,18 +176,16 @@ public class Subscriber_Controller {
     }
 
     /**
-     * Updates the details of a subscriber.
-     *
+     * This method creates a new Subscriber object with the updated 
+     * details and sends it to the server for processing.
+     * 
      * @param userID      The unique identifier of the subscriber whose details are to be updated.
      * @param firstName   The updated first name of the subscriber.
      * @param lastName    The updated last name of the subscriber.
      * @param phoneNumber The updated phone number of the subscriber.
      * @param email       The updated email address of the subscriber.
      * @param status      The updated status of the subscriber (e.g., active or inactive).
-     * @return {@code true} if the update was successful, {@code false} otherwise.
-     *
-     * <p>This method creates a new {@link Subscriber} object with the updated details and sends it to the server
-     * for processing. The server response determines the success of the operation.</p>
+     * @return  The server boolean response that determines the success of the operation.
      */
     public boolean updateSubscriberDetails(String userID, String firstName, String lastName, String phoneNumber, String email, Boolean status) {
         // Create a new subscriber with the updates and send to server
@@ -178,14 +196,12 @@ public class Subscriber_Controller {
     }
 
     /**
-     * Updates the password of a subscriber.
-     *
+     * This method creates a data structure containing the subscriber's ID and 
+     * the new password, then sends it to the server for processing.
+     * 
      * @param userID   The unique identifier of the subscriber whose password is to be updated.
      * @param password The new password to be set for the subscriber.
-     * @return {@code true} if the password update was successful, {@code false} otherwise.
-     *
-     * <p>This method creates a data structure containing the subscriber's ID and the new password,
-     * then sends it to the server for processing. The server response determines the success of the operation.</p>
+     * @return  The server boolean response determines the success of the operation.
      */
     public boolean updateSubscriberPassword(String userID, String password) {
         // Create a list of data for the password update and send to the server
@@ -200,7 +216,7 @@ public class Subscriber_Controller {
     /**
      * Attempts to extend the return date of a borrow by the subscriber.
      *
-     * @param borrowID      The ID of the borrow to be extended.
+     * @param borrowID The ID of the borrow to be extended.
      * @param newReturnDate The new return date requested for the borrow.
      * @return true if the server approves the extension, false otherwise.
      */
@@ -214,4 +230,3 @@ public class Subscriber_Controller {
         return ChatClient.serverResponse;
     }
 }
-
