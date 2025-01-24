@@ -347,23 +347,8 @@ public class LibrarianUI_Controller {
     }
 
     public void refreshMessagesTable() {
-        // Clear existing data
-        messageEntries.clear();
-        // Fetch updated borrow data from the server
-        ClientUI.chat.accept(new MessageType("128", null));
-        messages = ChatClient.listOfMessages;
-        if (messages.isEmpty())
-        {
-            numberOfMessages.setText("No new unapproved messages.");
-            messagesTable.setVisible(false);
-            messagesTable.setManaged(false);
-        }
-        else
-        {
-            numberOfMessages.setText("You have " + messages.size() + " new messages:");
-        }
-        // Load the updated data into the table
-        loadMessagesData();
+        // Refresh the messages table by reloading the scene
+        SceneManager.switchScene("/gui/librarian/librarianUI/LibrarianUI.fxml", "BLib.4 - Braude Library Management");
     }
 
     /**
