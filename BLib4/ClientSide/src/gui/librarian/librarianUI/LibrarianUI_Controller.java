@@ -346,7 +346,7 @@ public class LibrarianUI_Controller {
         }
     }
 
-    private void refreshMessagesTable() {
+    public void refreshMessagesTable() {
         // Clear existing data
         messageEntries.clear();
         // Fetch updated borrow data from the server

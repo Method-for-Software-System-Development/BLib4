@@ -5,6 +5,7 @@
 package logic.communication;
 
 import entities.book.Book;
+import gui.librarian.librarianUI.LibrarianUI_Controller;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import logic.communication.ChatIF;
@@ -158,6 +159,11 @@ public class ChatClient extends AbstractClient
                     alert.showAndWait();
                     System.out.println("Alert shown");
                 });
+
+                Object controller = SceneManager.getCurrentController();
+                if (controller instanceof LibrarianUI_Controller) {
+                    ((LibrarianUI_Controller) controller).refreshMessagesTable();
+                }
 
                 break;
 
