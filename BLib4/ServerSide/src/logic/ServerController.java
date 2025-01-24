@@ -79,6 +79,13 @@ public class ServerController extends AbstractServer
             case "101":
                 //subscriber wants to log in by card
                 responseMsg = new MessageType("201", dbController.handleLogInSubscriberByCard((String) receiveMsg.data));
+
+                // add the subscriber to the connected subscribers list
+                if (responseMsg.data != null)
+                {
+                    activeSubscribers.put((String) receiveMsg.data, client);
+                }
+
                 break;
 
             case "1002":

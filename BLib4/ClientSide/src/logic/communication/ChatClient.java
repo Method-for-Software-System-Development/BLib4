@@ -131,9 +131,6 @@ public class ChatClient extends AbstractClient
                 break;
 
             case "208":
-            	availability = (List<String>) receiveMsg.getData();
-            	break;
-
             case "209":
             	returnOutcome = (ArrayList<Boolean>) receiveMsg.getData();
                 break;

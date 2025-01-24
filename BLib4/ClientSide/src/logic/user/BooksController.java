@@ -119,11 +119,11 @@ public class BooksController {
         
         // Wait for server response
         // if the book has successfully ordered - return 1
-        if (ChatClient.availability.get(0).equals("true")) {
+        if (ChatClient.returnOutcome.get(0)) {
         	// Subscriber successfully added to the waitlist
         	return 1;
         } // if the book cannot be ordered due to a high number of reservations - return 2
-        else if (!ChatClient.availability.get(0).equals("true") && !ChatClient.availability.get(1).equals("true")) {
+        else if (!ChatClient.returnOutcome.get(0) && !ChatClient.returnOutcome.get(1)) {
         	// Too many reservations, cannot add subscriber to waitlist
         	return 2;
         }
