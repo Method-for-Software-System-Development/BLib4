@@ -211,6 +211,8 @@ public class EditProfile_Controller {
                     phoneNumber,
                     email,
                     subscriberController.getLoggedSubscriber().getStatus());
+            subscriberController.getLoggedSubscriber().setEmail(email);
+            subscriberController.getLoggedSubscriber().setPhone(phoneNumber);
         }
 
         // Update password if a new password was provided
