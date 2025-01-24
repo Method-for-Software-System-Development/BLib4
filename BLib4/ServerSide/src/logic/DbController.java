@@ -2128,7 +2128,7 @@ public class DbController
                     rs = stmt.executeQuery();
                     rs.next();
                     Date expectedReturnDate = rs.getDate(1);
-                    LocalDate newDate = expectedReturnDate.toLocalDate().plusWeeks(2);
+                    LocalDate newDate = expectedReturnDate.toLocalDate().plusWeeks(2).plusDays(1);
                     returnValue.add(newDate.toString());
                 }
                 else
@@ -2142,7 +2142,7 @@ public class DbController
                     rs.next();
 
                     Date expectedReturnDate = rs.getDate(1);
-                    returnValue.add(expectedReturnDate.toLocalDate().toString());
+                    returnValue.add((expectedReturnDate.toLocalDate().plusDays(1)).toString());
 
                 }
             }

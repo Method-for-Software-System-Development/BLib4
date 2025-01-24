@@ -1,6 +1,8 @@
 package logic;
 
 import entities.logic.MessageType;
+import logic.librarian.ReportsGenerator_Controller;
+import logic.user.BooksController;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -12,7 +14,8 @@ import java.util.Map;
 
 public class ReportsGenerator_Controller {
 
-    private static ReportsGenerator_Controller instance;
+	// Singleton instance of ReportsGenerator_Controller
+    private static volatile ReportsGenerator_Controller instance = null;
 
 
     private final DbController dbController;
@@ -20,14 +23,25 @@ public class ReportsGenerator_Controller {
     public ReportsGenerator_Controller() {
         this.dbController = DbController.getInstance();
     }
-    public static ReportsGenerator_Controller getInstance()
-    {
-        if (instance == null)
-        {
-            instance = new ReportsGenerator_Controller();
-        }
-        return instance;
-    }
+    /**
+     * get the instance of the ReportsGenerator_Controller for singleton
+     *
+     * @return the instance of the ReportsGenerator_Controller
+     */
+	public static ReportsGenerator_Controller getInstance() 
+	{
+		if(instance == null) 
+		{
+			 synchronized (ReportsGenerator_Controller.class)
+	            {
+	                if (instance == null)
+	                {
+	                    instance = new ReportsGenerator_Controller();
+	                }
+	            }
+		}
+		return instance;
+	}
 
     /**
      * Updates the daily status of subscribers in the database.
