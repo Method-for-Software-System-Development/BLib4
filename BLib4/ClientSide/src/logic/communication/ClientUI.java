@@ -160,5 +160,12 @@ public class ClientUI extends Application
                 primaryStage.setFullScreen(true);
             }
         });
+
+        // Set the action to be performed when the user tries to close the window
+        primaryStage.setOnCloseRequest(e ->
+        {
+            e.consume();
+            ClientUI.chat.getClient().quit();
+        });
     }
 }

@@ -32,6 +32,10 @@ public class ChatClient extends AbstractClient
 {
     //Instance variables **********************************************
 
+    private boolean isLogIn = false;
+    private String loginID;
+    private String loginType;
+
     /**
      * The interface type variable.  It allows the implementation of
      * the display method in the client.
@@ -91,6 +95,11 @@ public class ChatClient extends AbstractClient
         {
             case "201":
                 // log in succeed, save subscriber details
+                this.isLogIn = true;
+                this.loginID = ((Subscriber) receiveMsg.getData()).getId();
+                this.loginType = "subscriber";
+
+
                 serverResponse = true;
                 subscriber = (Subscriber) receiveMsg.getData();
                 subscribers.clear();
@@ -102,12 +111,19 @@ public class ChatClient extends AbstractClient
 
             case "202":
                 // log in succeed, save librarian details
+                this.isLogIn = true;
+                this.loginID = ((Librarian) receiveMsg.getData()).getId();
+                this.loginType = "librarian";
+
                 serverResponse = true;
                 librarian = (Librarian) receiveMsg.getData();
                 break;
 
             case "2002":
                 // response for log out request
+                this.isLogIn = false;
+                this.loginID = null;
+                this.loginType = null;
                 break;
 
             case "203":
@@ -333,6 +349,13 @@ public class ChatClient extends AbstractClient
     {
         try
         {
+            // check if the client is logged in
+            if (isLogIn)
+            {
+                // send log-out request
+                sendLogOutRequest();
+            }
+
             sendDisconnectRequest();
             closeConnection();
         }
@@ -342,7 +365,10 @@ public class ChatClient extends AbstractClient
         System.exit(0);
     }
 
-    public void sendDisconnectRequest()
+    /**
+     * This method sends a disconnect request to the server.
+     */
+    private void sendDisconnectRequest()
     {
         try
         {
@@ -357,24 +383,27 @@ public class ChatClient extends AbstractClient
         }
     }
 
-    public EditSubscriberFrameController getEditSubscriberFrameController()
+    /**
+     * This method sends a log-out request to the server.
+     */
+    private void sendLogOutRequest()
     {
-        return editSubscriberFrameController;
+        try
+        {
+            openConnection();
+            List<String> data = new ArrayList<>();
+            data.add(loginType);
+            data.add(loginID);
+
+            MessageType logOutMessage = new MessageType("1002", data);
+            ClientUI.chat.accept(logOutMessage);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+            clientUI.display("Could not send log out request to server: " + e);
+        }
     }
 
-    public void setEditSubscriberFrameController(EditSubscriberFrameController editSubscriberFrameController)
-    {
-        this.editSubscriberFrameController = editSubscriberFrameController;
-    }
-
-    public ShowAllSubscribersFrameController getShowAllSubscribersController()
-    {
-        return showAllSubscribersController;
-    }
-
-    public void setShowAllSubscribersController(ShowAllSubscribersFrameController showAllSubscribersController)
-    {
-        this.showAllSubscribersController = showAllSubscribersController;
-    }
 }
 //End of ChatClient class
