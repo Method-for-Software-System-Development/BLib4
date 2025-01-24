@@ -5,6 +5,7 @@ import entities.report.BorrowingReport;
 import entities.report.SubscriberStatusReport;
 import logic.communication.ChatClient;
 import logic.communication.ClientUI;
+import logic.user.BooksController;
 
 import java.util.*;
 
@@ -13,17 +14,30 @@ import java.util.*;
  */
 public class ReportsGenerator_Controller {
 
-    private static ReportsGenerator_Controller instance = null;
+	 // Singleton instance of BooksController
+    private static volatile ReportsGenerator_Controller instance = null;
     private String month;
 	private String year;
-    public static ReportsGenerator_Controller getInstance()
-    {
-        if (instance == null)
-        {
-            instance = new ReportsGenerator_Controller();
-        }
-        return instance;
-    }
+	
+	 /**
+     * get the instance of the ReportsGenerator_Controller for singleton
+     *
+     * @return the instance of the ReportsGenerator_Controller
+     */
+	public static ReportsGenerator_Controller getInstance() 
+	{
+		if(instance == null) 
+		{
+			 synchronized (BooksController.class)
+	            {
+	                if (instance == null)
+	                {
+	                    instance = new ReportsGenerator_Controller();
+	                }
+	            }
+		}
+		return instance;
+	}
 
     /**
      * Retrieves a BorrowingReport for a given month and year.
