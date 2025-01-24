@@ -5,6 +5,8 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
+import javafx.scene.transform.Scale;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import java.io.IOException;
 
@@ -84,12 +86,30 @@ public class ServerUI extends Application
         primaryStage.setScene(scene);
         primaryStage.show();
 
+
+        //!/////////////////////////////////////// check this (scale the window)
+//        Screen screen = Screen.getPrimary();
+//        primaryStage.setWidth(screen.getBounds().getWidth());
+//        primaryStage.setHeight(screen.getBounds().getHeight());
+//        double scaleX = screen.getBounds().getWidth()/1920.0;
+//        double scaleY = screen.getBounds().getHeight()/1080.0;
+//        double scaleD = Math.min(scaleX, scaleY);
+//        Scale scale = new Scale(scaleD, scaleD);
+//        root.getTransforms().add(scale);
+//        scale.xProperty().bind(primaryStage.widthProperty().divide(1920));
+//        scale.yProperty().bind(primaryStage.heightProperty().divide(1080));
+
+        //?/////////////////////////////////////////
+
+
         // Allow resizing
         primaryStage.setResizable(true);
 
         // Set initial size
-        primaryStage.setWidth(1760);  // Initial width
-        primaryStage.setHeight(990);  // Initial height
+        primaryStage.setWidth(1920);  // Initial width
+        primaryStage.setHeight(1080);  // Initial height
+        primaryStage.setMaximized(true);
+
 
         // Set the action to be performed when the user tries to close the window
         primaryStage.setOnCloseRequest(e ->

@@ -151,11 +151,8 @@ public class LibrarianUI_Controller {
             exitImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/close_24dp_FFFFFF.png")));
         });
 
-//        ClientUI.chat.accept(new MessageType("128", null));
-//        messages = ChatClient.listOfMessages;
-
-        // FOR TESTING
-        initializeMessagesForTesting();
+        ClientUI.chat.accept(new MessageType("128", null));
+        messages = ChatClient.listOfMessages;
 
         if (messages.isEmpty())
         {
@@ -367,22 +364,6 @@ public class LibrarianUI_Controller {
         }
         // Load the updated data into the table
         loadMessagesData();
-    }
-
-    private void initializeMessagesForTesting() {
-        messages = new ArrayList<>();
-
-        // Adding 10 example records
-        messages.add(new ArrayList<>(Arrays.asList("1", "01/01/2025", "Overdue book notification")));
-        messages.add(new ArrayList<>(Arrays.asList("2", "02/01/2025", "Reservation ready for pickup")));
-        messages.add(new ArrayList<>(Arrays.asList("3", "03/01/2025", "New book recommendation")));
-        messages.add(new ArrayList<>(Arrays.asList("4", "04/01/2025", "Membership renewal reminder")));
-        messages.add(new ArrayList<>(Arrays.asList("5", "05/01/2025", "System maintenance notice")));
-        messages.add(new ArrayList<>(Arrays.asList("6", "06/01/2025", "Event invitation: Book Club")));
-        messages.add(new ArrayList<>(Arrays.asList("7", "07/01/2025", "Borrowing policy update")));
-        messages.add(new ArrayList<>(Arrays.asList("8", "08/01/2025", "Your reserved book is overdue")));
-        messages.add(new ArrayList<>(Arrays.asList("9", "09/01/2025", "Returned book confirmation")));
-        messages.add(new ArrayList<>(Arrays.asList("10", "10/01/2025", "Account activity report")));
     }
 
     /**

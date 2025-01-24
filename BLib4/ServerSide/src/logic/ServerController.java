@@ -1,11 +1,10 @@
 package logic;
 
 import java.io.IOException;
-import java.sql.Date;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import gui.ServerMonitorFrameController;
 import entities.book.Book;
@@ -23,7 +22,7 @@ public class ServerController extends AbstractServer
 
     //Class variables *************************************************
     private static DbController dbController;
-    private final DocumentationController documantaionController;
+    private final DocumentationController documentationController;
     private static Map<String, ConnectionToClient> activeSubscribers;
     private static Map<String, ConnectionToClient> activeLibrarians;
     //Constructors ****************************************************
@@ -39,7 +38,7 @@ public class ServerController extends AbstractServer
         super(port);
         this.monitorController = monitorController;
 
-        documantaionController = DocumentationController.getInstance();
+        documentationController = DocumentationController.getInstance();
         activeSubscribers = new HashMap<>();
         activeLibrarians = new HashMap<>();
     }
@@ -55,7 +54,7 @@ public class ServerController extends AbstractServer
     public void handleMessageFromClient(Object msg, ConnectionToClient client)
     {
         MessageType receiveMsg = (MessageType) msg;
-        MessageType responseMsg = null;
+        MessageType responseMsg;
         switch (receiveMsg.getId())
         {
             case "99":
@@ -95,7 +94,7 @@ public class ServerController extends AbstractServer
 
             case "1002":
                 // Client wants to log out
-                handleLogoutRequest((List<String>) receiveMsg.data, client);
+                handleLogoutRequest((List<String>) receiveMsg.data);
                 responseMsg = new MessageType("2002", null);
                 break;
 
@@ -108,7 +107,7 @@ public class ServerController extends AbstractServer
                     // Getting the history file of the subscriber by his id
                     List<String[]> historyList = dbController.getHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0));
                     // Document sign up on subscriber card
-                    List<String[]> newHistoryList = documantaionController.documentOnReaderCard("104", historyList, null, null);
+                    List<String[]> newHistoryList = documentationController.documentOnReaderCard("104", historyList, null, null);
                     // Updating a subscriber history file in DB
                     dbController.handleUpdateHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0), newHistoryList);
                 }
@@ -139,7 +138,7 @@ public class ServerController extends AbstractServer
                     String futureDateString = ((List<String>) receiveMsg.getData()).get(2);
 
                     // Document book borrow on subscriber card
-                    List<String[]> newHistoryList = documantaionController.documentOnReaderCard("107", historyList, book.getTitle(), futureDateString);
+                    List<String[]> newHistoryList = documentationController.documentOnReaderCard("107", historyList, book.getTitle(), futureDateString);
 
                     // Updating a subscriber history file in DB
                     dbController.handleUpdateHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0), newHistoryList);
@@ -156,7 +155,7 @@ public class ServerController extends AbstractServer
                     // Getting the history file of the subscriber by his id
                     List<String[]> historyList = dbController.getHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0));
                     // Document book order on subscriber card
-                    List<String[]> newHistoryList = documantaionController.documentOnReaderCard("108", historyList, book.getTitle(), "");
+                    List<String[]> newHistoryList = documentationController.documentOnReaderCard("108", historyList, book.getTitle(), "");
                     // Updating a subscriber history file in DB
                     dbController.handleUpdateHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0), newHistoryList);
                 }
@@ -165,18 +164,23 @@ public class ServerController extends AbstractServer
             case "109":
                 // Request to return a borrowed book
                 responseMsg = new MessageType("209", dbController.handleReturnBorrowedBook((String) receiveMsg.data));
-                if (((List<Boolean>) responseMsg).get(0))
+
+                if (((List<Boolean>) responseMsg.getData()).get(0))
                 {
                     // Getting book name by borrow ID
                     String bookName = (dbController.getBookDetailsByBorrowId((String) receiveMsg.data)).getTitle();
+
                     // Getting subscriber ID from DB using borrow ID
-                    String subscriberID = dbController.getSubscriberIdFromBorrowId((String) receiveMsg.data);
+                    String subscriberId = dbController.getSubscriberIdFromBorrowId((String) receiveMsg.data);
+
                     // Getting a history file of subscriber
-                    List<String[]> historyList = dbController.getHistoryFileBySubscriberId(subscriberID);
+                    List<String[]> historyList = dbController.getHistoryFileBySubscriberId(subscriberId);
+
                     // Document return of a book
-                    List<String[]> newHistoryList = documantaionController.documentOnReaderCard("109", historyList, bookName, null);
+                    List<String[]> newHistoryList = documentationController.documentOnReaderCard("109", historyList, bookName, null);
+
                     // Updating a subscriber history file in DB
-                    dbController.handleUpdateHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0), newHistoryList);
+                    dbController.handleUpdateHistoryFileBySubscriberId(subscriberId, newHistoryList);
                 }
                 break;
 
@@ -194,31 +198,32 @@ public class ServerController extends AbstractServer
                 String borrowId = dataList.get(0);
                 // Getting book name by borrow ID
                 String bookName = (dbController.getBookDetailsByBorrowId(borrowId)).getTitle();
+
+                // Getting subscriber ID by borrow ID
+                String subscriberId = dbController.getSubscriberIdFromBorrowId(borrowId);
+                // Getting a history file of subscriber
+                List<String[]> historyList = dbController.getHistoryFileBySubscriberId(subscriberId);
+
                 if ((boolean) responseMsg.getData())
                 {
-                    // Getting subscriber ID by borrow ID
-                    String subscriberID = dbController.getSubscriberIdFromBorrowId(borrowId);
-                    // Getting a history file of subscriber
-                    List<String[]> historyList = dbController.getHistoryFileBySubscriberId(subscriberID);
                     // Document extend granted
-                    List<String[]> newHistoryList = documantaionController.documentOnReaderCard("111-1", historyList, bookName, ((List<String>) receiveMsg.getData()).get(1));
+                    List<String[]> newHistoryList = documentationController.documentOnReaderCard("111-1", historyList, bookName, ((List<String>) receiveMsg.getData()).get(1));
                     // Updating a subscriber history file in DB
-                    dbController.handleUpdateHistoryFileBySubscriberId(subscriberID, newHistoryList);
+                    dbController.handleUpdateHistoryFileBySubscriberId(subscriberId, newHistoryList);
                 }
                 else
                 {
-                    // Getting subscriber ID by borrow ID
-                    String subscriberID = dbController.getSubscriberIdFromBorrowId(borrowId);
-                    // Getting history file of subscriber
-                    List<String[]> historyList = dbController.getHistoryFileBySubscriberId(subscriberID);
-                    // Updating subscriber history file 
-                    List<String[]> newHistoryList = documantaionController.documentOnReaderCard("111-2", historyList, bookName, null);
-                    // Updating subscriber history file in DB
-                    dbController.handleUpdateHistoryFileBySubscriberId(subscriberID, newHistoryList);
+                    // Updating a subscriber history file
+                    List<String[]> newHistoryList = documentationController.documentOnReaderCard("111-2", historyList, bookName, null);
+                    // Updating a subscriber history file in DB
+                    dbController.handleUpdateHistoryFileBySubscriberId(subscriberId, newHistoryList);
                 }
 
+                // get subscriber name by id
+                String subscriberName = dbController.GetSubscriberNameById(subscriberId);
+
                 // send notification to the librarian
-                //ToDo:
+                HandleSendExtensionNotificationToLibrarian("Subscriber " + subscriberName + " requested to extend borrow of book " + bookName);
                 break;
 
             case "112":
@@ -229,32 +234,34 @@ public class ServerController extends AbstractServer
             case "113":
                 // Request to update subscriber email and phone number
                 responseMsg = new MessageType("213", dbController.handleUpdateSubscriberDetails((Subscriber) receiveMsg.data));
+
+
                 if ((boolean) responseMsg.getData())
                 {
                     Subscriber subscriber = dbController.getSubscriberBySubscriberId(((Subscriber) receiveMsg.data).getId());
-                    // Getting history file of subscriber
-                    List<String[]> historyList = dbController.getHistoryFileBySubscriberId(subscriber.getId());
+                    // Getting a history file of subscriber
+                    historyList = dbController.getHistoryFileBySubscriberId(subscriber.getId());
                     // Setting the new list to the old list in-case there will be no changes
                     List<String[]> newHistoryList = historyList;
                     // Case for phone number and mail change
-                    if (subscriber.getEmail() != ((Subscriber) receiveMsg.data).getEmail() && subscriber.getPhone() != ((Subscriber) receiveMsg.data).getPhone())
+                    if (!Objects.equals(subscriber.getEmail(), ((Subscriber) receiveMsg.data).getEmail()) && !Objects.equals(subscriber.getPhone(), ((Subscriber) receiveMsg.data).getPhone()))
                     {
                         // Document phone number and mail change
-                        newHistoryList = documantaionController.documentOnReaderCard("113-3", historyList, ((Subscriber) receiveMsg.data).getPhone(), ((Subscriber) receiveMsg.data).getEmail());
+                        newHistoryList = documentationController.documentOnReaderCard("113-3", historyList, ((Subscriber) receiveMsg.data).getPhone(), ((Subscriber) receiveMsg.data).getEmail());
                     }
                     // Case for only mail change
-                    else if (subscriber.getEmail() != ((Subscriber) receiveMsg.data).getEmail())
+                    else if (!Objects.equals(subscriber.getEmail(), ((Subscriber) receiveMsg.data).getEmail()))
                     {
                         // Document mail change
-                        newHistoryList = documantaionController.documentOnReaderCard("113-2", historyList, ((Subscriber) receiveMsg.data).getEmail(), null);
+                        newHistoryList = documentationController.documentOnReaderCard("113-2", historyList, ((Subscriber) receiveMsg.data).getEmail(), null);
                     }
                     // Case for only phone number change
-                    else if (subscriber.getPhone() != ((Subscriber) receiveMsg.data).getPhone())
+                    else if (!Objects.equals(subscriber.getPhone(), ((Subscriber) receiveMsg.data).getPhone()))
                     {
                         // Document phone number change
-                        newHistoryList = documantaionController.documentOnReaderCard("113-1", historyList, ((Subscriber) receiveMsg.data).getPhone(), null);
+                        newHistoryList = documentationController.documentOnReaderCard("113-1", historyList, ((Subscriber) receiveMsg.data).getPhone(), null);
                     }
-                    // Updating subscriber history file in DB
+                    // Updating a subscriber history file in DB
                     dbController.handleUpdateHistoryFileBySubscriberId(subscriber.getId(), newHistoryList);
                 }
                 break;
@@ -265,10 +272,10 @@ public class ServerController extends AbstractServer
                 if ((boolean) responseMsg.getData())
                 {
                     // Getting the history file of the subscriber by his id
-                    List<String[]> historyList = dbController.getHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0));
+                    historyList = dbController.getHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0));
                     // Document updated password
-                    List<String[]> newHistoryList = documantaionController.documentOnReaderCard("114", historyList, null, null);
-                    // Updating subscriber history file in DB
+                    List<String[]> newHistoryList = documentationController.documentOnReaderCard("114", historyList, null, null);
+                    // Updating a subscriber history file in DB
                     dbController.handleUpdateHistoryFileBySubscriberId(((List<String>) receiveMsg.getData()).get(0), newHistoryList);
                 }
                 break;
@@ -290,15 +297,15 @@ public class ServerController extends AbstractServer
                 if ((boolean) responseMsg.getData())
                 {
                     // Getting subscriber ID using borrow ID
-                    String subscriberID = dbController.getSubscriberIdFromBorrowId(((List<String>) receiveMsg.getData()).get(0));
+                    subscriberId = dbController.getSubscriberIdFromBorrowId(((List<String>) receiveMsg.getData()).get(0));
                     // Getting book name by borrow ID
-                    String bookname = (dbController.getBookDetailsByBorrowId((String) receiveMsg.data)).getTitle();
-                    // Getting history file of subscriber
-                    List<String[]> historyList = dbController.getHistoryFileBySubscriberId(subscriberID);
+                    bookName = (dbController.getBookDetailsByBorrowId(((List<String>) receiveMsg.data).get(0)).getTitle());
+                    // Getting a history file of subscriber
+                    historyList = dbController.getHistoryFileBySubscriberId(subscriberId);
                     // Document manual extension
-                    List<String[]> newHistoryList = documantaionController.documentOnReaderCard("117", historyList, bookname, null);
-                    // Updating subscriber history file in DB
-                    dbController.handleUpdateHistoryFileBySubscriberId(subscriberID, newHistoryList);
+                    List<String[]> newHistoryList = documentationController.documentOnReaderCard("117", historyList, bookName, null);
+                    // Updating a subscriber history file in DB
+                    dbController.handleUpdateHistoryFileBySubscriberId(subscriberId, newHistoryList);
                 }
                 break;
 
@@ -372,7 +379,6 @@ public class ServerController extends AbstractServer
         }
         catch (Exception e)
         {
-            System.out.println(e.toString());
             System.out.println("Error sending message to client");
         }
     }
@@ -386,7 +392,7 @@ public class ServerController extends AbstractServer
         System.out.println("Server listening for connections on port " + getPort());
 
         // get connection to the db
-        this.dbController = DbController.getInstance();
+        dbController = DbController.getInstance();
 
         // start the schedulers
         //ToDo: remove comment to run the schedulers
@@ -467,9 +473,8 @@ public class ServerController extends AbstractServer
      * This method handles the received "1002" message and updates the active subscribers/librarians list
      *
      * @param receiveMsg - received message from the client
-     * @param client     - the client connection
      */
-    private void handleLogoutRequest(List<String> receiveMsg, ConnectionToClient client)
+    private void handleLogoutRequest(List<String> receiveMsg)
     {
         switch (receiveMsg.get(0))
         {
@@ -494,7 +499,7 @@ public class ServerController extends AbstractServer
      */
     private MessageType handleBookSearchRequest(MessageType receiveMsg)
     {
-        MessageType responseMsg = null;
+        MessageType responseMsg;
         List<String> data = (List<String>) receiveMsg.data;
 
         switch (data.get(0))
@@ -522,17 +527,18 @@ public class ServerController extends AbstractServer
 
     /**
      * The method handle to send sms to subscriber
-     * @param subscriberID - the subscriber id
-     * @param message - the message to send
+     *
+     * @param subscriberId - the subscriber id
+     * @param message      - the message to send
      */
-    public static void HandleSendSmsToSubscriber(String subscriberID, String message)
+    public static void HandleSendSmsToSubscriber(String subscriberId, String message)
     {
         // check if the subscriber is connected
-        if (activeSubscribers.containsKey(subscriberID))
+        if (activeSubscribers.containsKey(subscriberId))
         {
             try
             {
-                activeSubscribers.get(subscriberID).sendToClient(new MessageType("222", message));
+                activeSubscribers.get(subscriberId).sendToClient(new MessageType("222", message));
             }
             catch (IOException e)
             {
@@ -542,8 +548,31 @@ public class ServerController extends AbstractServer
         else
         {
             // add the subscriber message to the table in the DB
-            dbController.handleSaveSubscriberMissedSms(subscriberID, message);
+            dbController.handleSaveSubscriberMissedSms(subscriberId, message);
         }
+    }
+
+    private void HandleSendExtensionNotificationToLibrarian(String message)
+    {
+        System.out.println("Message to send to librarian: " + message);
+        // check if there is a connected librarian
+        if (!activeLibrarians.isEmpty())
+        {
+            for (ConnectionToClient librarian : activeLibrarians.values())
+            {
+                try
+                {
+                    librarian.sendToClient(new MessageType("2111", message));
+                }
+                catch (IOException e)
+                {
+                    System.out.println("Error sending message to librarian");
+                }
+            }
+        }
+
+        // save the message in the DB
+        dbController.handleSaveLibrarianMessage(message);
     }
 
 }

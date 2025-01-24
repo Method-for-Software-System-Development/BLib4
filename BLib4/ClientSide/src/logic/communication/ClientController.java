@@ -70,7 +70,6 @@ public class ClientController implements ChatIF
      */
     public void accept(MessageType str)
     {
-        System.out.println("ClientController: accept");
         client.handleMessageFromClientUI(str);
     }
 

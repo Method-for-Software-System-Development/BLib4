@@ -158,12 +158,10 @@ public class ChatClient extends AbstractClient
             case "212":
                 // Convert List<String[]> to ArrayList<ArrayList<String>> with reordered indices
                 List<String[]> rawData = (List<String[]>) receiveMsg.getData();
-                System.out.println("Raw data: " + rawData);
                 listOfActivities = new ArrayList<>();
 
                 for (String[] array : rawData) {
                     // Create a new ArrayList and reorder elements
-                    System.out.println("Array: " + array);
                     ArrayList<String> activity = new ArrayList<>();
                     activity.add(array[2]); // Move index 2 to position 0
                     activity.add(array[1]); // Move index 1 to position 1
@@ -171,7 +169,6 @@ public class ChatClient extends AbstractClient
                     // Add the reordered activity to the list
                     listOfActivities.add(activity);
                 }
-                System.out.println("List of activities: " + listOfActivities);
                 break;
 
             case "213":

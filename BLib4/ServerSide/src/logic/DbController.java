@@ -3,6 +3,8 @@ package logic;
 import java.io.IOException;
 import java.sql.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -219,7 +221,7 @@ public class DbController
             byte[] blob = BlobUtil.convertListToBlob(emptyHistory);
             stmt = connection.prepareStatement("UPDATE subsribers_history SET history_file = ? WHERE id = ?;");
             stmt.setBytes(1, blob);
-            stmt.setInt(2,historyId);
+            stmt.setInt(2, historyId);
             stmt.executeUpdate();
 
             //create a new row in the subscriber table
@@ -245,7 +247,7 @@ public class DbController
         }
         catch (IOException e)
         {
-            System.out.println("Error! cant creaste empty history file");
+            System.out.println("Error! cant create empty history file");
             return false;
         }
 
@@ -865,9 +867,16 @@ public class DbController
             // return the borrowed book, update the copy of the book to be available + update the borrow to be inactive
             try
             {
+                // get the copy id of the borrow
+                stmt = connection.prepareStatement("SELECT copy_id from borrow_book WHERE borrow_id = ?;");
+                stmt.setString(1, borrowId);
+                ResultSet rs = stmt.executeQuery();
+                rs.next();
+                String copyId = rs.getString(1);
+
                 // update the copy of the book to be available
                 stmt = connection.prepareStatement("UPDATE copy_of_the_book SET is_available = true WHERE copy_id = ?;");
-                stmt.setString(1, borrowId);
+                stmt.setString(1, copyId);
                 stmt.executeUpdate();
 
                 // update the borrow to be inactive
@@ -878,7 +887,7 @@ public class DbController
                 // check the due date of the borrow
                 stmt = connection.prepareStatement("SELECT borrow_due_date from borrow_book WHERE borrow_id = ?;");
                 stmt.setString(1, borrowId);
-                ResultSet rs = stmt.executeQuery();
+                rs = stmt.executeQuery();
                 rs.next();
                 Date dueDate = rs.getDate(1);
 
@@ -916,7 +925,6 @@ public class DbController
                 }
                 else
                 {
-                    System.out.println("The borrow is not late by a week or more");
                     // borrow return succeeded
                     returnValue.add(true);
                     returnValue.add(false);
@@ -943,7 +951,7 @@ public class DbController
                 String bookId = rs.getString(1);
 
                 // check if there are orders for the book and get the oldest order
-                stmt = connection.prepareStatement("SELECT * from subscriber_order WHERE book_id = ? AND is_active = true AND is_his_turn = false ORDER BY order_date ASC LIMIT 1;");
+                stmt = connection.prepareStatement("SELECT * from subscriber_order WHERE book_id = ? AND is_active = true AND is_his_turn = false ORDER BY order_date LIMIT 1;");
                 stmt.setString(1, bookId);
                 rs = stmt.executeQuery();
 
@@ -1146,6 +1154,7 @@ public class DbController
 
     /**
      * The method run SQL query to check if the subscriber exists in the db
+     *
      * @param subscriberId - the id of the subscriber to check
      * @return - true if the subscriber exists, else false
      */
@@ -1426,10 +1435,10 @@ public class DbController
      */
     public Map<String, Subscriber> handleDeleteUnfulfilledOrder()
     {
-        PreparedStatement selectBookStmt = null;
-        PreparedStatement updateStmt = null;
-        PreparedStatement getLastWaitingSubscriberStmt = null;
-        ResultSet bookResultSet = null;
+        PreparedStatement selectBookStmt;
+        PreparedStatement updateStmt;
+        PreparedStatement getLastWaitingSubscriberStmt;
+        ResultSet bookResultSet;
         Map<String, Subscriber> bookToSubscriberMap = new HashMap<>();
 
         try
@@ -1522,9 +1531,9 @@ public class DbController
      */
     public void handleOneMonthFromFreezeDate()
     {
-        PreparedStatement selectStmt = null;
-        PreparedStatement updateSubscriberStmt = null;
-        ResultSet rs = null;
+        PreparedStatement selectStmt;
+        PreparedStatement updateSubscriberStmt;
+        ResultSet rs;
 
         try
         {
@@ -1579,8 +1588,8 @@ public class DbController
     public String fetchSubscriberName(String subscriberID)
     {
         String subscriberName = null;
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
+        PreparedStatement stmt;
+        ResultSet rs;
 
         try
         {
@@ -1611,8 +1620,8 @@ public class DbController
     public Map<String, String> fetchOrderDetails(String subscriberID)
     {
         Map<String, String> details = new HashMap<>();
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
+        PreparedStatement stmt;
+        ResultSet rs;
 
         try
         {
@@ -1650,8 +1659,8 @@ public class DbController
      */
     public List<String[]> HandleGetHistoryFileById(String history_id)
     {
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
+        PreparedStatement stmt;
+        ResultSet rs;
         byte[] blob = null;
         try
         {
@@ -1681,7 +1690,7 @@ public class DbController
      */
     public boolean handleUpdateHistoryFileById(String history_id, List<String[]> list) throws IOException
     {
-        PreparedStatement stmt = null;
+        PreparedStatement stmt;
         byte[] blob = BlobUtil.convertListToBlob(list);
         try
         {
@@ -1708,8 +1717,7 @@ public class DbController
      */
     public List<String[]> getHistoryFileBySubscriberId(String subscriberId)
     {
-        List<String[]> historyList = null;
-        PreparedStatement stmt = null;
+        List<String[]> historyList;
 
         String historyId = getHistoryIdBySubscriberId(subscriberId);
         historyList = HandleGetHistoryFileById(historyId);
@@ -1725,7 +1733,7 @@ public class DbController
      */
     public void handleUpdateHistoryFileBySubscriberId(String subscriberId, List<String[]> list)
     {
-        PreparedStatement stmt = null;
+        PreparedStatement stmt;
 
         try
         {
@@ -1755,8 +1763,8 @@ public class DbController
      */
     private String getHistoryIdBySubscriberId(String subscriberId)
     {
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
+        PreparedStatement stmt;
+        ResultSet rs;
         String historyId = null;
         try
         {
@@ -1784,8 +1792,8 @@ public class DbController
      */
     public Book getBookByBookId(String bookId)
     {
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
+        PreparedStatement stmt;
+        ResultSet rs;
         Book book = null;
 
         try
@@ -1817,8 +1825,8 @@ public class DbController
      */
     public Book getBookByCopyId(String copyId)
     {
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
+        PreparedStatement stmt;
+        ResultSet rs;
         Book book = null;
 
         try
@@ -1848,8 +1856,8 @@ public class DbController
      */
     public String getSubscriberIdFromBorrowId(String borrowId)
     {
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
+        PreparedStatement stmt;
+        ResultSet rs;
         String subscriberId = null;
 
         try
@@ -1879,8 +1887,8 @@ public class DbController
      */
     public Date getBorrowDueDateByBorrowId(String borrowId)
     {
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
+        PreparedStatement stmt;
+        ResultSet rs;
         Date dueDate = null;
 
         try
@@ -1910,8 +1918,8 @@ public class DbController
      */
     public Subscriber getSubscriberBySubscriberId(String subscriberId)
     {
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
+        PreparedStatement stmt;
+        ResultSet rs;
         Subscriber subscriber = null;
 
         try
@@ -1943,8 +1951,8 @@ public class DbController
      */
     public Book getBookDetailsByBorrowId(String borrowId)
     {
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
+        PreparedStatement stmt;
+        ResultSet rs;
         Book book = null;
 
         try
@@ -1981,11 +1989,11 @@ public class DbController
     public List<String> handleGetBookLocation(String bookId)
     {
         List<String> returnValue = new ArrayList<>();
-        PreparedStatement stmt = null;
+        PreparedStatement stmt;
         boolean inLibrary = true;
-        int ordered = 0;
+        int ordered;
 
-        // check if there is copy of the book available in the library
+        // check if there is a copy of the book available in the library
         try
         {
             // count the number of copies of the book in the library that available to borrow
@@ -2099,8 +2107,8 @@ public class DbController
      */
     public boolean handleCheckIfBookIsAvailableForOrder(String bookId)
     {
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
+        PreparedStatement stmt;
+        ResultSet rs;
         boolean returnValue = false;
         int ordered = 0;
 
@@ -2123,16 +2131,9 @@ public class DbController
                 if (rs.next())
                 {
                     ordered = rs.getInt(1);
-                    if (copies - ordered > 0)
-                    {
-                        // there is a copy available to borrow, we cant order the book
-                        returnValue = true;
-                    }
-                    else
-                    {
-                        // there is no copy available to borrow, we can order the book
-                        returnValue = false;
-                    }
+
+                    // there is no copy available to borrow, we can order the book
+                    returnValue = copies - ordered > 0;
                 }
             }
         }
@@ -2297,7 +2298,7 @@ public class DbController
      */
     public Map<String, String> fetchTotalBorrowTime()
     {
-    	String query = "SELECT b.book_title,\n" +
+        String query = "SELECT b.book_title,\n" +
                 "       SUM(\n" +
                 "               CASE\n" +
                 "                   WHEN bb.borrow_return_date IS NOT NULL AND MONTH(bb.borrow_date) <> MONTH(CURRENT_DATE)\n" +
@@ -2349,7 +2350,7 @@ public class DbController
      */
     public Map<String, String> fetchLateBorrowTime()
     {
-    	String query = "SELECT b.book_title,\n" +
+        String query = "SELECT b.book_title,\n" +
                 "       SUM(\n" +
                 "               CASE\n" +
                 "                   -- Case 1: Book borrowed in the previous month and returned late in the current month\n" +
@@ -2402,8 +2403,7 @@ public class DbController
         }
         catch (SQLException e)
         {
-            System.out.println("Error executing the query: " + e.getMessage());
-            e.printStackTrace();
+            System.out.println("Error! fetch late borrow time failed");
         }
         return lateBorrowTimeMap;
     }
@@ -2434,8 +2434,7 @@ public class DbController
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to save the monthly report");
+            System.out.println("Error! save monthly report failed");
         }
     }
 
@@ -2478,8 +2477,7 @@ public class DbController
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to insert empty monthly report.");
+            System.out.println("Error! insert empty monthly report failed");
         }
     }
 
@@ -2512,8 +2510,7 @@ public class DbController
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to fetch report ID");
+            System.out.println("Error! fetch report ID failed");
         }
         return -1; // Return -1 if no report is found
     }
@@ -2547,8 +2544,7 @@ public class DbController
         }
         catch (SQLException e)
         {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to fetch report Blob");
+            System.out.println("Error! fetch report blob failed");
         }
         return null; // Return null if no report is found or an error occurs
     }
@@ -2574,7 +2570,17 @@ public class DbController
             {
                 List<String> message = new ArrayList<>();
                 message.add(rs.getString("notification_id"));
-                message.add(rs.getString("notification_date"));
+
+                String dateTime = rs.getString("notification_date");
+                // Utility method to format dates
+                try {
+                    LocalDateTime localDateTime = LocalDateTime.parse(dateTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                    dateTime = localDateTime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
+                } catch (Exception e) {
+                    // Do nothing
+                }
+                message.add(dateTime);
+
                 message.add(rs.getString("notification_text"));
                 returnList.add(message);
             }
@@ -2583,7 +2589,6 @@ public class DbController
         {
             System.out.println("Error! get unread librarian messages failed");
         }
-
 
         return returnList;
     }
@@ -2680,5 +2685,63 @@ public class DbController
         }
     }
 
+    /**
+     * The method run SQL query to save the librarian message in DB
+     *
+     * @param message - the message of the librarian
+     */
+    public void handleSaveLibrarianMessage(String message)
+    {
+        PreparedStatement stmt;
+
+        try
+        {
+            // get the latest notification id
+            stmt = connection.prepareStatement("SELECT MAX(notification_id) FROM notification;");
+            ResultSet rs = stmt.executeQuery();
+            rs.next();
+            int notificationId = rs.getInt(1) + 1;
+
+            stmt = connection.prepareStatement("INSERT INTO notification (notification_id, notification_type, user_id, notification_date, notification_text, is_confirmed) VALUES (? ,'Librarian',0, NOW(), ?, 0);");
+            stmt.setInt(1, notificationId);
+            stmt.setString(2, message);
+            stmt.executeUpdate();
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! save librarian message failed");
+        }
+    }
+
+    /**
+     * The method run SQL query to get the subscriber name by his id
+     *
+     * @param subscriberId - the id of the subscriber to get his name
+     * @return - the full name of the subscriber
+     */
+    public String GetSubscriberNameById(String subscriberId)
+    {
+        PreparedStatement stmt;
+        ResultSet rs;
+        String subscriberName = null;
+
+        try
+        {
+            String query = "SELECT subscriber_first_name, subscriber_last_name FROM subscriber WHERE subscriber_id = ?";
+            stmt = connection.prepareStatement(query);
+            stmt.setString(1, subscriberId);
+            rs = stmt.executeQuery();
+            if (rs.next())
+            {
+                subscriberName = rs.getString("subscriber_first_name") + " " + rs.getString("subscriber_last_name");
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! get subscriber name by id failed");
+        }
+
+        return subscriberName;
+    }
 }
 
