@@ -28,7 +28,8 @@ import java.util.List;
  * This class is responsible for handling user interactions on the search page,
  * including scanning a reader card, login functionality, and searching for books by various parameters.
  */
-public class ViewOrderBook_Controller implements DataReceiver {
+public class ViewOrderBook_Controller implements DataReceiver
+{
 
     // FXML fields for seeIfNotLoggedIn
     @FXML
@@ -136,8 +137,10 @@ public class ViewOrderBook_Controller implements DataReceiver {
     private boolean canOrder;
 
     @Override
-    public void receiveData(Object data) {
-        if (data instanceof Book) {
+    public void receiveData(Object data)
+    {
+        if (data instanceof Book)
+        {
             this.book = (Book) data;
             showBookDetails(book);
         }
@@ -149,7 +152,8 @@ public class ViewOrderBook_Controller implements DataReceiver {
      * and adjusts the UI accordingly.
      */
     @FXML
-    public void initialize() {
+    public void initialize()
+    {
         // Get the singleton instance of Subscriber_Controller
         subscriberController = Subscriber_Controller.getInstance();
         // Get the singleton instance of BooksController
@@ -160,7 +164,8 @@ public class ViewOrderBook_Controller implements DataReceiver {
         isLibrarianLoggedIn = subscriberController.getLoggedLibrarian() != null;
 
         // Show the appropriate VBox based on login status
-        if (isSubscriberLoggedIn) {
+        if (isSubscriberLoggedIn)
+        {
             seeIfNotLoggedIn.setVisible(false);
             seeIfNotLoggedIn.setManaged(false);
             seeIfLoggedIn.setVisible(true);
@@ -168,7 +173,9 @@ public class ViewOrderBook_Controller implements DataReceiver {
             seeIfLibrarianLoggedIn.setVisible(false);
             seeIfLibrarianLoggedIn.setManaged(false);
             userGreeting.setText(getGreetingMessage() + " " + subscriberController.getLoggedSubscriber().getFirstName() + " !");
-        } else if (isLibrarianLoggedIn) {
+        }
+        else if (isLibrarianLoggedIn)
+        {
             seeIfNotLoggedIn.setVisible(false);
             seeIfNotLoggedIn.setManaged(false);
             seeIfLoggedIn.setVisible(false);
@@ -176,7 +183,9 @@ public class ViewOrderBook_Controller implements DataReceiver {
             seeIfLibrarianLoggedIn.setVisible(true);
             seeIfLibrarianLoggedIn.setManaged(true);
             userGreeting2.setText(getGreetingMessage() + " " + subscriberController.getLoggedLibrarian().getName() + " !");
-        } else {
+        }
+        else
+        {
             seeIfNotLoggedIn.setVisible(true);
             seeIfNotLoggedIn.setManaged(true);
             seeIfLoggedIn.setVisible(false);
@@ -192,115 +201,147 @@ public class ViewOrderBook_Controller implements DataReceiver {
         subscriberRadioButton.setSelected(true);
 
         // Set up hover effects for buttons
-        scanReaderCardButton.setOnMouseEntered(event -> {
+        scanReaderCardButton.setOnMouseEntered(event ->
+        {
             scanReaderCardImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/qr_code_scanner_24dp_525FE1.png")));
         });
-        scanReaderCardButton.setOnMouseExited(event -> {
+        scanReaderCardButton.setOnMouseExited(event ->
+        {
             scanReaderCardImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/qr_code_scanner_24dp_FFFFFF.png")));
         });
 
-        loginButton.setOnMouseEntered(event -> {
+        loginButton.setOnMouseEntered(event ->
+        {
             loginImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/login_24dp_F86F03.png")));
         });
-        loginButton.setOnMouseExited(event -> {
+        loginButton.setOnMouseExited(event ->
+        {
             loginImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/login_24dp_FFFFFF.png")));
         });
 
-        searchBooksButton.setOnMouseEntered(event -> {
+        searchBooksButton.setOnMouseEntered(event ->
+        {
             searchBooksImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/search_24dp_525FE1.png")));
         });
-        searchBooksButton.setOnMouseExited(event -> {
+        searchBooksButton.setOnMouseExited(event ->
+        {
             searchBooksImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/search_24dp_FFFFFF.png")));
         });
 
-        dashboardButton.setOnMouseEntered(event -> {
+        dashboardButton.setOnMouseEntered(event ->
+        {
             dashboardImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/person_24dp_F86F03.png")));
         });
-        dashboardButton.setOnMouseExited(event -> {
+        dashboardButton.setOnMouseExited(event ->
+        {
             dashboardImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/person_24dp_FFFFFF.png")));
         });
 
-        searchBooksButton2.setOnMouseEntered(event -> {
+        searchBooksButton2.setOnMouseEntered(event ->
+        {
             searchBooksImageView2.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/search_24dp_525FE1.png")));
         });
-        searchBooksButton2.setOnMouseExited(event -> {
+        searchBooksButton2.setOnMouseExited(event ->
+        {
             searchBooksImageView2.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/search_24dp_FFFFFF.png")));
         });
 
-        viewHistoryButton.setOnMouseEntered(event -> {
+        viewHistoryButton.setOnMouseEntered(event ->
+        {
             viewHistoryImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/history_24dp_525FE1.png")));
         });
-        viewHistoryButton.setOnMouseExited(event -> {
+        viewHistoryButton.setOnMouseExited(event ->
+        {
             viewHistoryImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/history_24dp_FFFFFF.png")));
         });
 
-        editProfileButton.setOnMouseEntered(event -> {
+        editProfileButton.setOnMouseEntered(event ->
+        {
             editProfileImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/edit_24dp_525FE1.png")));
         });
-        editProfileButton.setOnMouseExited(event -> {
+        editProfileButton.setOnMouseExited(event ->
+        {
             editProfileImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/edit_24dp_FFFFFF.png")));
         });
 
-        logoutButton.setOnMouseEntered(event -> {
+        logoutButton.setOnMouseEntered(event ->
+        {
             logoutImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/logout_24dp_525FE1.png")));
         });
-        logoutButton.setOnMouseExited(event -> {
+        logoutButton.setOnMouseExited(event ->
+        {
             logoutImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/logout_24dp_FFFFFF.png")));
         });
 
-        librarianDashButton.setOnMouseEntered(event -> {
+        librarianDashButton.setOnMouseEntered(event ->
+        {
             librarianDashImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/local_library_24dp_F86F03.png")));
         });
-        librarianDashButton.setOnMouseExited(event -> {
+        librarianDashButton.setOnMouseExited(event ->
+        {
             librarianDashImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/local_library_24dp_FFFFFF.png")));
         });
 
-        searchBooksButton3.setOnMouseEntered(event -> {
+        searchBooksButton3.setOnMouseEntered(event ->
+        {
             searchBooksImageView3.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/search_24dp_525FE1.png")));
         });
-        searchBooksButton3.setOnMouseExited(event -> {
+        searchBooksButton3.setOnMouseExited(event ->
+        {
             searchBooksImageView3.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/search_24dp_FFFFFF.png")));
         });
 
-        newBorrowButton.setOnMouseEntered(event -> {
+        newBorrowButton.setOnMouseEntered(event ->
+        {
             newBorrowImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/post_add_24dp_525FE1.png")));
         });
-        newBorrowButton.setOnMouseExited(event -> {
+        newBorrowButton.setOnMouseExited(event ->
+        {
             newBorrowImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/post_add_24dp_FFFFFF.png")));
         });
 
-        addSubscriberButton.setOnMouseEntered(event -> {
+        addSubscriberButton.setOnMouseEntered(event ->
+        {
             addSubscriberImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/person_add_24dp_525FE1.png")));
         });
-        addSubscriberButton.setOnMouseExited(event -> {
+        addSubscriberButton.setOnMouseExited(event ->
+        {
             addSubscriberImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/person_add_24dp_FFFFFF.png")));
         });
 
-        reportsButton.setOnMouseEntered(event -> {
+        reportsButton.setOnMouseEntered(event ->
+        {
             reportsImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/bar_chart_24dp_525FE1.png")));
         });
-        reportsButton.setOnMouseExited(event -> {
+        reportsButton.setOnMouseExited(event ->
+        {
             reportsImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/bar_chart_24dp_FFFFFF.png")));
         });
 
-        logoutButton2.setOnMouseEntered(event -> {
+        logoutButton2.setOnMouseEntered(event ->
+        {
             logoutImageView2.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/logout_24dp_525FE1.png")));
         });
-        logoutButton2.setOnMouseExited(event -> {
+        logoutButton2.setOnMouseExited(event ->
+        {
             logoutImageView2.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/logout_24dp_FFFFFF.png")));
         });
 
-        homePageButton.setOnMouseEntered(event -> {
+        homePageButton.setOnMouseEntered(event ->
+        {
             homePageImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/home_24dp_525FE1.png")));
         });
-        homePageButton.setOnMouseExited(event -> {
+        homePageButton.setOnMouseExited(event ->
+        {
             homePageImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/home_24dp_FFFFFF.png")));
         });
 
-        exitButton.setOnMouseEntered(event -> {
+        exitButton.setOnMouseEntered(event ->
+        {
             exitImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/close_24dp_525FE1.png")));
         });
-        exitButton.setOnMouseExited(event -> {
+        exitButton.setOnMouseExited(event ->
+        {
             exitImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/close_24dp_FFFFFF.png")));
         });
     }
@@ -310,21 +351,30 @@ public class ViewOrderBook_Controller implements DataReceiver {
      *
      * @return the greeting message
      */
-    private String getGreetingMessage() {
+    private String getGreetingMessage()
+    {
         int hour = java.time.LocalTime.now().getHour();
 
-        if (hour >= 5 && hour < 12) {
+        if (hour >= 5 && hour < 12)
+        {
             return "Good Morning";
-        } else if (hour >= 12 && hour < 17) {
+        }
+        else if (hour >= 12 && hour < 17)
+        {
             return "Good Afternoon";
-        } else if (hour >= 17 && hour < 21) {
+        }
+        else if (hour >= 17 && hour < 21)
+        {
             return "Good Evening";
-        } else {
+        }
+        else
+        {
             return "Good Night";
         }
     }
 
-    private void showBookDetails(Book book) {
+    private void showBookDetails(Book book)
+    {
         GridPane bookGrid = new GridPane();
         bookGrid.getStyleClass().add("bookContainer"); // CSS class for book container
         bookGrid.setHgap(20); // Horizontal gap between elements
@@ -337,7 +387,8 @@ public class ViewOrderBook_Controller implements DataReceiver {
         HBox.setHgrow(bookGrid, Priority.ALWAYS);
 
         // Check if the book has an image
-        if (book.getImage() != null) {
+        if (book.getImage() != null)
+        {
             // Create ImageView for the book cover
             ImageView bookImageView = new ImageView(book.getImage());
             bookImageView.setFitHeight(480);
@@ -353,7 +404,9 @@ public class ViewOrderBook_Controller implements DataReceiver {
             GridPane.setRowSpan(bookImageView, 6);
             bookGrid.getChildren().add(bookImageView);
 
-        } else {
+        }
+        else
+        {
             // Create a placeholder rectangle styled with CSS
             Rectangle placeholder = new Rectangle(348, 480);
             placeholder.setArcWidth(15);
@@ -455,7 +508,8 @@ public class ViewOrderBook_Controller implements DataReceiver {
         ClientUI.chat.accept(new MessageType("124", String.valueOf(book.getBookId())));
         canOrder = ChatClient.serverResponse;
 
-        if (canOrder && isSubscriberLoggedIn) { // only users can order books
+        if (canOrder && isSubscriberLoggedIn)
+        { // only users can order books
             // Create a spacer to push the order button to the right
             Region orderButtonSpacer = new Region();
             HBox.setHgrow(orderButtonSpacer, Priority.ALWAYS);
@@ -466,18 +520,31 @@ public class ViewOrderBook_Controller implements DataReceiver {
             openOrderButton.setPrefWidth(150.0);
             availabilityHBox.getChildren().addAll(orderButtonSpacer, openOrderButton);
 
-            openOrderButton.setOnAction(event -> {
-                if (isSubscriberLoggedIn) {
+            openOrderButton.setOnAction(event ->
+            {
+                if (isSubscriberLoggedIn)
+                {
                     int result = booksController.addToWaitlist(String.valueOf(book.getBookId()), subscriberController.getLoggedSubscriber().getId());
 
-                    if (result == 1) {
-                        showInformationAlert("Order Book", "The book has been successfully ordered."); // TRUE FALSE
-                    } else if (result == 2) {
-                        showErrorAlert("Order Book", "The book cannot be ordered at this time due to a high number of reservations exceeding the number of the book copies in the library. Please try again later."); // FALSE FALSE
-                    } else if (result == 3) {
-                        showErrorAlert("Order Book", "Your account is frozen. Please contact the library staff for further information."); // FALSE TRUE
+                    if (result == 1)
+                    {
+                        showInformationAlert("Order Book", "The book has been successfully ordered."); // TRUE FALSE FALSE
                     }
-                } else {
+                    else if (result == 2)
+                    {
+                        showErrorAlert("Order Book", "The book cannot be ordered at this time due to a high number of reservations exceeding the number of the book copies in the library. Please try again later."); // FALSE FALSE FALSE
+                    }
+                    else if (result == 3)
+                    {
+                        showErrorAlert("Order Book", "The book cant be ordered, order already exists for this book."); // FALSE FALSE TRUE
+                    }
+                    else if (result == 4)
+                    {
+                        showErrorAlert("Order Book", "Your account is frozen. Please contact the library staff for further information."); // FALSE TRUE FALSE
+                    }
+                }
+                else
+                {
                     showErrorAlert("Order Book", "You must be logged in to order a book.");
                 }
             });
@@ -491,7 +558,8 @@ public class ViewOrderBook_Controller implements DataReceiver {
     }
 
     @FXML
-    private void validate_scanReaderCard_login() {
+    private void validate_scanReaderCard_login()
+    {
         // Create a custom Alert
         Alert alert = new Alert(Alert.AlertType.NONE);
         alert.initOwner(SceneManager.getStage());
@@ -514,18 +582,26 @@ public class ViewOrderBook_Controller implements DataReceiver {
         alert.getButtonTypes().addAll(confirmButton, cancelButton);
 
         // Show the Alert and wait for a response
-        alert.showAndWait().ifPresent(response -> {
-            if (response == confirmButton) {
+        alert.showAndWait().ifPresent(response ->
+        {
+            if (response == confirmButton)
+            {
                 String enteredId = inputField.getText();
                 // Check if the ID is not empty
-                if (enteredId != null && !enteredId.trim().isEmpty()) {
+                if (enteredId != null && !enteredId.trim().isEmpty())
+                {
                     Subscriber subscriber = subscriberController.attemptSubscriberLogInByCard(enteredId);
-                    if (subscriber != null) {
+                    if (subscriber != null)
+                    {
                         SceneManager.switchScene("/gui/user/subscriberUI/SubscriberUI_UI.fxml", "BLib.4 - Braude Library Management");
-                    } else {
+                    }
+                    else
+                    {
                         showErrorAlert("Login By Reader Card Failed", "The account was not found. Please scan again. If the problem persists, please contact the librarian.");
                     }
-                } else {
+                }
+                else
+                {
                     showErrorAlert("Invalid Input", "Please enter a valid User ID.");
                 }
             }
@@ -538,7 +614,8 @@ public class ViewOrderBook_Controller implements DataReceiver {
      * If the login is successful, navigates to the corresponding UI screen; otherwise, shows an error alert.
      */
     @FXML
-    public void validate_login_form() {
+    public void validate_login_form()
+    {
         idTextField.getStyleClass().remove("error-text-field");
         passwordTextField.getStyleClass().remove("error-text-field");
 
@@ -548,38 +625,51 @@ public class ViewOrderBook_Controller implements DataReceiver {
         String password = passwordTextField.getText();
         RadioButton selectedRadioButton = (RadioButton) accountTypeGroup.getSelectedToggle();
 
-        if (selectedRadioButton == null) {
+        if (selectedRadioButton == null)
+        {
             isValid = false;
         }
 
-        if (userID == null || userID.trim().isEmpty()) {
+        if (userID == null || userID.trim().isEmpty())
+        {
             idTextField.setPromptText("ID is required");
             idTextField.getStyleClass().add("error-text-field");
             isValid = false;
         }
 
-        if (password == null || password.trim().isEmpty()) {
+        if (password == null || password.trim().isEmpty())
+        {
             passwordTextField.setPromptText("Password is required");
             passwordTextField.getStyleClass().add("error-text-field");
             isValid = false;
         }
 
-        if (isValid) {
+        if (isValid)
+        {
             String accountType = selectedRadioButton.getText();
 
-            if (accountType.equals("Subscriber")) {
+            if (accountType.equals("Subscriber"))
+            {
                 Subscriber subscriber = subscriberController.attemptLoginAsSubscriber(userID, password);
-                if (subscriber != null) {
+                if (subscriber != null)
+                {
                     SceneManager.switchScene("/gui/user/subscriberUI/SubscriberUI_UI.fxml", "BLib.4 - Braude Library Management");
-                } else {
+                }
+                else
+                {
                     clearFields();
                     showErrorAlert("Login Failed", "The account was not found. Please verify that the details you entered are correct.");
                 }
-            } else if (accountType.equals("Librarian")) {
+            }
+            else if (accountType.equals("Librarian"))
+            {
                 Librarian librarian = subscriberController.attemptLoginAsLibrarian(userID, password);
-                if (librarian != null) {
+                if (librarian != null)
+                {
                     SceneManager.switchScene("/gui/librarian/librarianUI/LibrarianUI_UI.fxml", "BLib.4 - Braude Library Management");
-                } else {
+                }
+                else
+                {
                     clearFields();
                     showErrorAlert("Login Failed", "The account was not found. Please verify that the details you entered are correct.");
                 }
@@ -590,7 +680,8 @@ public class ViewOrderBook_Controller implements DataReceiver {
     /**
      * Clears the ID and Password text fields.
      */
-    private void clearFields() {
+    private void clearFields()
+    {
         idTextField.clear();
         passwordTextField.clear();
     }
@@ -601,7 +692,8 @@ public class ViewOrderBook_Controller implements DataReceiver {
      * @param title   the title of the error alert
      * @param message the message displayed in the error alert
      */
-    private void showErrorAlert(String title, String message) {
+    private void showErrorAlert(String title, String message)
+    {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(null);
@@ -610,7 +702,8 @@ public class ViewOrderBook_Controller implements DataReceiver {
         alert.showAndWait();
     }
 
-    private void showInformationAlert(String title, String message) {
+    private void showInformationAlert(String title, String message)
+    {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
         alert.setHeaderText(null);
@@ -623,15 +716,20 @@ public class ViewOrderBook_Controller implements DataReceiver {
      * Logs out the current user and navigates to the Home Page.
      */
     @FXML
-    private void logout() {
+    private void logout()
+    {
         subscriberController.attemptLogOut();
     }
 
     @FXML
-    private void goToDashboard() {
-        if (isSubscriberLoggedIn) {
+    private void goToDashboard()
+    {
+        if (isSubscriberLoggedIn)
+        {
             SceneManager.switchScene("/gui/user/subscriberUI/SubscriberUI_UI.fxml", "BLib.4 - Braude Library Management");
-        } else if (isLibrarianLoggedIn) {
+        }
+        else if (isLibrarianLoggedIn)
+        {
             SceneManager.switchScene("/gui/librarian/librarianUI/LibrarianUI_UI.fxml", "BLib.4 - Braude Library Management");
         }
     }
@@ -640,37 +738,44 @@ public class ViewOrderBook_Controller implements DataReceiver {
      * Navigates to the Search screen.
      */
     @FXML
-    private void goToSearch() {
+    private void goToSearch()
+    {
         SceneManager.switchScene("/gui/common/search/Search_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
     @FXML
-    private void goToViewHistory() {
+    private void goToViewHistory()
+    {
         SceneManager.switchScene("/gui/user/viewHistory/ViewHistory_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
     @FXML
-    private void goToEditProfile() {
+    private void goToEditProfile()
+    {
         SceneManager.switchScene("/gui/user/editProfile/EditProfile_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
     @FXML
-    private void goToLibrarianDash() {
+    private void goToLibrarianDash()
+    {
         SceneManager.switchScene("/gui/librarian/librarianUI/LibrarianUI_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
     @FXML
-    private void goToNewBorrow() {
+    private void goToNewBorrow()
+    {
         SceneManager.switchScene("/gui/librarian/newBorrow/NewBorrow_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
     @FXML
-    private void goToAddSubscriber() {
+    private void goToAddSubscriber()
+    {
         SceneManager.switchScene("/gui/librarian/addSubscriber/AddSubscriber_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
     @FXML
-    private void goToHomePage() {
+    private void goToHomePage()
+    {
         SceneManager.switchScene("/gui/common/homePage/HomePage_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
@@ -678,7 +783,8 @@ public class ViewOrderBook_Controller implements DataReceiver {
      * Exits the application by quitting the client connection.
      */
     @FXML
-    private void exitApp() {
+    private void exitApp()
+    {
         ClientUI.chat.getClient().quit();
     }
 }
