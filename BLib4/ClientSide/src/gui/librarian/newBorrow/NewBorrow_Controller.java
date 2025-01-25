@@ -249,8 +249,9 @@ public class NewBorrow_Controller {
                 nextButton1.setDisable(true);
                 nextButton1.getStyleClass().add("disabled-button");
             } else if (availability == 2) {
-                showErrorAlert("Error", "The book copy does not exist in the database.");
+                showErrorAlert("Error", "The book copy already borrowed.");
             }
+            else showErrorAlert("Error", "The book copy does not exist in the database.");
         }
     }
 

@@ -76,25 +76,28 @@ public class BooksController {
 	        ClientUI.chat.accept(new MessageType("106", copyID));
 	        
 	        // Wait for the server's response
-	        // if the copy of book is available
-	        if (ChatClient.availability.get(0).equals("true")) {
-	            return 0;
-	        } else if(ChatClient.availability.size()>1){
+	        
+	        // check if the copy of book is available
+	        if (ChatClient.availability.get(0).equals("1")) {
+	        //available for everyone
+	        	return 0;	        		
+	        //book has orders so it available for wait list only
+	        } else if(ChatClient.availability.get(0).equals("2")){
 	        	// Add IDs of subscribers who are waiting for the book
 	        	subscriberIdWithOrder.addAll(ChatClient.availability.subList(1, ChatClient.availability.size()));
-	            // If the server indicates the copy is not available
-	            return 1;
-	        }
-	        else {
-	        	// Book is not in DB
+	        	return 1;
+	        //copy is borrowed
+	        } else if (ChatClient.availability.get(0).equals("3")) {
 	        	return 2;
 	        }
+	        // Book is not in DB
+	        else return 3;
+	        
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	        return -1;
 	    }
 	}
-	
 
 	/**
      * Adds a subscriber to the waitlist for a book that is currently unavailable.
