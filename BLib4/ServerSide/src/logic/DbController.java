@@ -846,6 +846,7 @@ public class DbController
         List<Boolean> returnValue = new ArrayList<>();
         boolean validFlag = true;
         PreparedStatement stmt;
+        String copyId = "";
 
         // check if the borrow is active
         try
@@ -889,7 +890,7 @@ public class DbController
                 stmt.setString(1, borrowId);
                 ResultSet rs = stmt.executeQuery();
                 rs.next();
-                String copyId = rs.getString(1);
+                copyId = rs.getString(1);
 
                 // update the copy of the book to be available
                 stmt = connection.prepareStatement("UPDATE copy_of_the_book SET is_available = 1 WHERE copy_id = ?;");
@@ -981,11 +982,12 @@ public class DbController
                     stmt.executeUpdate();
 
                     // get the subscriber email
-                    stmt = connection.prepareStatement("SELECT subscriber_email from subscriber WHERE subscriber_id = ?;");
+                    stmt = connection.prepareStatement("SELECT subscriber_first_name,subscriber_email from subscriber WHERE subscriber_id = ?;");
                     stmt.setString(1, rs.getString("subscriber_id"));
                     ResultSet rs2 = stmt.executeQuery();
                     rs2.next();
-                    String subscriberEmail = rs2.getString(1);
+                    String subscriberFirstName = rs2.getString(1);
+                    String subscriberEmail = rs2.getString(2);
 
                     // get the book name
                     stmt = connection.prepareStatement("SELECT book_title from book WHERE book_id = ?;");
@@ -994,7 +996,7 @@ public class DbController
                     rs2.next();
 
                     // send email to the subscriber
-                    String message = "Dear " + rs.getString("subscriber_first_name") + ", your order for the book " + rs2.getString("book_title") + " with ID \"" + bookId + "\" has arrived. Please visit the library to collect it.";
+                    String message = "Dear " + subscriberFirstName + ",\n\n your order for the book " + rs2.getString("book_title") + " with book id \"" + bookId + "\" and copy id \"" + copyId + "\" has arrived.\n\n Please visit the library to collect it.";
                     Notification_Controller.getInstance().sendEmail(subscriberEmail, "The book you ordered is now available for you to borrow", message);
                 }
             }
