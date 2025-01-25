@@ -8,13 +8,9 @@ public class Subscriber implements Serializable
     private final String id;
     private final String firstName;
     private final String lastName;
-    //? save the subscription history in a file
     private String phone;
     private String email;
     private boolean status;
-
-    private boolean EmailChanged = false;
-    private boolean PhoneChanged = false;
 
     /**
      * Default constructor
@@ -34,8 +30,6 @@ public class Subscriber implements Serializable
         this.phone = phone;
         this.email = email;
         this.status = status;
-
-        // ToDo: add subscription history file
     }
 
     /**
@@ -108,7 +102,6 @@ public class Subscriber implements Serializable
         if (!this.phone.equals(phone))
         {
             this.phone = phone;
-            this.PhoneChanged = true;
         }
     }
 
@@ -122,7 +115,6 @@ public class Subscriber implements Serializable
         if (validateEmail(email) && !this.email.equals(email))
         {
             this.email = email;
-            this.EmailChanged = true;
         }
     }
 
@@ -140,7 +132,7 @@ public class Subscriber implements Serializable
      * Validate the email
      *
      * @param email - the email to validate
-     * @return
+     * @return - true if the email is valid, false otherwise
      */
     private boolean validateEmail(String email)
     {
@@ -149,25 +141,6 @@ public class Subscriber implements Serializable
 
         //Checking if the entered email is valid
         return validEmailPattern.matcher(email).matches();
-    }
-
-    /**
-     * The method returns if the subscriber data has changed
-     *
-     * @return - true if the subscriber data has changed, false otherwise
-     */
-    public boolean isChanged()
-    {
-        return EmailChanged || PhoneChanged;
-    }
-
-    /**
-     * The method resets the changed flags
-     */
-    public void resetChanged()
-    {
-        EmailChanged = false;
-        PhoneChanged = false;
     }
 
     /**
@@ -187,6 +160,4 @@ public class Subscriber implements Serializable
                 ", status=" + status +
                 '}';
     }
-
-
 }
