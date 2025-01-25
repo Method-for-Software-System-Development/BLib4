@@ -144,11 +144,25 @@ public class EditProfile_Controller {
 
     @FXML
     public void validate_editProfile_form() {
+    	// Request updated subscriber information from the server
+    	synchronized (this) {
+            // Wait until the server response updates the subscriber
+            while (!subscriberController.getUpdatedSubscriberFromDB(subscriberController.getLoggedSubscriber().getId())) {
+                try {
+                    this.wait(); // Wait until notified
+                } catch (Exception e) {
+                    showErrorAlert("Error", "Failed to synchronize with the server. Please try again.");
+                    return;
+                }
+            }
+    	}
+
+        
         // Initialize variables for updated fields
         String phoneNumber = "";
         String email = "";
         String password = "";
-
+        
         // Validate phone number
         if (phoneNumberField != null && phoneNumberField.getText() != null && !phoneNumberField.getText().isEmpty()) {
             if (phoneNumberField.getText().matches("\\d{10}") && (((String) phoneNumberField.getText()).startsWith("05"))) {
@@ -196,7 +210,7 @@ public class EditProfile_Controller {
         if (email.isEmpty()) {
             email = subscriberController.getLoggedSubscriber().getEmail();
         }
-
+        
         // Perform the updates
         boolean successfulDetailsUpdate = true;
         boolean successfulPasswordUpdate = true;
@@ -205,9 +219,9 @@ public class EditProfile_Controller {
         if (!phoneNumber.equals(subscriberController.getLoggedSubscriber().getPhone()) ||
                 !email.equals(subscriberController.getLoggedSubscriber().getEmail())) {
             successfulDetailsUpdate = subscriberController.updateSubscriberDetails(
-                    subscriberController.getLoggedSubscriber().getId(),
-                    subscriberController.getLoggedSubscriber().getFirstName(),
-                    subscriberController.getLoggedSubscriber().getLastName(),
+            		subscriberController.getLoggedSubscriber().getId(),
+            		subscriberController.getLoggedSubscriber().getFirstName(),
+            		subscriberController.getLoggedSubscriber().getLastName(),
                     phoneNumber,
                     email,
                     subscriberController.getLoggedSubscriber().getStatus());
