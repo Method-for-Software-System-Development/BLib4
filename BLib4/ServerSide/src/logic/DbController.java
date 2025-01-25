@@ -520,7 +520,7 @@ public class DbController
     public List<String> handleCheckBorrowedBookAvailability(String copyId)
     {
         PreparedStatement stmt;
-        String returnValue="";
+        String returnValue = "";
         String bookId = "";
         ResultSet rs;
         List<String> returnList = new ArrayList<>();
@@ -539,16 +539,18 @@ public class DbController
                 returnList.add(returnValue);
                 return returnList;
             }
-            else {
+            else
+            {
                 // save the book id for the next query
                 bookId = rs.getString("book_id");
                 //if the book copy is borrowed
-                if (rs.getInt("is_available") == 0) {
+                if (rs.getInt("is_available") == 0)
+                {
                     returnValue = "3";
                     returnList.add(returnValue);
                     return returnList;
                 }
-                else returnValue ="1"; //book copy available 
+                else returnValue = "1"; //book copy available
             }
         }
         catch (SQLException e)
@@ -587,21 +589,21 @@ public class DbController
             }
         }
         returnList.add(returnValue);
-        
+
         // Add all the subscribers that have active orders for the book and got notified
         try
         {
-        	stmt = connection.prepareStatement("SELECT subscriber_id FROM subscriber_order WHERE book_id = ? AND is_active = true AND is_his_turn = true;");
-        	stmt.setString(1, bookId);
-        	rs = stmt.executeQuery();
-        	while (rs.next())
-        	{
-        		returnList.add(rs.getString("subscriber_id"));
-        	}
+            stmt = connection.prepareStatement("SELECT subscriber_id FROM subscriber_order WHERE book_id = ? AND is_active = true AND is_his_turn = true;");
+            stmt.setString(1, bookId);
+            rs = stmt.executeQuery();
+            while (rs.next())
+            {
+                returnList.add(rs.getString("subscriber_id"));
+            }
         }
         catch (SQLException e)
         {
-        	System.out.println("Error! check borrowed book availability failed - cant get the subscribers that have active orders for the book");
+            System.out.println("Error! check borrowed book availability failed - cant get the subscribers that have active orders for the book");
         }
         return returnList;
     }
@@ -1524,10 +1526,10 @@ public class DbController
      * The method run SQL query to get all the borrow details that the return date is tomorrow
      *
      * @return - list of the borrow details
-     *              [0] - the subscriber id
-     *              [1] - the subscriber name
-     *              [2] - the subscriber email
-     *              [3] - the book title
+     * [0] - the subscriber id
+     * [1] - the subscriber name
+     * [2] - the subscriber email
+     * [3] - the book title
      */
     public List<List<String>> handleGetReminderDayBeforeDetails()
     {
@@ -1731,14 +1733,15 @@ public class DbController
 
     /**
      * The method checks if a specific report is ready
-     *  
+     *
      * @param data [0] the report type
      *             [1] the month
      *             [2] the year
      * @return the boolean response if the report is ready or not
      */
-    public boolean checkIfReportIsReady(List<String> data) {
-    	PreparedStatement stmt;
+    public boolean checkIfReportIsReady(List<String> data)
+    {
+        PreparedStatement stmt;
         ResultSet rs;
         try
         {
@@ -1748,15 +1751,15 @@ public class DbController
             stmt.setInt(3, Integer.parseInt(data.get(2)));
             rs = stmt.executeQuery();
             if (rs.next())
-            	return true;
+                return true;
         }
         catch (SQLException e)
         {
             System.out.println("Error! cannot get the status of the report.");
         }
-		return false;
+        return false;
     }
-    
+
     /**
      * The method run SQL query to check if we need to update the daily report and create trigger for tomorrow
      *
@@ -1844,47 +1847,6 @@ public class DbController
         }
         return false;
     }
-
-
-    /**
-     * Fetches the subscriber's name and the book title for their order.*
-     *
-     * @param subscriberID The ID of the subscriber.
-     * @return A map containing the subscriber's name and the book title.
-     */
-    public Map<String, String> fetchOrderDetails(String subscriberID)
-    {
-        Map<String, String> details = new HashMap<>();
-        PreparedStatement stmt;
-        ResultSet rs;
-
-        try
-        {
-            String query = "SELECT s.subscriber_first_name, s.subscriber_last_name, b.book_title\n" +
-                    "FROM subscriber_order so\n" +
-                    "         JOIN subscriber s ON so.subscriber_id = s.subscriber_id\n" +
-                    "         JOIN book b ON so.book_id = b.book_id\n" +
-                    "WHERE so.subscriber_id = ?\n" +
-                    "  AND so.is_active = 1";
-
-            stmt = connection.prepareStatement(query);
-            stmt.setString(1, subscriberID);
-
-            rs = stmt.executeQuery();
-            if (rs.next())
-            {
-                details.put("subscriberName", rs.getString("subscriber_first_name") + " " + rs.getString("subscriber_last_name"));
-                details.put("bookTitle", rs.getString("book_title"));
-            }
-        }
-        catch (SQLException e)
-        {
-            System.out.println("Error! fetch order details failed");
-        }
-
-        return details;
-    }
-
 
     /**
      * The method run SQL query to get the history of a subscriber by his id

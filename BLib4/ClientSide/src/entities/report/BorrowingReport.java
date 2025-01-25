@@ -35,6 +35,10 @@ public class BorrowingReport extends Report
         return borrowingData.get(bookTitle);
     }
 
+    /**
+     * Retrieves the borrowing data for all books.
+     * @return A map containing the borrowing data for all books.
+     */
     public Map<String, List<String>> getBorrowingData()
     {
         return borrowingData;
