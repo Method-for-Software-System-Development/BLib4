@@ -514,7 +514,8 @@ public class DbController
      * The method run SQL query to check if a copy of the book is available to borrow (not borrowed and not ordered)
      *
      * @param copyId - the id of the copy to check
-     * @return - return 1 in index 0 if available , 2 and waiting list if the copy is available for waitlist only, 3 if copy exists but not available for order, 4 if copy not exist
+     * @return - return 1 in index 0 if available, two and waiting lists if the copy is available for waitlist only,
+     * 3 if copy exists but not available for order, 4 if copy not exist
      */
     public List<String> handleCheckBorrowedBookAvailability(String copyId)
     {
@@ -711,6 +712,7 @@ public class DbController
                 {
                     returnValue.add(false);
                     returnValue.add(true);
+                    returnValue.add(false);
                     return returnValue;
                 }
             }
@@ -718,6 +720,7 @@ public class DbController
         catch (SQLException e)
         {
             System.out.println("Error! order book failed - cant check if the subscriber is frozen");
+            returnValue.add(false);
             returnValue.add(false);
             returnValue.add(false);
             validFlag = false;
@@ -737,6 +740,7 @@ public class DbController
                 {
                     returnValue.add(false);
                     returnValue.add(false);
+                    returnValue.add(true);
 
                     validFlag = false;
                 }
@@ -744,6 +748,7 @@ public class DbController
             catch (SQLException e)
             {
                 System.out.println("Error! order book failed - cant check if the subscriber already ordered the book");
+                returnValue.add(false);
                 returnValue.add(false);
                 returnValue.add(false);
                 validFlag = false;
@@ -776,6 +781,7 @@ public class DbController
                 {
                     returnValue.add(false);
                     returnValue.add(false);
+                    returnValue.add(false);
 
                     validFlag = false;
                 }
@@ -784,6 +790,7 @@ public class DbController
             catch (SQLException e)
             {
                 System.out.println("Error! order book failed - cant check if we have enough copies of the book that are not ordered");
+                returnValue.add(false);
                 returnValue.add(false);
                 returnValue.add(false);
                 validFlag = false;
@@ -810,10 +817,12 @@ public class DbController
 
                 returnValue.add(true);
                 returnValue.add(false);
+                returnValue.add(false);
             }
             catch (SQLException e)
             {
                 System.out.println("Error! order book failed - cant add the order to the db");
+                returnValue.add(false);
                 returnValue.add(false);
                 returnValue.add(false);
             }
