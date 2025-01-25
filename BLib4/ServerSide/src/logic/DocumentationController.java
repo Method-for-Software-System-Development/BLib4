@@ -131,7 +131,7 @@ public class DocumentationController
 
             case "118":
                 // Lost a book document on reader card
-                addToReaderCard[0] = "Subscriber lost the book: " + obj;
+                addToReaderCard[0] = "Subscriber lost the book: " + obj + " and fined for it";
                 break;
 
             default:

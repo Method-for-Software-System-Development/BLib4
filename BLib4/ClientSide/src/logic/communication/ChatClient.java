@@ -1,15 +1,9 @@
-// This file contains material supporting section 3.7 of the textbook:
-// "Object Oriented Software Engineering" and is issued under the open-source
-// license found at www.lloseng.com 
-
 package logic.communication;
 
 import entities.book.Book;
 import gui.librarian.librarianUI.LibrarianUI_Controller;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
-import logic.communication.ChatIF;
-import gui.common.*;
 import entities.logic.*;
 import entities.user.*;
 import ocsf.client.AbstractClient;
@@ -19,15 +13,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- * This class overrides some of the methods defined in the abstract
- * superclass in order to give more functionality to the client.
- *
- * @author Dr Timothy C. Lethbridge
- * @author Dr Robert Lagani&egrave;
- * @author Fran&ccedil;ois B&eacute;langer
- * @version July 2000
- */
 public class ChatClient extends AbstractClient
 {
     //Instance variables **********************************************
@@ -41,14 +26,11 @@ public class ChatClient extends AbstractClient
      * the display method in the client.
      */
     ChatIF clientUI;
-    private ShowAllSubscribersFrameController showAllSubscribersController;
-    private EditSubscriberFrameController editSubscriberFrameController;
     public static List<Subscriber> subscribers = new ArrayList<Subscriber>();
     public static List<Book> books = new ArrayList<>();
     public static List<String> availability = new ArrayList<>();
     public static boolean serverResponse = false;
     public static boolean awaitResponse = false;
-    public static Date todayDate;
     public static Librarian librarian;
     public static ArrayList<Boolean> returnOutcome;
     public static ArrayList<ArrayList<String>> listOfBorrows;
@@ -70,7 +52,6 @@ public class ChatClient extends AbstractClient
      * @param port     The port number to connect on.
      * @param clientUI The interface type variable.
      */
-
     public ChatClient(String host, int port, ChatIF clientUI)
             throws IOException
     {
@@ -177,7 +158,8 @@ public class ChatClient extends AbstractClient
 
                 Object controller = SceneManager.getCurrentController();
 
-                if (controller instanceof LibrarianUI_Controller) {
+                if (controller instanceof LibrarianUI_Controller)
+                {
                     Platform.runLater(() -> ((LibrarianUI_Controller) controller).refreshMessagesTable());
                 }
 
@@ -306,7 +288,7 @@ public class ChatClient extends AbstractClient
                 //response from server for message confirmation
                 serverResponse = (boolean) receiveMsg.getData();
                 break;
-            	
+
             default:
                 System.out.println("Invalid message received from server");
                 break;
@@ -323,7 +305,7 @@ public class ChatClient extends AbstractClient
     {
         try
         {
-            openConnection();//in order to send more than one message
+            openConnection();//to send more than one message
             awaitResponse = true;
             sendToServer(message);
             // wait for response

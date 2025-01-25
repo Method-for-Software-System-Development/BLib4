@@ -14,7 +14,7 @@ public class ServerUI extends Application
 {
     private static Stage primaryStage;
 
-    public static void main(String args[]) throws Exception
+    public static void main(String[] args) throws Exception
     {
         launch(args);
     } // end main
@@ -26,10 +26,9 @@ public class ServerUI extends Application
      *                     the application scene can be set.
      *                     Applications may create other stages, if needed, but they will not be
      *                     primary stages.
-     * @throws Exception
      */
     @Override
-    public void start(Stage primaryStage) throws Exception
+    public void start(Stage primaryStage)
     {
         // save the primary stage
         this.primaryStage = primaryStage;
@@ -58,7 +57,6 @@ public class ServerUI extends Application
      * The method open the server monitor window and start the server
      *
      * @param p the port number
-     * @throws IOException
      */
     public static void runServer(String p) throws IOException
     {
