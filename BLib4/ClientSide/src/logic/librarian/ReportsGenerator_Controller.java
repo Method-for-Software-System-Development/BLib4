@@ -5,8 +5,6 @@ import entities.report.BorrowingReport;
 import entities.report.SubscriberStatusReport;
 import logic.communication.ChatClient;
 import logic.communication.ClientUI;
-import logic.user.BooksController;
-
 import java.util.*;
 
 /**
@@ -116,6 +114,18 @@ public class ReportsGenerator_Controller {
             }
         }
         return mappedData;
+    }
+    
+    public boolean checkIfReportIsReady(String reportType) {
+        System.out.println("Checking if "+reportType+" report for: " + month + " " + year+ " is ready..");
+        // Create a list of data of the requested report to send to the server
+        ArrayList<String> dataOfReport = new ArrayList<>();
+        dataOfReport.add(reportType);
+        dataOfReport.add(month);
+        dataOfReport.add(year);
+        //checks if the report is ready
+        ClientUI.chat.accept(new MessageType("127",dataOfReport));
+        return ChatClient.serverResponse;
     }
 
 	public String getMonth() {

@@ -291,6 +291,11 @@ public class ChatClient extends AbstractClient
                 //response for blob data of report request
                 blobData = (List<String[]>) receiveMsg.data;
                 break;
+                
+            case "227":
+            	//response for report status
+                serverResponse = (boolean) receiveMsg.getData();
+            	break;
             	
             case "228":
                 // list of unread librarian messages
