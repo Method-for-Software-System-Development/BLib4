@@ -140,7 +140,23 @@ public class ViewHistory_Controller {
         activityDetailsColumn.setCellValueFactory(data -> data.getValue().activityDetailsProperty());
 
         activitiesTable.setPlaceholder(new Text("No activities to display.")); // Set the placeholder text
-        activitiesTable.setFixedCellSize(35); // Set the row height
+        activityDetailsColumn.setCellFactory(column -> {
+            return new TableCell<ActivityEntry, String>() {
+                private final Text text = new Text();
+
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setGraphic(null);
+                    } else {
+                        text.setText(item);
+                        text.wrappingWidthProperty().bind(activityDetailsColumn.widthProperty().subtract(10)); // Wrap text within column width
+                        setGraphic(text);
+                    }
+                }
+            };
+        });
         activitiesTable.setSelectionModel(null); // Disable row selection
 
         // Populate the table
