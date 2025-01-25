@@ -2153,7 +2153,7 @@ public class DbController
                 else
                 {
                     // get all the active borrow due date ordered by the due date
-                    stmt = connection.prepareStatement("SELECT borrow_due_date from borrow_book WHERE copy_id IN (SELECT copy_id from copy_of_the_book WHERE book_id = ? AND is_available <> 2) ORDER BY borrow_due_date DESC LIMIT 1;");
+                    stmt = connection.prepareStatement("SELECT borrow_due_date from borrow_book WHERE copy_id IN (SELECT copy_id from copy_of_the_book WHERE book_id = ? AND is_available <> 2 AND is_active=1) ORDER BY borrow_due_date LIMIT 1;");
                     stmt.setString(1, bookId);
                     stmt.executeQuery();
 
