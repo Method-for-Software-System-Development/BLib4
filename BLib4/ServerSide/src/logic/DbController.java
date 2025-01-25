@@ -514,66 +514,48 @@ public class DbController
      * The method run SQL query to check if a copy of the book is available to borrow (not borrowed and not ordered)
      *
      * @param copyId - the id of the copy to check
-     * @return - true if the copy is available, else false
+     * @return - return 1 in index 0 if available , 2 and waiting list if the copy is available for waitlist only, 3 if copy exists but not available for order, 4 if copy not exist
      */
     public List<String> handleCheckBorrowedBookAvailability(String copyId)
     {
         PreparedStatement stmt;
-        boolean returnValue = true;
+        String returnValue="";
         String bookId = "";
         ResultSet rs;
-
+        List<String> returnList = new ArrayList<>();
 
         // check if the copy exists
         try
         {
-            stmt = connection.prepareStatement("SELECT * from copy_of_the_book where copy_id = ? AND is_available <> 2;");
+            stmt = connection.prepareStatement("SELECT * from copy_of_the_book WHERE copy_id = ? AND is_available <> 2;");
             stmt.setString(1, copyId);
             rs = stmt.executeQuery();
 
             if (!rs.next())
             {
-                List<String> returnList = new ArrayList<>();
-                returnList.add("false");
+                // the copy not found
+                returnValue = "4";
+                returnList.add(returnValue);
                 return returnList;
             }
-
+            else {
+                // save the book id for the next query
+                bookId = rs.getString("book_id");
+                //if the book copy is borrowed
+                if (rs.getInt("is_available") == 0) {
+                    returnValue = "3";
+                    returnList.add(returnValue);
+                    return returnList;
+                }
+                else returnValue ="1"; //book copy available 
+            }
         }
         catch (SQLException e)
         {
             System.out.println("Error! check borrowed book availability failed - The book not found");
         }
 
-
-        // check if the book is not borrowed
-        try
-        {
-            stmt = connection.prepareStatement("SELECT * from copy_of_the_book WHERE copy_id = ?;");
-            stmt.setString(1, copyId);
-
-            rs = stmt.executeQuery();
-            if (rs.next())
-            {
-                // save the book id for the next query
-                bookId = rs.getString("book_id");
-
-                if (rs.getInt("is_available") == 0)
-                {
-                    returnValue = false;
-                }
-            }
-            else
-            {
-                // the copy not found
-                returnValue = false;
-            }
-        }
-        catch (SQLException e)
-        {
-            System.out.println("Error! check borrowed book availability failed - cant check if the book is borrowed");
-        }
-
-        if (returnValue)
+        if (returnValue.equals("1"))
         {
             // check that we have enough copies of the book that not ordered
             try
@@ -596,36 +578,30 @@ public class DbController
 
                 // check if we have enough copies of the book that are not ordered
                 if (copyAvailableToBorrow - ordered < 1)
-                {
-                    returnValue = false;
-                }
-
+                    returnValue = "2";
             }
             catch (SQLException e)
             {
                 System.out.println("Error! check borrowed book availability failed - cant check if the book is ordered");
             }
         }
-
-        List<String> returnList = new ArrayList<>();
-        returnList.add(String.valueOf(returnValue));
-
+        returnList.add(returnValue);
+        
         // Add all the subscribers that have active orders for the book and got notified
         try
         {
-            stmt = connection.prepareStatement("SELECT subscriber_id FROM subscriber_order WHERE book_id = ? AND is_active = true AND is_his_turn = true;");
-            stmt.setString(1, bookId);
-            rs = stmt.executeQuery();
-            while (rs.next())
-            {
-                returnList.add(rs.getString("subscriber_id"));
-            }
+        	stmt = connection.prepareStatement("SELECT subscriber_id FROM subscriber_order WHERE book_id = ? AND is_active = true AND is_his_turn = true;");
+        	stmt.setString(1, bookId);
+        	rs = stmt.executeQuery();
+        	while (rs.next())
+        	{
+        		returnList.add(rs.getString("subscriber_id"));
+        	}
         }
         catch (SQLException e)
         {
-            System.out.println("Error! check borrowed book availability failed - cant get the subscribers that have active orders for the book");
+        	System.out.println("Error! check borrowed book availability failed - cant get the subscribers that have active orders for the book");
         }
-
         return returnList;
     }
 
