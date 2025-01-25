@@ -126,12 +126,15 @@ public class BooksController {
         	// Subscriber successfully added to the waitlist
         	return 1;
         } // if the book cannot be ordered due to a high number of reservations - return 2
-        else if (!ChatClient.returnOutcome.get(0) && !ChatClient.returnOutcome.get(1)) {
+        else if (!ChatClient.returnOutcome.get(0) && !ChatClient.returnOutcome.get(1) && !ChatClient.returnOutcome.get(2)) {
         	// Too many reservations, cannot add subscriber to waitlist
         	return 2;
         }
+		else if (!ChatClient.returnOutcome.get(0) && !ChatClient.returnOutcome.get(1) && ChatClient.returnOutcome.get(2)) {
+			return 3;
+		}
        // Account is frozen, cannot add subscriber to waitlist
-        	return 3;
+        	return 4;
     } catch (Exception e) {
         e.printStackTrace();
         return 0;
