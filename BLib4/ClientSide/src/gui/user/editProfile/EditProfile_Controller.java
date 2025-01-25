@@ -66,7 +66,7 @@ public class EditProfile_Controller {
     @FXML
     public void initialize() {
         // Get the singleton instance of Subscriber_Controller
-        subscriberController = Subscriber_Controller.getInstance();
+        subscriberController = Subscriber_Controller.getInstance(); 
 
         // Set the greeting message
         userGreeting.setText(getGreetingMessage() + " " + subscriberController.getLoggedSubscriber().getFirstName() + " !");
@@ -141,23 +141,15 @@ public class EditProfile_Controller {
             return "Good Night";
         }
     }
-
+    
+    /**
+     * This method validates that subscriber entered data into edit file so it will change it's info in DB
+     * 
+     */
     @FXML
     public void validate_editProfile_form() {
     	// Request updated subscriber information from the server
-    	synchronized (this) {
-            // Wait until the server response updates the subscriber
-            while (!subscriberController.getUpdatedSubscriberFromDB(subscriberController.getLoggedSubscriber().getId())) {
-                try {
-                    this.wait(); // Wait until notified
-                } catch (Exception e) {
-                    showErrorAlert("Error", "Failed to synchronize with the server. Please try again.");
-                    return;
-                }
-            }
-    	}
 
-        
         // Initialize variables for updated fields
         String phoneNumber = "";
         String email = "";

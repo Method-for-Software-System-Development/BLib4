@@ -360,11 +360,6 @@ public class ServerController extends AbstractServer
                 byte[] blobData = dbController.fetchReportBlob((List<String>) receiveMsg.data);
                 responseMsg = new MessageType("226", BlobUtil.convertBlobToList(blobData));
                 break;
-
-            case "127":
-            	// Request for a subscriber updated information
-            	responseMsg = new MessageType("227", dbController.getSubscriberBySubscriberId((String) receiveMsg.data));
-            	break;
             	
             case "128":
                 // Response to get all librarian unread messages
