@@ -138,9 +138,9 @@ public class DocumentationController
                 System.out.println("Invalid MessageType");
                 return readerCard;
         }
+
         // Returning updated reader card
         readerCard.add(addToReaderCard);
         return readerCard;
     }
-
 }

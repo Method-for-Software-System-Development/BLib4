@@ -7,7 +7,6 @@ public class SubscriberStatusReport extends Report
 {
     private List<String[]> usersActivityStatus;
 
-
     /**
      * Constructor to initialize the SubscriberStatusReport
      *
@@ -22,7 +21,11 @@ public class SubscriberStatusReport extends Report
         this.usersActivityStatus = usersActivityStatus;
     }
 
-
+    /**
+     * Get the users' activity status
+     *
+     * @return The users' activity status
+     */
     public List<String[]> getUsersActivityStatus()
     {
         return usersActivityStatus;

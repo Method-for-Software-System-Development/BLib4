@@ -27,34 +27,53 @@ public class Notification
     }
 
 
+    /**
+     * Get the unique number identifying the notification
+     *
+     * @return The unique number identifying the notification
+     */
     public int getNoteNum()
     {
         return noteNum;
     }
 
-
+    /**
+     * Get the sender of the notification
+     *
+     * @return The sender of the notification
+     */
     public String getSender()
     {
         return sender;
     }
 
-
+    /**
+     * Get the receiver of the notification
+     *
+     * @return The receiver of the notification
+     */
     public String getReceiver()
     {
         return reciver;
     }
 
-
+    /**
+     * Get the medium or means of the notification
+     *
+     * @return The medium or means of the notification
+     */
     public String getMean()
     {
         return mean;
     }
 
-
+    /**
+     * Get the content or message of the notification
+     *
+     * @return The content or message of the notification
+     */
     public String getContent()
     {
         return content;
     }
-
-
 }

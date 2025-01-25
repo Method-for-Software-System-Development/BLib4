@@ -18,6 +18,11 @@ public class ReportsGenerator_Controller
         this.dbController = DbController.getInstance();
     }
 
+    /**
+     * Singleton instance getter.
+     *
+     * @return The singleton instance of the class.
+     */
     public static ReportsGenerator_Controller getInstance()
     {
         synchronized (ReportsGenerator_Controller.class)

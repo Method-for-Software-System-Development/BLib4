@@ -15,11 +15,14 @@ public class SceneManager
      *
      * @param stage The primary stage to set.
      */
-    public static void setStage(Stage stage) {
+    public static void setStage(Stage stage)
+    {
         primaryStage = stage;
 
         // Set an initial empty scene to avoid resetting the stage on scene switch
-        Scene initialScene = new Scene(new Parent() {});
+        Scene initialScene = new Scene(new Parent()
+        {
+        });
         primaryStage.setScene(initialScene);
     }
 
@@ -29,15 +32,19 @@ public class SceneManager
      * @param fxmlPath The path to the FXML file.
      * @param title    The title for the new scene.
      */
-    public static void switchScene(String fxmlPath, String title) {
-        try {
+    public static void switchScene(String fxmlPath, String title)
+    {
+        try
+        {
             FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource(fxmlPath));
             Parent root = loader.load();
 
             // Update the current scene's root without resetting the stage
             primaryStage.getScene().setRoot(root);
             primaryStage.setTitle(title);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             System.out.println("Error loading scene: " + e.getMessage());
         }
     }
