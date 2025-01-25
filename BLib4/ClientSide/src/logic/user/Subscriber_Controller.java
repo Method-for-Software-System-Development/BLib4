@@ -229,4 +229,10 @@ public class Subscriber_Controller {
         // Return server response
         return ChatClient.serverResponse;
     }
+    
+    public boolean getUpdatedSubscriberFromDB(String subscriberID) {
+    	ClientUI.chat.accept(new MessageType("127", subscriberID));
+    	loggedSubscriber = ChatClient.updatedSubscriberInfo;
+    	return true;
+    }
 }
