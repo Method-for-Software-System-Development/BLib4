@@ -202,13 +202,14 @@
         <!-- Table View -->
         <TableView fx:id="borrowsTable" prefHeight="492" styleClass="custom-table">
             <columns>
-                <TableColumn fx:id="borrowIdColumn" prefWidth="170" resizable="false" text="Borrow ID"/>
-                <TableColumn fx:id="copyIdColumn" prefWidth="170" resizable="false" text="Book Copy ID"/>
+                <TableColumn fx:id="borrowIdColumn" prefWidth="140" resizable="false" text="Borrow ID"/>
+                <TableColumn fx:id="copyIdColumn" prefWidth="140" resizable="false" text="Book Copy ID"/>
                 <TableColumn fx:id="bookTitleColumn" resizable="false" text="Book Title"/>
-                <TableColumn fx:id="borrowDateColumn" prefWidth="170" resizable="false" text="Borrow Date"/>
-                <TableColumn fx:id="dueDateColumn" prefWidth="170" resizable="false" text="Due Date"/>
+                <TableColumn fx:id="borrowDateColumn" prefWidth="140" resizable="false" text="Borrow Date"/>
+                <TableColumn fx:id="dueDateColumn" prefWidth="140" resizable="false" text="Due Date"/>
                 <TableColumn fx:id="returnColumn" prefWidth="170" resizable="false" text="Return Option"/>
                 <TableColumn fx:id="extendColumn" prefWidth="170" resizable="false" text="Extend Option"/>
+                <TableColumn fx:id="lostColumn" prefWidth="170" resizable="false" text="Lost Option"/>
             </columns>
             <opaqueInsets>
                 <Insets/>

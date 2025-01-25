@@ -135,4 +135,23 @@ public class BorrowController
         }
         return -1; // must do it for the compiler
     }
+
+    /**
+     * The method handles the loss of a copy
+     * @param borrowID the borrow id of the lost copy
+     * @return true if the copy was lost successfully, false otherwise
+     */
+    public boolean lostCopy(String borrowID)
+    {
+        try
+        {
+            // Sending to the server MessageType 118
+            ClientUI.chat.accept(new MessageType("118", borrowID));
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.toString());
+        }
+        return ChatClient.serverResponse;
+    }
 }

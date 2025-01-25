@@ -86,6 +86,8 @@ public class SubscriberBorrows_Controller implements DataReceiver {
     private TableColumn<BorrowEntry, Void> returnColumn;
     @FXML
     private TableColumn<BorrowEntry, Void> extendColumn;
+    @FXML
+    private TableColumn<BorrowEntry, Void> lostColumn;
 
     // Fields
     private Subscriber_Controller subscriberController;
@@ -252,10 +254,43 @@ public class SubscriberBorrows_Controller implements DataReceiver {
             }
         });
 
+        // Add Lost button
+        lostColumn.setCellFactory(param -> new TableCell<BorrowEntry, Void>() {
+            private final Button lostButton = new Button("Lost");
+
+            {
+                // Set the CSS class for the button
+                lostButton.getStyleClass().add("orange-orange-button");
+
+                // Set preferred size for the button
+                lostButton.setPrefHeight(50.0);
+                lostButton.setPrefWidth(150.0);
+
+                // Set the action for the button
+                lostButton.setOnAction(event -> {
+                    BorrowEntry entry = getTableView().getItems().get(getIndex());
+                    String borrowId = entry.getBorrowId();
+                    handleLostAction(borrowId);
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null); // Clear the cell for empty rows
+                } else {
+                    setGraphic(lostButton); // Add the button for non-empty rows
+                }
+            }
+        });
+
         borrowsTable.setPlaceholder(new Text("No borrows to display.")); // Set the placeholder text
         borrowsTable.setFixedCellSize(70); // Set the row height
         borrowsTable.setSelectionModel(null); // Disable row selection
         extendColumn.setSortable(false); // Disable sorting for the "Extend" column
+        returnColumn.setSortable(false); // Disable sorting for the "Return" column
+        lostColumn.setSortable(false); // Disable sorting for the "Lost" column
 
         // Highlight rows based on due date
         borrowsTable.setRowFactory(tv -> new TableRow<BorrowEntry>() {
@@ -317,7 +352,8 @@ public class SubscriberBorrows_Controller implements DataReceiver {
         // Ensure the bookTitleColumn fills the remaining space
         bookTitleColumn.prefWidthProperty().bind(
                 borrowsTable.widthProperty()
-                        .subtract(170 * 6) // Subtract the total width of fixed columns
+                        .subtract(170 * 4) // Subtract the total width of fixed columns
+                        .subtract(140 * 3)
                         .subtract(2) // Subtract the border width
                         .subtract(borrowsTable.getItems().size() > 7 ? 20 : 0) // Subtract 20 if more than 7 rows for the scrollbar
         );
@@ -373,6 +409,15 @@ public class SubscriberBorrows_Controller implements DataReceiver {
                 entry.getBookTitle() + " (Copy ID: " + entry.getCopyId() + "):    ");
         selectedDueDate = entry.getDueDate();  
         selectedBorrowId = entry.getBorrowId();
+    }
+
+    private void handleLostAction(String borrowId) {
+        if (borrowController.lostCopy(borrowId)) {
+            showInformationAlert("Lost Successful", "The book has been marked as lost.");
+            refreshBorrowsTable();
+        } else {
+            showErrorAlert("Lost Error", "An error occurred while marking the book as lost. Please try again.");
+        }
     }
 
     /**
