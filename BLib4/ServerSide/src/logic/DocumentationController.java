@@ -84,6 +84,16 @@ public class DocumentationController
                 addToReaderCard[0] = "Subscriber returned book: " + obj;
                 break;
 
+            case "109-1":
+                // Late return of a book document on reader card (account frozen)
+                addToReaderCard[0] = "Subscriber account is frozen due to late return of book: " + obj;
+                break;
+
+            case "109-2":
+                // unfreeze account document on reader card after late return
+                addToReaderCard[0] = "Subscriber account was unfrozen after a month";
+                break;
+
             case "111-1":
                 // Extension of a book granted a document on reader card
                 addToReaderCard[0] = "Subscriber extended borrow time for book: " + obj + " was granted. new return date: " + obj2;
@@ -117,6 +127,11 @@ public class DocumentationController
             case "117":
                 // Manual extension document on reader card
                 addToReaderCard[0] = "Manual extension granted by librarian to the book: " + obj;
+                break;
+
+            case "118":
+                // Lost a book document on reader card
+                addToReaderCard[0] = "Subscriber lost the book: " + obj;
                 break;
 
             default:

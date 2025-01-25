@@ -514,66 +514,48 @@ public class DbController
      * The method run SQL query to check if a copy of the book is available to borrow (not borrowed and not ordered)
      *
      * @param copyId - the id of the copy to check
-     * @return - true if the copy is available, else false
+     * @return - return 1 in index 0 if available , 2 and waiting list if the copy is available for waitlist only, 3 if copy exists but not available for order, 4 if copy not exist
      */
     public List<String> handleCheckBorrowedBookAvailability(String copyId)
     {
         PreparedStatement stmt;
-        boolean returnValue = true;
+        String returnValue="";
         String bookId = "";
         ResultSet rs;
-
+        List<String> returnList = new ArrayList<>();
 
         // check if the copy exists
         try
         {
-            stmt = connection.prepareStatement("SELECT * from copy_of_the_book where copy_id = ? AND is_available <> 2;");
+            stmt = connection.prepareStatement("SELECT * from copy_of_the_book WHERE copy_id = ? AND is_available <> 2;");
             stmt.setString(1, copyId);
             rs = stmt.executeQuery();
 
             if (!rs.next())
             {
-                List<String> returnList = new ArrayList<>();
-                returnList.add("false");
+                // the copy not found
+                returnValue = "4";
+                returnList.add(returnValue);
                 return returnList;
             }
-
+            else {
+                // save the book id for the next query
+                bookId = rs.getString("book_id");
+                //if the book copy is borrowed
+                if (rs.getInt("is_available") == 0) {
+                    returnValue = "3";
+                    returnList.add(returnValue);
+                    return returnList;
+                }
+                else returnValue ="1"; //book copy available 
+            }
         }
         catch (SQLException e)
         {
             System.out.println("Error! check borrowed book availability failed - The book not found");
         }
 
-
-        // check if the book is not borrowed
-        try
-        {
-            stmt = connection.prepareStatement("SELECT * from copy_of_the_book WHERE copy_id = ?;");
-            stmt.setString(1, copyId);
-
-            rs = stmt.executeQuery();
-            if (rs.next())
-            {
-                // save the book id for the next query
-                bookId = rs.getString("book_id");
-
-                if (rs.getInt("is_available") == 0)
-                {
-                    returnValue = false;
-                }
-            }
-            else
-            {
-                // the copy not found
-                returnValue = false;
-            }
-        }
-        catch (SQLException e)
-        {
-            System.out.println("Error! check borrowed book availability failed - cant check if the book is borrowed");
-        }
-
-        if (returnValue)
+        if (returnValue.equals("1"))
         {
             // check that we have enough copies of the book that not ordered
             try
@@ -596,36 +578,30 @@ public class DbController
 
                 // check if we have enough copies of the book that are not ordered
                 if (copyAvailableToBorrow - ordered < 1)
-                {
-                    returnValue = false;
-                }
-
+                    returnValue = "2";
             }
             catch (SQLException e)
             {
                 System.out.println("Error! check borrowed book availability failed - cant check if the book is ordered");
             }
         }
-
-        List<String> returnList = new ArrayList<>();
-        returnList.add(String.valueOf(returnValue));
-
+        returnList.add(returnValue);
+        
         // Add all the subscribers that have active orders for the book and got notified
         try
         {
-            stmt = connection.prepareStatement("SELECT subscriber_id FROM subscriber_order WHERE book_id = ? AND is_active = true AND is_his_turn = true;");
-            stmt.setString(1, bookId);
-            rs = stmt.executeQuery();
-            while (rs.next())
-            {
-                returnList.add(rs.getString("subscriber_id"));
-            }
+        	stmt = connection.prepareStatement("SELECT subscriber_id FROM subscriber_order WHERE book_id = ? AND is_active = true AND is_his_turn = true;");
+        	stmt.setString(1, bookId);
+        	rs = stmt.executeQuery();
+        	while (rs.next())
+        	{
+        		returnList.add(rs.getString("subscriber_id"));
+        	}
         }
         catch (SQLException e)
         {
-            System.out.println("Error! check borrowed book availability failed - cant get the subscribers that have active orders for the book");
+        	System.out.println("Error! check borrowed book availability failed - cant get the subscribers that have active orders for the book");
         }
-
         return returnList;
     }
 
@@ -1408,47 +1384,43 @@ public class DbController
     /**
      * The method run SQL query to handle update book copy to lost status
      *
-     * @param copyId - the id of the copy
+     * @param borrowId - the id of the borrow that lost
      * @return - true if the update succeeds, else false
      */
-    public boolean handleUpdateBookCopyToLost(String copyId)
+    public boolean handleUpdateBookCopyToLost(String borrowId)
     {
         PreparedStatement stmt;
         boolean returnValue = true;
+        String copyId = "";
 
-        // check if the copy exists
+        // get the copy id of the borrow
         try
         {
-            stmt = connection.prepareStatement("SELECT * from copy_of_the_book WHERE copy_id = ?;");
-            stmt.setString(1, copyId);
-
+            stmt = connection.prepareStatement("SELECT copy_id from borrow_book WHERE borrow_id = ?;");
+            stmt.setString(1, borrowId);
             ResultSet rs = stmt.executeQuery();
-            if (rs.next())
-            {
-                if (rs.getInt("is_available") == 2)
-                {
-                    returnValue = false;
-                }
-            }
-            else
-            {
-                // the copy not found
-                returnValue = false;
-            }
+            rs.next();
+            copyId = rs.getString(1);
         }
         catch (SQLException e)
         {
-            System.out.println("Error! update book copy to lost failed - cant check if the copy is available");
+            System.out.println("Error! update book copy to lost failed - cant get the copy id from the borrow");
             returnValue = false;
         }
 
         if (returnValue)
         {
-            // update the copy to be lost
+
             try
             {
+                // update the copy to be lost
                 stmt = connection.prepareStatement("UPDATE copy_of_the_book SET is_available = 2 WHERE copy_id = ?;");
                 stmt.setString(1, copyId);
+                stmt.executeUpdate();
+
+                // update the borrow to be lost
+                stmt = connection.prepareStatement("UPDATE borrow_book SET is_active = 2 WHERE borrow_id = ?;");
+                stmt.setString(1, borrowId);
                 stmt.executeUpdate();
             }
             catch (SQLException e)
@@ -1717,6 +1689,17 @@ public class DbController
                 {
                     updateSubscriberStmt.setString(1, subscriberId);
                     updateSubscriberStmt.executeUpdate();
+
+                    // document the unfrozen subscriber in subscriber history
+
+                    // Getting a history file of subscriber
+                    List<String[]> historyList = getHistoryFileBySubscriberId(subscriberId);
+
+                    // Document lost book
+                    List<String[]> newHistoryList = DocumentationController.getInstance().documentOnReaderCard("109-2", historyList, null, null);
+                    // Updating a subscriber history file in DB
+                    handleUpdateHistoryFileBySubscriberId(subscriberId, newHistoryList);
+
                 }
             }
 
