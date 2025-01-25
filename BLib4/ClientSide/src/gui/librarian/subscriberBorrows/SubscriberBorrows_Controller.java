@@ -94,6 +94,7 @@ public class SubscriberBorrows_Controller implements DataReceiver {
     private ArrayList<ArrayList<String>> subscriberBorrows;
     private final ObservableList<BorrowEntry> borrowEntries = FXCollections.observableArrayList(); // List of borrow entries (dynamic)
     private String selectedBorrowId;
+    private String selectedDueDate;
 
     @Override
     public void receiveData(Object data) {
@@ -327,8 +328,8 @@ public class SubscriberBorrows_Controller implements DataReceiver {
             public void updateItem(LocalDate item, boolean empty) {
                 super.updateItem(item, empty);
 
-                // Disable dates today and before today
-                if (item.isBefore(LocalDate.now().plusDays(1))) {
+             // Disable dates before the current return date
+                if (item.isBefore(LocalDate.parse(selectedDueDate, DateTimeFormatter.ofPattern("dd/MM/yyyy")).plusDays(1))) {
                     setDisable(true);
                     setStyle("-fx-background-color: #EEEEEE; -fx-text-fill: #999999;");
                 }
@@ -370,6 +371,7 @@ public class SubscriberBorrows_Controller implements DataReceiver {
         extendFormHBox.setVisible(true);
         extendBookTitle.setText("Select a new return date for " +
                 entry.getBookTitle() + " (Copy ID: " + entry.getCopyId() + "):    ");
+        selectedDueDate = entry.getDueDate();  
         selectedBorrowId = entry.getBorrowId();
     }
 
