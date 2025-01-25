@@ -77,6 +77,7 @@ public class SubscriberUI_Controller {
     private ArrayList<ArrayList<String>> subscriberBorrows;
     private final ObservableList<BorrowEntry> borrowEntries = FXCollections.observableArrayList(); // List of borrow entries (dynamic)
     private String selectedBorrowId;
+    private String selectedDueDate;
 
     @FXML
     public void initialize() {
@@ -279,8 +280,8 @@ public class SubscriberUI_Controller {
             public void updateItem(LocalDate item, boolean empty) {
                 super.updateItem(item, empty);
 
-                // Disable dates today and before today
-                if (item.isBefore(LocalDate.now().plusDays(1))) {
+             // Disable dates before the current return date
+                if (item.isBefore(LocalDate.parse(selectedDueDate, DateTimeFormatter.ofPattern("dd/MM/yyyy")).plusDays(1))) {
                     setDisable(true);
                     setStyle("-fx-background-color: #EEEEEE; -fx-text-fill: #999999;");
                 }
@@ -306,6 +307,7 @@ public class SubscriberUI_Controller {
         extendBookTitle.setText("Select a new return date for " +
                 entry.getBookTitle() + " (Copy ID: " + entry.getCopyId() + "):    ");
         selectedBorrowId = entry.getBorrowId();
+        selectedDueDate = entry.getDueDate();
     }
 
     /**
