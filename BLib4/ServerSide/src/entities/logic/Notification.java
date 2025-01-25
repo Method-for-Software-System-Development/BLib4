@@ -1,6 +1,7 @@
 package entities.logic;
 
-public class Notification {
+public class Notification
+{
 	private int noteNum;
 	private String sender;
 	private String reciver;

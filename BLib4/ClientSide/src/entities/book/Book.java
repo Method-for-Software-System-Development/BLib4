@@ -43,6 +43,7 @@ public class Book implements Serializable
 
     /**
      * Getter to the book id
+     *
      * @return - The book id
      */
     public int getBookId()
@@ -52,6 +53,7 @@ public class Book implements Serializable
 
     /**
      * Getter to the book title
+     *
      * @return - The book title
      */
     public String getTitle()
@@ -61,12 +63,17 @@ public class Book implements Serializable
 
     /**
      * Getter to the book author
+     *
      * @return - The book author
      */
-    public String getAuthor() { return author; }
+    public String getAuthor()
+    {
+        return author;
+    }
 
     /**
      * Getter to the book edition number
+     *
      * @return - The book edition number
      */
     public int getEditionNum()
@@ -76,6 +83,7 @@ public class Book implements Serializable
 
     /**
      * Getter to the book print date
+     *
      * @return - The book print date
      */
     public Date getPrintDate()
@@ -85,6 +93,7 @@ public class Book implements Serializable
 
     /**
      * Getter to the book subject
+     *
      * @return - The book subject
      */
     public String getSubject()
@@ -94,6 +103,7 @@ public class Book implements Serializable
 
     /**
      * Getter to the book description
+     *
      * @return - The book description
      */
     public String getDescription()
@@ -103,6 +113,7 @@ public class Book implements Serializable
 
     /**
      * Getter to the book image
+     *
      * @return - The book image
      */
     public Image getImage()
@@ -113,6 +124,7 @@ public class Book implements Serializable
 
     /**
      * Get the book wait list
+     *
      * @return - The book wait list as a HashMap
      */
     public HashMap<String, Date> getWaitlist()
@@ -122,6 +134,7 @@ public class Book implements Serializable
 
     /**
      * Set the book image
+     *
      * @param image - The book image
      */
     public void setImage(byte[] image)
@@ -131,7 +144,8 @@ public class Book implements Serializable
 
     /**
      * Add a subscriber to the book wait list
-     * @param SubscriberID - The subscriber id
+     *
+     * @param SubscriberID  - The subscriber id
      * @param orderDateTime - The date and time the subscriber ordered the book
      */
     public void addSubscriberToWaitlist(String SubscriberID, Date orderDateTime)
@@ -145,6 +159,7 @@ public class Book implements Serializable
 
     /**
      * Remove a subscriber from the book wait list
+     *
      * @param SubscriberID - The subscriber id
      */
     public void removeSubscriberFromWaitlist(String SubscriberID)
