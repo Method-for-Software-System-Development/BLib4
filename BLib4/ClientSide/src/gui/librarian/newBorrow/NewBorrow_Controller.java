@@ -354,13 +354,16 @@ public class NewBorrow_Controller {
             String copyID = copyIdField.getText();
             String userID = userIdField.getText();
 
-            if (borrowController.createNewBorrow(userID, copyID, returnDate.toString()))
+            if (borrowController.createNewBorrow(userID, copyID, returnDate.toString())) {
                 showInformationAlert("Success", "The borrow has been successfully created.");
+                //back to the start of new borrow
+                SceneManager.switchScene("/gui/librarian/newBorrow/NewBorrow_UI.fxml", "BLib.4 - Braude Library Management");
+            }
             else
                 showErrorAlert("Error", "Failed to create the borrow. Please try again.");
         }
     }
-
+    
     @FXML
     private void reset_form() {
         // Reset the form by reloading the scene

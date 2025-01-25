@@ -228,41 +228,52 @@ public class ServerController extends AbstractServer
 
             case "112":
                 // Request to get all the subscriber history
+            	// Old subscriber details
                 responseMsg = new MessageType("212", dbController.handleReturnSubscriberHistory((String) receiveMsg.data));
                 break;
 
             case "113":
                 // Request to update subscriber email and phone number
+                Subscriber oldSubscriber = dbController.getSubscriberBySubscriberId(((Subscriber) receiveMsg.data).getId());
+                
                 responseMsg = new MessageType("213", dbController.handleUpdateSubscriberDetails((Subscriber) receiveMsg.data));
-
-
+                
                 if ((boolean) responseMsg.getData())
                 {
-                    Subscriber subscriber = dbController.getSubscriberBySubscriberId(((Subscriber) receiveMsg.data).getId());
+                	// Fetch subscriber details after update in DB
+                	Subscriber updatedSubscriber = dbController.getSubscriberBySubscriberId(oldSubscriber.getId());
                     // Getting a history file of subscriber
-                    historyList = dbController.getHistoryFileBySubscriberId(subscriber.getId());
+                    historyList = dbController.getHistoryFileBySubscriberId(updatedSubscriber.getId());
+                    
+                    // Old and new details that can be changed
+                    String newPhone = updatedSubscriber.getPhone();
+                    String newMail = updatedSubscriber.getEmail();
+                    String oldPhone = oldSubscriber.getPhone();
+                    String oldMail = oldSubscriber.getEmail();
+                    
                     // Setting the new list to the old list in-case there will be no changes
                     List<String[]> newHistoryList = historyList;
+                    
                     // Case for phone number and mail change
-                    if (!Objects.equals(subscriber.getEmail(), ((Subscriber) receiveMsg.data).getEmail()) && !Objects.equals(subscriber.getPhone(), ((Subscriber) receiveMsg.data).getPhone()))
+                    if (!Objects.equals(newMail, oldMail) && !Objects.equals(newPhone, oldPhone))
                     {
                         // Document phone number and mail change
-                        newHistoryList = documentationController.documentOnReaderCard("113-3", historyList, ((Subscriber) receiveMsg.data).getPhone(), ((Subscriber) receiveMsg.data).getEmail());
+                        newHistoryList = documentationController.documentOnReaderCard("113-3", historyList, newPhone, newMail);
                     }
                     // Case for only mail change
-                    else if (!Objects.equals(subscriber.getEmail(), ((Subscriber) receiveMsg.data).getEmail()))
+                    else if (!Objects.equals(newMail, oldMail))
                     {
                         // Document mail change
-                        newHistoryList = documentationController.documentOnReaderCard("113-2", historyList, ((Subscriber) receiveMsg.data).getEmail(), null);
+                        newHistoryList = documentationController.documentOnReaderCard("113-2", historyList, newMail, null);
                     }
                     // Case for only phone number change
-                    else if (!Objects.equals(subscriber.getPhone(), ((Subscriber) receiveMsg.data).getPhone()))
+                    else if (!Objects.equals(newPhone, oldPhone))
                     {
                         // Document phone number change
-                        newHistoryList = documentationController.documentOnReaderCard("113-1", historyList, ((Subscriber) receiveMsg.data).getPhone(), null);
+                        newHistoryList = documentationController.documentOnReaderCard("113-1", historyList, newPhone, null);
                     }
                     // Updating a subscriber history file in DB
-                    dbController.handleUpdateHistoryFileBySubscriberId(subscriber.getId(), newHistoryList);
+                    dbController.handleUpdateHistoryFileBySubscriberId(updatedSubscriber.getId(), newHistoryList);
                 }
                 break;
 
@@ -350,6 +361,11 @@ public class ServerController extends AbstractServer
                 responseMsg = new MessageType("226", BlobUtil.convertBlobToList(blobData));
                 break;
 
+            case "127":
+            	// Request for a subscriber updated information
+            	responseMsg = new MessageType("227", dbController.getSubscriberBySubscriberId((String) receiveMsg.data));
+            	break;
+            	
             case "128":
                 // Response to get all librarian unread messages
                 responseMsg = new MessageType("228", dbController.handleGetUnreadLibrarianMessages());
@@ -359,7 +375,7 @@ public class ServerController extends AbstractServer
                 // Response to update mark librarian message as read
                 responseMsg = new MessageType("229", dbController.handleMarkLibrarianNotificationAsRead((String) receiveMsg.data));
                 break;
-
+                
             default:
                 System.out.println("Invalid message type");
                 return;

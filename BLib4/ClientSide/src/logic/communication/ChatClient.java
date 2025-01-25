@@ -60,6 +60,7 @@ public class ChatClient extends AbstractClient
     public static List<String> smsData;
     public static int subscriberStatus;
     public static String messageData;
+    public static Subscriber updatedSubscriberInfo;
 
     //Constructors ****************************************************
 
@@ -291,7 +292,11 @@ public class ChatClient extends AbstractClient
                 //response for blob data of report request
                 blobData = (List<String[]>) receiveMsg.data;
                 break;
-
+            case "227":
+            	// response subscriber info
+            	updatedSubscriberInfo = (Subscriber) receiveMsg.getData();
+            	break;
+            	
             case "228":
                 // list of unread librarian messages
                 listOfMessages = (ArrayList<ArrayList<String>>) receiveMsg.getData();
@@ -301,7 +306,7 @@ public class ChatClient extends AbstractClient
                 //response from server for message confirmation
                 serverResponse = (boolean) receiveMsg.getData();
                 break;
-
+            	
             default:
                 System.out.println("Invalid message received from server");
                 break;
