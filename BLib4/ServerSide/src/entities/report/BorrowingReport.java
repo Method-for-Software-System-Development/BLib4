@@ -1,7 +1,9 @@
 package entities.report;
 
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 public class BorrowingReport extends Report
 {

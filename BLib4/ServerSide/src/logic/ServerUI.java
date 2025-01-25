@@ -98,7 +98,6 @@ public class ServerUI extends Application
 
         //?/////////////////////////////////////////
 
-
         // Allow resizing
         primaryStage.setResizable(true);
 

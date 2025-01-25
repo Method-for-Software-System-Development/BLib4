@@ -55,6 +55,7 @@ public class ServerController extends AbstractServer
     {
         MessageType receiveMsg = (MessageType) msg;
         MessageType responseMsg;
+        
         switch (receiveMsg.getId())
         {
             case "99":
