@@ -667,13 +667,13 @@ public class DbController
             stmt.setString(3, copyId);
             stmt.setString(4, dueDate);
             stmt.executeUpdate();
-            
+
             //check if a matching book order exists
             stmt = connection.prepareStatement("SELECT order_id FROM subscriber_order WHERE subscriber_id= ? AND is_his_turn = 1 AND book_id=(SELECT book_id from copy_of_the_book WHERE copy_id = ?);");
             stmt.setString(1, subscriberId);
             stmt.setString(2, copyId);
             rs = stmt.executeQuery();
-            
+
             //if a matching order exists - change the order's is_active to 0
             if (rs.next())
             {
@@ -683,6 +683,19 @@ public class DbController
                 stmt.setString(1, orderId);
                 stmt.executeUpdate();
             }
+
+            // get the max scheduler id
+            stmt = connection.prepareStatement("SELECT MAX(scheduler_id) FROM scheduler_triggers;");
+            rs = stmt.executeQuery();
+            rs.next();
+
+            // add trigger to send reminder email to the subscriber day before the return date
+            stmt = connection.prepareStatement("INSERT INTO scheduler_triggers (scheduler_id, trigger_date, trigger_operation, relevant_id, is_triggered) VALUES (?, ?, ?, ?,0);");
+            stmt.setString(1, String.valueOf(rs.getInt(1) + 1));
+            stmt.setString(2, LocalDate.parse(dueDate).minusDays(1).toString());
+            stmt.setString(3, "notifyDayBeforeReturnDate");
+            stmt.setString(4, String.valueOf(borrowId));
+            stmt.executeUpdate();
 
         }
         catch (SQLException e)
@@ -846,7 +859,7 @@ public class DbController
         List<Boolean> returnValue = new ArrayList<>();
         boolean validFlag = true;
         PreparedStatement stmt;
-        String copyId = "";
+        String copyId;
 
         // check if the borrow is active
         try
@@ -934,7 +947,7 @@ public class DbController
                     stmt = connection.prepareStatement("INSERT INTO scheduler_triggers (scheduler_id, trigger_date, trigger_operation, relevant_id) VALUES (?,?, ?, ?);");
                     stmt.setString(1, String.valueOf(schedulerId));
                     stmt.setDate(2, Date.valueOf(LocalDate.now().plusMonths(1)));
-                    stmt.setString(3, "freeze");
+                    stmt.setString(3, "unfrozen");
                     stmt.setString(4, subscriberId);
                     stmt.executeUpdate();
 
@@ -947,6 +960,17 @@ public class DbController
                     returnValue.add(true);
                     returnValue.add(false);
                 }
+
+                // update the scheduler trigger to be triggered (no need to send reminder email)
+                stmt = connection.prepareStatement("SELECT scheduler_id FROM scheduler_triggers WHERE trigger_operation = 'notifyDayBeforeReturnDate' AND relevant_id = ? AND is_triggered = 0;");
+                stmt.setString(1, borrowId);
+                rs = stmt.executeQuery();
+                rs.next();
+
+                stmt = connection.prepareStatement("UPDATE scheduler_triggers SET is_triggered = 1 WHERE scheduler_id = ?;");
+                stmt.setInt(1, rs.getInt(1));
+                stmt.executeUpdate();
+
             }
             catch (SQLException e)
             {
@@ -968,37 +992,8 @@ public class DbController
                 rs.next();
                 String bookId = rs.getString(1);
 
-                // check if there are orders for the book and get the oldest order
-                stmt = connection.prepareStatement("SELECT * from subscriber_order WHERE book_id = ? AND is_active = true AND is_his_turn = false ORDER BY order_date LIMIT 1;");
-                stmt.setString(1, bookId);
-                rs = stmt.executeQuery();
+                handleBookOrderWhenCopyAvailable(bookId);
 
-                // check if we have a subscriber that waits for the book
-                if (rs.next())
-                {
-                    // update order to have his turn on
-                    stmt = connection.prepareStatement("UPDATE subscriber_order SET is_his_turn = true WHERE order_id = ?;");
-                    stmt.setString(1, rs.getString("order_id"));
-                    stmt.executeUpdate();
-
-                    // get the subscriber email
-                    stmt = connection.prepareStatement("SELECT subscriber_first_name,subscriber_email from subscriber WHERE subscriber_id = ?;");
-                    stmt.setString(1, rs.getString("subscriber_id"));
-                    ResultSet rs2 = stmt.executeQuery();
-                    rs2.next();
-                    String subscriberFirstName = rs2.getString(1);
-                    String subscriberEmail = rs2.getString(2);
-
-                    // get the book name
-                    stmt = connection.prepareStatement("SELECT book_title from book WHERE book_id = ?;");
-                    stmt.setString(1, bookId);
-                    rs2 = stmt.executeQuery();
-                    rs2.next();
-
-                    // send email to the subscriber
-                    String message = "Dear " + subscriberFirstName + ",\n\n your order for the book " + rs2.getString("book_title") + " with book id \"" + bookId + "\" and copy id \"" + copyId + "\" has arrived.\n\n Please visit the library to collect it.";
-                    Notification_Controller.getInstance().sendEmail(subscriberEmail, "The book you ordered is now available for you to borrow", message);
-                }
             }
             catch (SQLException e)
             {
@@ -1009,6 +1004,58 @@ public class DbController
 
         return returnValue;
     }
+
+    /**
+     * The method run SQL query
+     * to handle sending email to the subscriber that has ordered a book and when the book is available
+     *
+     * @param bookId - the id of the book that is available
+     */
+    public void handleBookOrderWhenCopyAvailable(String bookId)
+    {
+        PreparedStatement stmt;
+        ResultSet rs;
+
+        try
+        {
+            // check if there are orders for the book and get the oldest order
+            stmt = connection.prepareStatement("SELECT * from subscriber_order WHERE book_id = ? AND is_active = true AND is_his_turn = false ORDER BY order_date LIMIT 1;");
+            stmt.setString(1, bookId);
+            rs = stmt.executeQuery();
+
+            // check if we have a subscriber that waits for the book
+            if (rs.next())
+            {
+                // update order to have his turn on
+                stmt = connection.prepareStatement("UPDATE subscriber_order SET is_his_turn = true WHERE order_id = ?;");
+                stmt.setString(1, rs.getString("order_id"));
+                stmt.executeUpdate();
+
+                // get the subscriber email
+                stmt = connection.prepareStatement("SELECT subscriber_first_name,subscriber_email from subscriber WHERE subscriber_id = ?;");
+                stmt.setString(1, rs.getString("subscriber_id"));
+                ResultSet rs2 = stmt.executeQuery();
+                rs2.next();
+                String subscriberFirstName = rs2.getString(1);
+                String subscriberEmail = rs2.getString(2);
+
+                // get the book name
+                stmt = connection.prepareStatement("SELECT book_title from book WHERE book_id = ?;");
+                stmt.setString(1, bookId);
+                rs2 = stmt.executeQuery();
+                rs2.next();
+
+                // send email to the subscriber
+                String message = "Dear " + subscriberFirstName + ",\n\n your order for the book " + rs2.getString("book_title") + " with book id \"" + bookId + "\" has arrived.\n\n Please visit the library to collect it.";
+                Notification_Controller.getInstance().sendEmail(subscriberEmail, "The book you ordered is now available for you to borrow", message);
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! send email to the subscriber that has ordered a book and when the book is available failed");
+        }
+    }
+
 
     /**
      * The method run SQL query to get the subscriber active borrow list
@@ -1159,6 +1206,17 @@ public class DbController
                 stmt = connection.prepareStatement("UPDATE borrow_book SET borrow_due_date = ? WHERE borrow_id = ?;");
                 stmt.setDate(1, newDueDate);
                 stmt.setString(2, borrowId);
+                stmt.executeUpdate();
+
+                // update the scheduler to send reminder email to the subscriber day before the new return date
+                stmt = connection.prepareStatement("SELECT scheduler_id FROM scheduler_triggers WHERE trigger_operation = 'notifyDayBeforeReturnDate' AND relevant_id = ? AND is_triggered = 0;");
+                stmt.setString(1, borrowId);
+                rs = stmt.executeQuery();
+                rs.next();
+
+                stmt = connection.prepareStatement("UPDATE scheduler_triggers SET trigger_date = ? WHERE scheduler_id = ?;");
+                stmt.setDate(1, Date.valueOf(newDueDate.toLocalDate().minusDays(1)));
+                stmt.setInt(2, rs.getInt(1));
                 stmt.executeUpdate();
             }
             catch (SQLException e)
@@ -1325,6 +1383,17 @@ public class DbController
                 stmt.setDate(1, newDueDate);
                 stmt.setString(2, borrowId);
                 stmt.executeUpdate();
+
+                // update the scheduler to send reminder email to the subscriber day before the new return date
+                stmt = connection.prepareStatement("SELECT scheduler_id FROM scheduler_triggers WHERE trigger_operation = 'notifyDayBeforeReturnDate' AND relevant_id = ? AND is_triggered = 0;");
+                stmt.setString(1, borrowId);
+                rs = stmt.executeQuery();
+                rs.next();
+
+                stmt = connection.prepareStatement("UPDATE scheduler_triggers SET trigger_date = ? WHERE scheduler_id = ?;");
+                stmt.setDate(1, Date.valueOf(newDueDate.toLocalDate().minusDays(1)));
+                stmt.setInt(2, rs.getInt(1));
+                stmt.executeUpdate();
             }
             catch (SQLException e)
             {
@@ -1338,6 +1407,7 @@ public class DbController
 
     /**
      * The method run SQL query to handle update book copy to lost status
+     *
      * @param copyId - the id of the copy
      * @return - true if the update succeeds, else false
      */
@@ -1469,28 +1539,54 @@ public class DbController
         return books;
     }
 
-    public List<Subscriber> handleNotifyDayBeforeReturnDate()
+    /**
+     * The method run SQL query to get all the borrow details that the return date is tomorrow
+     *
+     * @return - list of the borrow details
+     *              [0] - the subscriber id
+     *              [1] - the subscriber name
+     *              [2] - the subscriber email
+     *              [3] - the book title
+     */
+    public List<List<String>> handleGetReminderDayBeforeDetails()
     {
-        List<Subscriber> allSubscribers = handleGetAllSubscribers();
-        List<Subscriber> dueSubscribers = new ArrayList<>();
+        PreparedStatement stmt;
+        ResultSet rs;
+        List<List<String>> reminderDetails = new ArrayList<>();
 
-        try (PreparedStatement stmt = connection.prepareStatement(
-                "SELECT subscriber_id FROM borrow_book WHERE borrow_due_date = DATE_ADD(CURRENT_DATE, INTERVAL 1 DAY)"
-        ))
+        try
         {
-            ResultSet rs = stmt.executeQuery();
+            // get all the borrow ids that the return date is tomorrow (from the scheduler_triggers table)
+            stmt = connection.prepareStatement("SELECT scheduler_id,relevant_id FROM scheduler_triggers " +
+                    "WHERE trigger_operation = 'notifyDayBeforeReturnDate' AND trigger_date <= NOW() AND is_triggered = 0;");
+            rs = stmt.executeQuery();
+
+            String borrowId;
             while (rs.next())
             {
-                String subscriberId = rs.getString("subscriber_id");
-                // Find and add the matching subscriber
-                for (Subscriber subscriber : allSubscribers)
-                {
-                    if (subscriber.getId().equals(subscriberId))
-                    {
-                        dueSubscribers.add(subscriber);
-                        break;
-                    }
-                }
+                borrowId = rs.getString("relevant_id");
+
+                // get the subscriber name and email + the book title
+                stmt = connection.prepareStatement("SELECT S.subscriber_id ,S.subscriber_first_name, S.subscriber_email, B.book_title\n" +
+                        "FROM subscriber S, book B, copy_of_the_book C, borrow_book BB\n" +
+                        "WHERE S.subscriber_id = BB.subscriber_id AND C.copy_id = BB.copy_id AND B.book_id = C.book_id AND BB.borrow_id = ?;");
+                stmt.setString(1, borrowId);
+
+                ResultSet rs2 = stmt.executeQuery();
+                rs2.next();
+
+                List<String> reminderRow = new ArrayList<>();
+                reminderRow.add(rs2.getString("subscriber_id"));
+                reminderRow.add(rs2.getString("subscriber_first_name"));
+                reminderRow.add(rs2.getString("subscriber_email"));
+                reminderRow.add(rs2.getString("book_title"));
+
+                reminderDetails.add(reminderRow);
+
+                // update the scheduler to be triggered
+                stmt = connection.prepareStatement("UPDATE scheduler_triggers SET is_triggered = 1 WHERE scheduler_id = ?;");
+                stmt.setString(1, rs.getString("scheduler_id"));
+                stmt.executeUpdate();
             }
         }
         catch (SQLException e)
@@ -1498,92 +1594,74 @@ public class DbController
             System.out.println("Error! notify day before return date failed");
         }
 
-        return dueSubscribers;
+        return reminderDetails;
     }
 
 
     /**
      * Handles unfulfilled orders by retrieving books, updating the subscriber status,
      * and returning a map of books to the last subscriber waiting for each book.
-     *
-     * @return A map where the key is the book ID, and the value is the last subscriber waiting for the book.
      */
-    public Map<String, Subscriber> handleDeleteUnfulfilledOrder()
+    public void handleDeleteUnfulfilledOrder()
     {
         PreparedStatement selectBookStmt;
         PreparedStatement updateStmt;
-        PreparedStatement getLastWaitingSubscriberStmt;
         ResultSet bookResultSet;
-        Map<String, Subscriber> bookToSubscriberMap = new HashMap<>();
 
         try
         {
             // Step 1: Select book IDs related to the unfulfilled orders
-            String selectBookQuery = "SELECT DISTINCT so.book_id\n" +
-                    "FROM subscriber_order so\n" +
-                    "         JOIN subscriber s ON so.subscriber_id = s.subscriber_id\n" +
-                    "         JOIN scheduler_triggers t ON t.relevant_id = s.subscriber_id\n" +
-                    "WHERE t.trigger_date = CURRENT_DATE\n" +
-                    "  AND t.trigger_operation = 'order'\n" +
-                    "  AND so.is_active = 1;";
+            String selectBookQuery = "SELECT st.scheduler_id, o.order_id, o.book_id\n" +
+                    "FROM scheduler_triggers st\n" +
+                    "         JOIN subscriber_order o ON st.relevant_id = o.order_id\n" +
+                    "WHERE st.is_triggered = 0\n" +
+                    "  AND st.trigger_date <= NOW()\n" +
+                    "  AND st.trigger_operation = 'order';";
 
             selectBookStmt = connection.prepareStatement(selectBookQuery);
             bookResultSet = selectBookStmt.executeQuery();
 
             List<String> bookIds = new ArrayList<>();
+            List<String> orderIds = new ArrayList<>();
+            List<String> schedulerIds = new ArrayList<>();
             while (bookResultSet.next())
             {
                 String bookId = bookResultSet.getString("book_id");
                 bookIds.add(bookId);
+
+                String orderId = bookResultSet.getString("order_id");
+                orderIds.add(orderId);
+
+                String schedulerId = bookResultSet.getString("scheduler_id");
+                schedulerIds.add(schedulerId);
             }
-            System.out.println("Books related to unfulfilled orders: " + bookIds);
 
             // Step 2: Update `is_active` status for the relevant subscribers
-            String updateQuery = "UPDATE subscriber_order\n" +
-                    "            SET is_active = 0\n" +
-                    "            WHERE subscriber_id IN\n" +
-                    "                (SELECT s.subscriber_id\n" +
-                    "               FROM scheduler_triggers t\n" +
-                    "               JOIN subscriber s ON t.relevant_id = s.subscriber_id\n" +
-                    "               WHERE t.trigger_date = CURRENT_DATE\n" +
-                    "                  AND t.trigger_operation = 'order'\n" +
-                    "                 AND s.is_active = 1);";
+            String updateQuery = "UPDATE subscriber_order SET is_active = 2 WHERE order_id = ?;";
 
             updateStmt = connection.prepareStatement(updateQuery);
-            int rowsUpdated = updateStmt.executeUpdate();
-            System.out.println("Number of rows updated in subscriber_order: " + rowsUpdated);
 
-            // Step 3: Retrieve the last subscriber waiting for each book based on order_date
-            String getLastWaitingSubscriberQuery = "SELECT s.subscriber_id, s.subscriber_first_name, s.subscriber_last_name,\n" +
-                    "       s.subscriber_phone_number, s.subscriber_email, so.is_active\n" +
-                    "FROM subscriber_order so\n" +
-                    "         JOIN subscriber s ON so.subscriber_id = s.subscriber_id\n" +
-                    "WHERE so.book_id = ?\n" +
-                    "  AND so.is_active = 1\n" +
-                    "ORDER BY so.order_date DESC\n" +
-                    "LIMIT 1";
-            getLastWaitingSubscriberStmt = connection.prepareStatement(getLastWaitingSubscriberQuery);
-
-            for (String bookId : bookIds)
+            for (String orderId : orderIds)
             {
-                getLastWaitingSubscriberStmt.setString(1, bookId);
-                ResultSet subscriberResultSet = getLastWaitingSubscriberStmt.executeQuery();
+                updateStmt.setString(1, orderId);
+                updateStmt.executeUpdate();
+            }
 
-                if (subscriberResultSet.next())
-                {
-                    Subscriber lastWaitingSubscriber = new Subscriber(
-                            subscriberResultSet.getString("subscriber_id"),
-                            subscriberResultSet.getString("subscriber_first_name"),
-                            subscriberResultSet.getString("subscriber_last_name"),
-                            subscriberResultSet.getString("subscriber_phone_number"),
-                            subscriberResultSet.getString("subscriber_email"),
-                            subscriberResultSet.getBoolean("is_active")
-                    );
+            // Step 3: update the scheduler_triggers table to mark the trigger as triggered
+            String updateTriggerQuery = "UPDATE scheduler_triggers SET is_triggered = 1 WHERE scheduler_id = ?";
+            updateStmt = connection.prepareStatement(updateTriggerQuery);
 
-                    bookToSubscriberMap.put(bookId, lastWaitingSubscriber);
-                    System.out.println("Last waiting subscriber for book ID " + bookId + ": " + lastWaitingSubscriber);
-                }
-                subscriberResultSet.close();
+            for (String schedulerId : schedulerIds)
+            {
+                updateStmt.setString(1, schedulerId);
+                updateStmt.executeUpdate();
+            }
+
+
+            // Step 4: send notification to the last subscriber waiting for each book
+            for (String book : bookIds)
+            {
+                handleBookOrderWhenCopyAvailable(book);
             }
 
         }
@@ -1591,8 +1669,6 @@ public class DbController
         {
             System.out.println("Error! delete unfulfilled order failed");
         }
-
-        return bookToSubscriberMap;
     }
 
 
@@ -1612,24 +1688,21 @@ public class DbController
 
         try
         {
-            // Step 1: Select frozen subscribers from `scheduler_triggers` where the freeze date is exactly 30 days ago
-            String selectQuery = "SELECT t.relevant_id, s.subscriber_first_name, s.subscriber_last_name\n" +
-                    "FROM scheduler_triggers t\n" +
-                    "         JOIN subscriber s ON t.relevant_id = s.subscriber_id\n" +
-                    "WHERE t.trigger_operation = 'freeze'\n" +
-                    "  AND DATEDIFF(CURRENT_DATE, t.trigger_date) = 30\n" +
-                    "  AND s.is_active = 0";
+            // Step 1: Select frozen subscribers from `scheduler_triggers`
+            // where the unfrozen date today or past today and not triggered before
+            String selectQuery = "SELECT scheduler_id, relevant_id from scheduler_triggers WHERE is_triggered = 0 AND trigger_date <= NOW() AND trigger_operation = 'unfrozen';";
             selectStmt = connection.prepareStatement(selectQuery);
             rs = selectStmt.executeQuery();
 
             List<String> frozenSubscriberIds = new ArrayList<>();
-
+            List<String> schedulerIds = new ArrayList<>();
             while (rs.next())
             {
                 String subscriberId = rs.getString("relevant_id");
-                String subscriberName = rs.getString("subscriber_first_name") + " " + rs.getString("subscriber_last_name");
                 frozenSubscriberIds.add(subscriberId);
-                System.out.println("Unfreezing subscriber: " + subscriberName + " (ID: " + subscriberId + ")");
+
+                String schedulerId = rs.getString("scheduler_id");
+                schedulerIds.add(schedulerId);
             }
 
             // Step 2: Update `subscriber` table to set `is_active = 1` for frozen subscribers
@@ -1647,6 +1720,16 @@ public class DbController
                 }
             }
 
+            // Step 3: Update the `scheduler_triggers` table to mark the trigger as triggered
+            String updateTriggerQuery = "UPDATE scheduler_triggers SET is_triggered = 1 WHERE scheduler_id = ?;";
+            updateSubscriberStmt = connection.prepareStatement(updateTriggerQuery);
+
+            for (String schedulerId : schedulerIds)
+            {
+                updateSubscriberStmt.setString(1, schedulerId);
+                updateSubscriberStmt.executeUpdate();
+            }
+
         }
         catch (SQLException e)
         {
@@ -1655,36 +1738,93 @@ public class DbController
     }
 
     /**
-     * Fetches the full name of a subscriber based on their ID.
+     * The method run SQL query to check if we need to update the daily report and create trigger for tomorrow
      *
-     * @param subscriberID The ID of the subscriber.
-     * @return The full name of the subscriber, or null if not found.
+     * @return - true if we need to update the daily report, else false
      */
-    public String fetchSubscriberName(String subscriberID)
+    public boolean handleGetTriggerOfDailyReportUpdate()
     {
-        String subscriberName = null;
         PreparedStatement stmt;
         ResultSet rs;
-
         try
         {
-            String query = "SELECT subscriber_first_name, subscriber_last_name FROM subscriber WHERE subscriber_id = ?";
-            stmt = connection.prepareStatement(query);
-            stmt.setString(1, subscriberID);
-
+            stmt = connection.prepareStatement("SELECT scheduler_id FROM scheduler_triggers WHERE trigger_operation = 'daily report' AND is_triggered = 0 AND trigger_date < NOW();");
             rs = stmt.executeQuery();
             if (rs.next())
             {
-                subscriberName = rs.getString("subscriber_first_name") + " " + rs.getString("subscriber_last_name");
+                // update the trigger to be triggered
+                stmt = connection.prepareStatement("UPDATE scheduler_triggers SET is_triggered = 1 WHERE scheduler_id = ?;");
+                stmt.setString(1, rs.getString("scheduler_id"));
+                stmt.executeUpdate();
+
+                // get the max scheduler id
+                stmt = connection.prepareStatement("SELECT MAX(scheduler_id) FROM scheduler_triggers;");
+                rs = stmt.executeQuery();
+                rs.next();
+                int schedulerId = rs.getInt(1) + 1;
+
+                // create trigger for tomorrow
+                stmt = connection.prepareStatement("INSERT INTO scheduler_triggers (scheduler_id, trigger_date, trigger_operation, relevant_id,is_triggered) VALUES (?,?,?, 0, 0);");
+                stmt.setString(1, String.valueOf(schedulerId));
+                stmt.setDate(2, Date.valueOf(LocalDate.now().plusDays(1)));
+                stmt.setString(3, "daily report");
+
+                stmt.executeUpdate();
+
+                return true;
             }
         }
         catch (SQLException e)
         {
-            System.out.println("Error! fetch subscriber name failed");
+            System.out.println("Error! get trigger of daily report update failed");
         }
-
-        return subscriberName;
+        return false;
     }
+
+    /**
+     * The method run SQL query to check if we need to update the monthly report and create trigger for next month
+     *
+     * @return - true if we need to update the monthly report, else false
+     */
+    public boolean handleGetTriggerOfMonthlyReportUpdate()
+    {
+        PreparedStatement stmt;
+        ResultSet rs;
+        try
+        {
+            stmt = connection.prepareStatement("SELECT scheduler_id FROM scheduler_triggers WHERE trigger_operation = 'monthly report' AND is_triggered = 0 AND trigger_date < NOW();");
+            rs = stmt.executeQuery();
+            if (rs.next())
+            {
+                // update the trigger to be triggered
+                stmt = connection.prepareStatement("UPDATE scheduler_triggers SET is_triggered = 1 WHERE scheduler_id = ?;");
+                stmt.setString(1, rs.getString("scheduler_id"));
+                stmt.executeUpdate();
+
+                // get the max scheduler id
+                stmt = connection.prepareStatement("SELECT MAX(scheduler_id) FROM scheduler_triggers;");
+                rs = stmt.executeQuery();
+                rs.next();
+                int schedulerId = rs.getInt(1) + 1;
+
+                // create trigger for the start of next month
+                stmt = connection.prepareStatement("INSERT INTO scheduler_triggers (scheduler_id, trigger_date, trigger_operation, relevant_id,is_triggered) VALUES (?,?,?, 0, 0);");
+                stmt.setString(1, String.valueOf(schedulerId));
+                stmt.setDate(2, Date.valueOf(LocalDate.now().plusMonths(1).withDayOfMonth(1)));
+                stmt.setString(3, "monthly report");
+
+                stmt.executeUpdate();
+
+                return true;
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! get trigger of daily report update failed");
+        }
+        return false;
+    }
+
 
     /**
      * Fetches the subscriber's name and the book title for their order.*
@@ -1754,34 +1894,6 @@ public class DbController
         }
 
         return BlobUtil.convertBlobToList(blob);
-    }
-
-    /**
-     * The method run SQL query to update the history of a subscriber by his id
-     *
-     * @param history_id - the id of the history
-     * @param list       - the new history file
-     * @return - true if the update succeeds, else false
-     */
-    public boolean handleUpdateHistoryFileById(String history_id, List<String[]> list) throws IOException
-    {
-        PreparedStatement stmt;
-        byte[] blob = BlobUtil.convertListToBlob(list);
-        try
-        {
-            String query = "UPDATE subsribers_history SET history_file = ? WHERE id = ?";
-            stmt = connection.prepareStatement(query);
-            stmt.setBytes(1, blob);
-            stmt.setString(2, history_id);
-            stmt.executeUpdate();
-        }
-        catch (SQLException e)
-        {
-            System.out.println("Error! update history file failed");
-            return false;
-        }
-
-        return true;
     }
 
     /**
@@ -1955,37 +2067,6 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to get the borrow due date by the borrow id
-     *
-     * @param borrowId - the id of the borrow
-     * @return - the due date of the borrow
-     */
-    public Date getBorrowDueDateByBorrowId(String borrowId)
-    {
-        PreparedStatement stmt;
-        ResultSet rs;
-        Date dueDate = null;
-
-        try
-        {
-            String query = "SELECT borrow_due_date FROM borrow_book WHERE borrow_id = ?";
-            stmt = connection.prepareStatement(query);
-            stmt.setString(1, borrowId);
-            rs = stmt.executeQuery();
-            if (rs.next())
-            {
-                dueDate = rs.getDate("borrow_due_date");
-            }
-        }
-        catch (SQLException e)
-        {
-            System.out.println("Error! get borrow due date by borrow id failed");
-        }
-
-        return dueDate;
-    }
-
-    /**
      * The method run SQL query to get the subscriber by subscriber id
      *
      * @param subscriberId - the id of the subscriber
@@ -2125,8 +2206,6 @@ public class DbController
         }
         else
         {
-            // check the first available date the book available
-
             // check how much copies of the book exists
             try
             {
@@ -2140,7 +2219,7 @@ public class DbController
                 if (copies == ordered)
                 {
                     // we need to check the closest return date and add 2 weeks
-                    stmt = connection.prepareStatement("SELECT MIN(borrow_due_date) from borrow_book WHERE copy_id IN (SELECT copy_id from copy_of_the_book WHERE book_id = ? AND is_available <> 2);");
+                    stmt = connection.prepareStatement("SELECT MIN(borrow_due_date) from borrow_book WHERE is_active = 1 AND copy_id IN (SELECT copy_id from copy_of_the_book WHERE book_id = ? AND is_available <> 2);");
                     stmt.setString(1, bookId);
                     stmt.executeQuery();
 
@@ -2153,7 +2232,7 @@ public class DbController
                 else
                 {
                     // get all the active borrow due date ordered by the due date
-                    stmt = connection.prepareStatement("SELECT borrow_due_date from borrow_book WHERE copy_id IN (SELECT copy_id from copy_of_the_book WHERE book_id = ? AND is_available <> 2 AND is_active=1) ORDER BY borrow_due_date LIMIT 1;");
+                    stmt = connection.prepareStatement("SELECT borrow_due_date from borrow_book WHERE is_active = 1 AND copy_id IN (SELECT copy_id from copy_of_the_book WHERE book_id = ? AND is_available <> 2) ORDER BY borrow_due_date LIMIT 1;");
                     stmt.setString(1, bookId);
                     stmt.executeQuery();
 
@@ -2502,7 +2581,7 @@ public class DbController
             int reportId = rs.getInt(1);
 
             // update the report with the new data
-            stmt = connection.prepareStatement("UPDATE monthly_reports SET report_file = ? WHERE report_id = ?");
+            stmt = connection.prepareStatement("UPDATE monthly_reports SET report_file = ?, is_ready = 1 WHERE report_id = ?");
             stmt.setBytes(1, reportBlob);
             stmt.setInt(2, reportId);
             stmt.executeUpdate();
@@ -2523,8 +2602,8 @@ public class DbController
      */
     public void insertEmptyMonthlyReport(List<String> data)
     {
-        String query = "INSERT INTO monthly_reports (report_id, report_type, report_month, report_year, report_file) " +
-                "VALUES (?,?, ?, ? , '')";
+        String query = "INSERT INTO monthly_reports (report_id, report_type, report_month, report_year, report_file, is_ready) " +
+                "VALUES (?,?, ?, ? , '', 0);";
 
         try
         {
@@ -2553,6 +2632,32 @@ public class DbController
         catch (SQLException e)
         {
             System.out.println("Error! insert empty monthly report failed");
+        }
+    }
+
+    /**
+     * The method run SQL query to update the subscriber report from last month to ready
+     */
+    public void handleUpdateSubscriberReportToReady()
+    {
+        PreparedStatement stmt;
+        ResultSet rs;
+
+        try
+        {
+            // get the latest report (max report_id) for the same report type
+            stmt = connection.prepareStatement("SELECT MAX(report_id) FROM monthly_reports WHERE report_type = 'SubscribersStatus'");
+            rs = stmt.executeQuery();
+            rs.next();
+
+            // update the report to ready
+            stmt = connection.prepareStatement("UPDATE monthly_reports SET is_ready = 1 WHERE report_id = ?");
+            stmt.setInt(1, rs.getInt(1));
+            stmt.executeUpdate();
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! update subscriber report to ready failed");
         }
     }
 
@@ -2648,10 +2753,13 @@ public class DbController
 
                 String dateTime = rs.getString("notification_date");
                 // Utility method to format dates
-                try {
+                try
+                {
                     LocalDateTime localDateTime = LocalDateTime.parse(dateTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
                     dateTime = localDateTime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     // Do nothing
                 }
                 message.add(dateTime);
@@ -2819,4 +2927,3 @@ public class DbController
         return subscriberName;
     }
 }
-

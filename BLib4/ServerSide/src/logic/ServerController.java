@@ -411,8 +411,7 @@ public class ServerController extends AbstractServer
         dbController = DbController.getInstance();
 
         // start the schedulers
-        //ToDo: remove comment to run the schedulers
-        //SchedulerController.getInstance().startSchedulers();
+        SchedulerController.getInstance().startSchedulers();
     }
 
     /**
@@ -422,6 +421,7 @@ public class ServerController extends AbstractServer
     protected void serverStopped()
     {
         System.out.println("Server has stopped listening for connections.");
+        SchedulerController.getInstance().stopSchedulers();
     }
 
 

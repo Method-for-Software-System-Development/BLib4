@@ -1,11 +1,8 @@
 package logic;
 
 import entities.logic.Notification;
-import entities.user.Subscriber;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -18,10 +15,10 @@ public class SchedulerController
 {
     private volatile static SchedulerController instance;
 
-    private ScheduledExecutorService scheduler;
-    private DbController dbController; // Controller for database interactions
-    private Notification_Controller notificationController;
-    private ReportsGenerator_Controller reportsGeneratorController;
+    private final ScheduledExecutorService scheduler;
+    private final DbController dbController; // Controller for database interactions
+    private final Notification_Controller notificationController;
+    private final ReportsGenerator_Controller reportsGeneratorController;
 
     public static SchedulerController getInstance()
     {
@@ -47,7 +44,7 @@ public class SchedulerController
         this.scheduler = Executors.newScheduledThreadPool(1);
         this.dbController = DbController.getInstance();
         this.notificationController = Notification_Controller.getInstance();
-        this.reportsGeneratorController = ReportsGenerator_Controller.getInstance();       //ToDo: error with the env check the path
+        this.reportsGeneratorController = ReportsGenerator_Controller.getInstance();
     }
 
     /**
@@ -61,9 +58,8 @@ public class SchedulerController
         scheduler.scheduleAtFixedRate(this::notifyDayBeforeReturnDate, 0, 1, TimeUnit.DAYS);
         scheduler.scheduleAtFixedRate(this::notifyDeleteUnfulfilledOrder, 0, 1, TimeUnit.DAYS);
         scheduler.scheduleAtFixedRate(this::triggerOneMonthFromFreezeDate, 0, 1, TimeUnit.DAYS);
-        scheduler.scheduleAtFixedRate(reportsGeneratorController::DBdailyUpdate_SubscriberStatus, 0, 1, TimeUnit.DAYS);
-        scheduler.scheduleAtFixedRate(reportsGeneratorController::autoGenerate_BorrowingReport, 0, 1, TimeUnit.DAYS);
-        scheduler.scheduleAtFixedRate(reportsGeneratorController::autoGenerate_SubscribersStatusReport, 0, 1, TimeUnit.DAYS);
+        scheduler.scheduleAtFixedRate(this::triggerMonthlyReportCreation, 0, 1, TimeUnit.DAYS);
+        scheduler.scheduleAtFixedRate(this::triggerDailyReportUpdate, 0, 1, TimeUnit.DAYS);
         System.out.println("Scheduler started successfully.");
     }
 
@@ -88,26 +84,29 @@ public class SchedulerController
             System.out.println("Checking for books due tomorrow...");
 
             // Fetch subscribers with books due tomorrow
-            List<Subscriber> subscribers = dbController.handleNotifyDayBeforeReturnDate();
+            List<List<String>> remindersList = dbController.handleGetReminderDayBeforeDetails();
 
-            for (Subscriber subscriber : subscribers)
+            for (List<String> reminder : remindersList)
             {
                 // Create a notification
+                String message = "Hello " + reminder.get(1) + "\n\nReminder: You have a book: \"" + reminder.get(3) + "\" is due tomorrow.";
+
+
                 Notification notification = new Notification(
                         1,
                         "Library",
-                        subscriber.getEmail(),
+                        reminder.get(2),
                         "Email",
-                        "Reminder: A book is due tomorrow."
+                        message
                 );
 
                 // Send the notification using Notification_Controller
-                notificationController.dayBeforeReturnDate_Email_SMS(subscriber.getId(), subscriber.getEmail(), notification.getContent());
+                notificationController.dayBeforeReturnDate_Email_SMS(reminder.get(0), reminder.get(2), notification.getContent());
             }
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            System.out.println("Error while checking for books due tomorrow: " + e.getMessage());
         }
     }
 
@@ -117,30 +116,17 @@ public class SchedulerController
      */
     private void notifyDeleteUnfulfilledOrder()
     {
-        try
-        {
-            System.out.println("Checking for unfulfilled reservations older than two days...");
-            Map<String, Subscriber> bookToSubscriberMap = new HashMap<>();
-            bookToSubscriberMap = dbController.handleDeleteUnfulfilledOrder();
-            notificationController.orderArrived(bookToSubscriberMap);
-            System.out.println("Expired reservations removed successfully.");
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        System.out.println("Checking for unfulfilled reservations older than two days...");
+        dbController.handleDeleteUnfulfilledOrder();
     }
 
     /**
      * Sends a request to the server to check for subscribers who have been frozen for more than one calendar month.
-     * @return List of subscribers who have been frozen for more than one calendar month.
      */
     public void triggerOneMonthFromFreezeDate()
     {
-
-        System.out.println("Checking for subscribers who have been frozen for more than one month...");
+        System.out.println("Checking for subscribers who have been frozen for more than one calendar month...");
         dbController.handleOneMonthFromFreezeDate();
-        System.out.println("Subscribers who were frozen exactly one month ago have now been successfully unfrozen. ");
     }
 
     /**
@@ -148,7 +134,11 @@ public class SchedulerController
      */
     public void triggerDailyReportUpdate()
     {
-        //ToDo: implement
+        if (dbController.handleGetTriggerOfDailyReportUpdate())
+        {
+            // save daily data for the monthly report
+            reportsGeneratorController.dbDailyUpdate_SubscriberStatus();
+        }
     }
 
     /**
@@ -156,7 +146,13 @@ public class SchedulerController
      */
     public void triggerMonthlyReportCreation()
     {
-        //ToDo: implement
+        if (dbController.handleGetTriggerOfMonthlyReportUpdate())
+        {
+            // create a subscriber status report for next month
+            reportsGeneratorController.autoGenerate_SubscribersStatusReport();
+            // create a borrowing report for the prev month
+            reportsGeneratorController.autoGenerate_BorrowingReport();
+        }
     }
 
 }
