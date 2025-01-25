@@ -234,47 +234,46 @@ public class ServerController extends AbstractServer
 
             case "113":
                 // Request to update subscriber email and phone number
-                Subscriber subscriber = dbController.getSubscriberBySubscriberId(((Subscriber) receiveMsg.data).getId());
+                Subscriber oldSubscriber = dbController.getSubscriberBySubscriberId(((Subscriber) receiveMsg.data).getId());
                 
                 responseMsg = new MessageType("213", dbController.handleUpdateSubscriberDetails((Subscriber) receiveMsg.data));
                 
                 if ((boolean) responseMsg.getData())
                 {
+                	// Fetch subscriber details after update in DB
+                	Subscriber updatedSubscriber = dbController.getSubscriberBySubscriberId(oldSubscriber.getId());
                     // Getting a history file of subscriber
-                    historyList = dbController.getHistoryFileBySubscriberId(subscriber.getId());
+                    historyList = dbController.getHistoryFileBySubscriberId(updatedSubscriber.getId());
                     
-                    String newPhone = ((Subscriber) receiveMsg.data).getPhone();
-                    String newMail = ((Subscriber) receiveMsg.data).getEmail();
-                    
-                    String currentPhone = subscriber.getPhone();
-                    String currentMail = subscriber.getEmail();
+                    // Old and new details that can be changed
+                    String newPhone = updatedSubscriber.getPhone();
+                    String newMail = updatedSubscriber.getEmail();
+                    String oldPhone = oldSubscriber.getPhone();
+                    String oldMail = oldSubscriber.getEmail();
                     
                     // Setting the new list to the old list in-case there will be no changes
                     List<String[]> newHistoryList = historyList;
                     
                     // Case for phone number and mail change
-                    if (!Objects.equals(currentMail, newMail) && !Objects.equals(currentPhone, newPhone))
+                    if (!Objects.equals(newMail, oldMail) && !Objects.equals(newPhone, oldPhone))
                     {
-                    	System.out.println("email changed and phone changed");
                         // Document phone number and mail change
                         newHistoryList = documentationController.documentOnReaderCard("113-3", historyList, newPhone, newMail);
                     }
                     // Case for only mail change
-                    else if (!Objects.equals(currentMail, newMail))
+                    else if (!Objects.equals(newMail, oldMail))
                     {
-                    	System.out.println("email changed");
                         // Document mail change
                         newHistoryList = documentationController.documentOnReaderCard("113-2", historyList, newMail, null);
                     }
                     // Case for only phone number change
-                    else if (!Objects.equals(currentPhone, newPhone))
+                    else if (!Objects.equals(newPhone, oldPhone))
                     {
-                    	System.out.println("phone changed");
                         // Document phone number change
                         newHistoryList = documentationController.documentOnReaderCard("113-1", historyList, newPhone, null);
                     }
                     // Updating a subscriber history file in DB
-                    dbController.handleUpdateHistoryFileBySubscriberId(subscriber.getId(), newHistoryList);
+                    dbController.handleUpdateHistoryFileBySubscriberId(updatedSubscriber.getId(), newHistoryList);
                 }
                 break;
 
@@ -362,6 +361,11 @@ public class ServerController extends AbstractServer
                 responseMsg = new MessageType("226", BlobUtil.convertBlobToList(blobData));
                 break;
 
+            case "127":
+            	// Request for a subscriber updated information
+            	responseMsg = new MessageType("227", dbController.getSubscriberBySubscriberId((String) receiveMsg.data));
+            	break;
+            	
             case "128":
                 // Response to get all librarian unread messages
                 responseMsg = new MessageType("228", dbController.handleGetUnreadLibrarianMessages());
@@ -371,7 +375,7 @@ public class ServerController extends AbstractServer
                 // Response to update mark librarian message as read
                 responseMsg = new MessageType("229", dbController.handleMarkLibrarianNotificationAsRead((String) receiveMsg.data));
                 break;
-
+                
             default:
                 System.out.println("Invalid message type");
                 return;
