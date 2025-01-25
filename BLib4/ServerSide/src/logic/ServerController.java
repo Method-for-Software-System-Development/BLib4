@@ -182,6 +182,8 @@ public class ServerController extends AbstractServer
                     // Updating a subscriber history file in DB
                     dbController.handleUpdateHistoryFileBySubscriberId(subscriberId, newHistoryList);
                 }
+
+                // ToDo: docoment on reader card if the subscriber is frozen
                 break;
 
             case "110":
@@ -323,6 +325,8 @@ public class ServerController extends AbstractServer
             case "118":
                 // Request to update copy of the book to lost status
                 responseMsg = new MessageType("218", dbController.handleUpdateBookCopyToLost((String) receiveMsg.data));
+
+                // ToDo: Document on reader card
                 break;
 
             case "120":
@@ -423,7 +427,6 @@ public class ServerController extends AbstractServer
         System.out.println("Server has stopped listening for connections.");
         SchedulerController.getInstance().stopSchedulers();
     }
-
 
     /**
      * This method is called when the server is connected to a client.

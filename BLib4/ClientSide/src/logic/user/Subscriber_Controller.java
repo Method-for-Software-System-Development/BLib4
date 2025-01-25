@@ -52,7 +52,7 @@ public class Subscriber_Controller {
     }
 
     /**
-     * This method send a request to the server to sign up a new subscriber.
+     * This method sends a request to the server to sign up a new subscriber.
      *
      * @param userID ID of the user.
      * @param firstName	first name of the user.

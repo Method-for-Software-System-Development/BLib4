@@ -1408,47 +1408,43 @@ public class DbController
     /**
      * The method run SQL query to handle update book copy to lost status
      *
-     * @param copyId - the id of the copy
+     * @param borrowId - the id of the borrow that lost
      * @return - true if the update succeeds, else false
      */
-    public boolean handleUpdateBookCopyToLost(String copyId)
+    public boolean handleUpdateBookCopyToLost(String borrowId)
     {
         PreparedStatement stmt;
         boolean returnValue = true;
+        String copyId = "";
 
-        // check if the copy exists
+        // get the copy id of the borrow
         try
         {
-            stmt = connection.prepareStatement("SELECT * from copy_of_the_book WHERE copy_id = ?;");
-            stmt.setString(1, copyId);
-
+            stmt = connection.prepareStatement("SELECT copy_id from borrow_book WHERE borrow_id = ?;");
+            stmt.setString(1, borrowId);
             ResultSet rs = stmt.executeQuery();
-            if (rs.next())
-            {
-                if (rs.getInt("is_available") == 2)
-                {
-                    returnValue = false;
-                }
-            }
-            else
-            {
-                // the copy not found
-                returnValue = false;
-            }
+            rs.next();
+            copyId = rs.getString(1);
         }
         catch (SQLException e)
         {
-            System.out.println("Error! update book copy to lost failed - cant check if the copy is available");
+            System.out.println("Error! update book copy to lost failed - cant get the copy id from the borrow");
             returnValue = false;
         }
 
         if (returnValue)
         {
-            // update the copy to be lost
+
             try
             {
+                // update the copy to be lost
                 stmt = connection.prepareStatement("UPDATE copy_of_the_book SET is_available = 2 WHERE copy_id = ?;");
                 stmt.setString(1, copyId);
+                stmt.executeUpdate();
+
+                // update the borrow to be lost
+                stmt = connection.prepareStatement("UPDATE borrow_book SET is_active = 2 WHERE borrow_id = ?;");
+                stmt.setString(1, borrowId);
                 stmt.executeUpdate();
             }
             catch (SQLException e)
