@@ -397,6 +397,11 @@ public class ServerController extends AbstractServer
                 byte[] blobData = dbController.fetchReportBlob((List<String>) receiveMsg.data);
                 responseMsg = new MessageType("226", BlobUtil.convertBlobToList(blobData));
                 break;
+                
+            case "127":
+            	//check if report is ready
+                responseMsg = new MessageType("227", dbController.checkIfReportIsReady((List<String>) receiveMsg.data));
+            	break;
             	
             case "128":
                 // Response to get all librarian unread messages

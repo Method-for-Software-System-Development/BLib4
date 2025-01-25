@@ -1730,6 +1730,34 @@ public class DbController
     }
 
     /**
+     * The method checks if a specific report is ready
+     *  
+     * @param data [0] the report type
+     *             [1] the month
+     *             [2] the year
+     * @return the boolean response if the report is ready or not
+     */
+    public boolean checkIfReportIsReady(List<String> data) {
+    	PreparedStatement stmt;
+        ResultSet rs;
+        try
+        {
+            stmt = connection.prepareStatement("SELECT * FROM monthly_reports WHERE report_type = ? AND report_month = ? AND report_year = ? AND is_ready = 1;");
+            stmt.setString(1, data.get(0));
+            stmt.setInt(2, Integer.parseInt(data.get(1)));
+            stmt.setInt(3, Integer.parseInt(data.get(2)));
+            rs = stmt.executeQuery();
+            if (rs.next())
+            	return true;
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! cannot get the status of the report.");
+        }
+		return false;
+    }
+    
+    /**
      * The method run SQL query to check if we need to update the daily report and create trigger for tomorrow
      *
      * @return - true if we need to update the daily report, else false
