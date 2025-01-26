@@ -73,10 +73,24 @@ public class SubscriberUI_Controller {
     @FXML
     private TableColumn<BorrowEntry, Void> extendColumn;
 
+    // Order Table FXML fields
+    @FXML
+    private TableView<OrderEntry> orderTable;
+    @FXML
+    private TableColumn<OrderEntry, String> orderIdColumn;
+    @FXML
+    private TableColumn<OrderEntry, String> orderBookIdColumn;
+    @FXML
+    private TableColumn<OrderEntry, String> orderBookTitleColumn;
+    @FXML
+    private TableColumn<OrderEntry, String> orderDateColumn;
+
     // Fields
     private Subscriber_Controller subscriberController;
     private ArrayList<ArrayList<String>> subscriberBorrows;
+    private ArrayList<ArrayList<String>> subscriberOrders;
     private final ObservableList<BorrowEntry> borrowEntries = FXCollections.observableArrayList(); // List of borrow entries (dynamic)
+    private final ObservableList<OrderEntry> orderEntries = FXCollections.observableArrayList(); // List of order entries (dynamic)
     private String selectedBorrowId;
     private String selectedDueDate;
 
@@ -306,6 +320,63 @@ public class SubscriberUI_Controller {
                 }
             }
         });
+
+        // Order Table
+
+        // Get the subscriber's borrows
+        ClientUI.chat.accept(new MessageType("119", subscriberController.getLoggedSubscriber().getId()));
+        subscriberOrders = ChatClient.listOfOrders;
+
+        // Add rounded corners to the TableView
+        Rectangle clip1 = new Rectangle();
+        clip1.setArcWidth(20);  // Set horizontal corner radius
+        clip1.setArcHeight(20); // Set vertical corner radius
+        // Bind the clip's size to the TableView's size
+        clip1.widthProperty().bind(orderTable.widthProperty());
+        clip1.heightProperty().bind(orderTable.heightProperty());
+        // Apply the clip to the TableView
+        orderTable.setClip(clip1);
+
+        // Initialize table columns
+        orderIdColumn.setCellValueFactory(data -> data.getValue().orderIdProperty());
+        orderBookIdColumn.setCellValueFactory(data -> data.getValue().bookIdProperty());
+        orderBookTitleColumn.setCellValueFactory(data -> data.getValue().bookTitleProperty());
+        orderDateColumn.setCellValueFactory(data -> data.getValue().orderDateProperty());
+
+        orderTable.setPlaceholder(new Text("No orders to display.")); // Set the placeholder text
+        orderBookTitleColumn.setCellFactory(column -> {
+            return new TableCell<OrderEntry, String>() {
+                private final Text text = new Text();
+
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setGraphic(null);
+                    } else {
+                        text.setText(item);
+                        text.wrappingWidthProperty().bind(orderBookTitleColumn.widthProperty().subtract(10)); // Wrap text within column width
+                        setGraphic(text);
+                    }
+                }
+            };
+        });
+
+        orderTable.setFixedCellSize(70); // Set the row height
+        orderTable.setSelectionModel(null); // Disable row selection
+
+        // Populate the table
+        loadOrderData();
+        orderTable.setItems(orderEntries);
+
+        // Ensure the bookTitleColumn fills the remaining space
+        orderBookTitleColumn.prefWidthProperty().bind(
+                orderTable.widthProperty()
+                        .subtract(200 * 2) // Subtract the total width of fixed columns
+                        .subtract(300)
+                        .subtract(2) // Subtract the border width
+                        .subtract(orderTable.getItems().size() > 7 ? 20 : 0) // Subtract 20 if more than 7 rows for the scrollbar
+        );
     }
 
     private void loadBorrowsData() {
@@ -318,6 +389,20 @@ public class SubscriberUI_Controller {
                     borrow.get(4)  // due date
             );
             borrowEntries.add(entry);
+        }
+    }
+
+    private void loadOrderData()
+    {
+        for (ArrayList<String> order : subscriberOrders)
+        {
+            OrderEntry entry = new OrderEntry(
+                    order.get(0), // order id
+                    order.get(1), // book id
+                    order.get(2), // book title
+                    order.get(3)  // order date
+            );
+            orderEntries.add(entry);
         }
     }
 
@@ -369,12 +454,17 @@ public class SubscriberUI_Controller {
         subscriberBorrows = ChatClient.listOfBorrows;
         // Clear the previous entries before updating the table
     	borrowEntries.clear();
-    	// Reload the borrows data
+    	// Reload the borrow data
         loadBorrowsData();  
          // Set the updated list of borrows in the table
-        borrowsTable.setItems(borrowEntries); 
-        
+        borrowsTable.setItems(borrowEntries);
         borrowsTable.refresh();
+
+        ClientUI.chat.accept(new MessageType("119", subscriberController.getLoggedSubscriber().getId()));
+
+        loadOrderData();
+        orderTable.setItems(orderEntries);
+        orderTable.refresh();
     }
 
     /**

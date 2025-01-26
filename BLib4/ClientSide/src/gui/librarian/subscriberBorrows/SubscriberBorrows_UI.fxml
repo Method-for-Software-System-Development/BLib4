@@ -230,6 +230,7 @@
 
         </HBox>
 
+        <!-- Active order table View -->
         <Text fx:id="activeOrdersTitle" styleClass="main-title">
             <VBox.margin>
                 <Insets bottom="15.0"/>

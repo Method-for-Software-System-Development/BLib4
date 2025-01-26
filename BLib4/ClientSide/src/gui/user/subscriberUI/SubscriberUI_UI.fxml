@@ -202,5 +202,26 @@
 
         </HBox>
 
+        <!-- Active order table View -->
+        <Text fx:id="activeOrdersTitle" styleClass="main-title">
+            <VBox.margin>
+                <Insets bottom="15.0"/>
+            </VBox.margin>
+        </Text>
+        <TableView fx:id="orderTable" prefHeight="492" styleClass="custom-table">
+            <columns>
+                <TableColumn fx:id="orderIdColumn" prefWidth="200" resizable="false" text="Borrow ID"/>
+                <TableColumn fx:id="orderBookIdColumn" prefWidth="200" resizable="false" text="Book Copy ID"/>
+                <TableColumn fx:id="orderBookTitleColumn" resizable="false" style="-fx-alignment: CENTER-RIGHT" text="Book Title" />
+                <TableColumn fx:id="orderDateColumn" prefWidth="300" resizable="false" text="Borrow Date"/>
+            </columns>
+            <opaqueInsets>
+                <Insets/>
+            </opaqueInsets>
+            <VBox.margin>
+                <Insets bottom="25.0"/>
+            </VBox.margin>
+        </TableView>
+
     </VBox>
 </GridPane>

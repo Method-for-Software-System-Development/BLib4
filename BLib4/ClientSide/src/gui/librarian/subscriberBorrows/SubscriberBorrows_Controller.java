@@ -452,7 +452,6 @@ public class SubscriberBorrows_Controller implements DataReceiver {
         orderTable.setFixedCellSize(70); // Set the row height
         orderTable.setSelectionModel(null); // Disable row selection
 
-        //ToDo: fix the space between the columns
         // Ensure the bookTitleColumn fills the remaining space
         orderBookTitleColumn.prefWidthProperty().bind(
                 orderTable.widthProperty()
@@ -461,7 +460,6 @@ public class SubscriberBorrows_Controller implements DataReceiver {
                         .subtract(2) // Subtract the border width
                         .subtract(orderTable.getItems().size() > 7 ? 20 : 0) // Subtract 20 if more than 7 rows for the scrollbar
         );
-
     }
 
     private void loadBorrowsData(String userId) {
@@ -564,12 +562,13 @@ public class SubscriberBorrows_Controller implements DataReceiver {
     	// Clear the previous entries before updating the table
         borrowEntries.clear(); 
         
-        // Reload the borrows data
+        // Reload the borrow data
         loadBorrowsData(userId);
         loadOrderData(userId);
         
         // Set the updated list of borrows in the table
         borrowsTable.setItems(borrowEntries);
+        orderTable.setItems(orderEntries);
     }
 
     /**
