@@ -12,7 +12,8 @@ import java.net.UnknownHostException;
  * Controller class for managing the client connection UI.
  * Handles input validation, setting default values, and initiating the connection process.
  */
-public class ClientConnection_Controller {
+public class ClientConnection_Controller
+{
 
     @FXML
     private TextField ipTextField;
@@ -25,11 +26,15 @@ public class ClientConnection_Controller {
      * If unable to fetch the IP, displays an error message in the prompt text.
      */
     @FXML
-    private void handleSetMyIP() {
-        try {
+    private void handleSetMyIP()
+    {
+        try
+        {
             String myIp = InetAddress.getLocalHost().getHostAddress();
             ipTextField.setText(myIp);
-        } catch (UnknownHostException e) {
+        }
+        catch (UnknownHostException e)
+        {
             ipTextField.setPromptText("Error fetching IP");
             ipTextField.getStyleClass().add("error-text-field");
         }
@@ -39,18 +44,20 @@ public class ClientConnection_Controller {
      * Sets the port field to the default port value (5555).
      */
     @FXML
-    private void handleSetDefaultPort() {
+    private void handleSetDefaultPort()
+    {
         portTextField.setText("5555");
     }
 
     /**
      * Validates the IP address and port fields.
      * Ensures both fields are not empty before attempting to connect.
-     * If validation passes, tries to initiate the connection.
+     * If validation passes, try to initiate the connection.
      * Displays an error alert in case of failure.
      */
     @FXML
-    public void validate_connect_form() {
+    public void validate_connect_form()
+    {
         // Reset styles before validation
         ipTextField.getStyleClass().remove("error-text-field");
         portTextField.getStyleClass().remove("error-text-field");
@@ -62,23 +69,29 @@ public class ClientConnection_Controller {
         String port = portTextField.getText();
 
         // Validate IP address field
-        if (ipAddress == null || ipAddress.trim().isEmpty()) {
+        if (ipAddress == null || ipAddress.trim().isEmpty())
+        {
             ipTextField.setPromptText("IP address is required");
             ipTextField.getStyleClass().add("error-text-field");
             isValid = false;
         }
 
         // Validate port field
-        if (port == null || port.trim().isEmpty()) {
+        if (port == null || port.trim().isEmpty())
+        {
             portTextField.setPromptText("Server port number is required");
             portTextField.getStyleClass().add("error-text-field");
             isValid = false;
         }
 
-        if (isValid) {
-            try {
+        if (isValid)
+        {
+            try
+            {
                 ClientUI.runClient(ipAddress, port);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 showErrorAlert("Connection Error", "Failed to connect to the server. Please try again.");
             }
         }
@@ -90,7 +103,8 @@ public class ClientConnection_Controller {
      * @param title   the title of the alert
      * @param message the content message of the alert
      */
-    private void showErrorAlert(String title, String message) {
+    private void showErrorAlert(String title, String message)
+    {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(null);

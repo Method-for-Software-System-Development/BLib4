@@ -24,8 +24,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-public class LibraryReports_Controller {
-
+public class LibraryReports_Controller
+{
     // FXML fields
     @FXML
     private Text userGreeting;
@@ -80,8 +80,12 @@ public class LibraryReports_Controller {
     private Subscriber_Controller subscriberController;
     private ReportsGenerator_Controller reportsGeneratorController;
 
+    /**
+     * Initializes the LibraryReports_Controller.
+     */
     @FXML
-    public void initialize() {
+    public void initialize()
+    {
         // Get the singleton instance of Subscriber_Controller
         subscriberController = Subscriber_Controller.getInstance();
         // Get the singleton instance of ReportsGenerator_Controller
@@ -91,52 +95,66 @@ public class LibraryReports_Controller {
         userGreeting.setText(getGreetingMessage() + " " + subscriberController.getLoggedLibrarian().getName() + " !");
 
         // Set the icons for the buttons
-        homePageButton.setOnMouseEntered(event -> {
+        homePageButton.setOnMouseEntered(event ->
+        {
             homePageImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/home_24dp_525FE1.png")));
         });
-        homePageButton.setOnMouseExited(event -> {
+        homePageButton.setOnMouseExited(event ->
+        {
             homePageImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/home_24dp_FFFFFF.png")));
         });
 
-        librarianDashButton.setOnMouseEntered(event -> {
+        librarianDashButton.setOnMouseEntered(event ->
+        {
             librarianDashImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/local_library_24dp_F86F03.png")));
         });
-        librarianDashButton.setOnMouseExited(event -> {
+        librarianDashButton.setOnMouseExited(event ->
+        {
             librarianDashImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/local_library_24dp_FFFFFF.png")));
         });
 
-        searchBooksButton.setOnMouseEntered(event -> {
+        searchBooksButton.setOnMouseEntered(event ->
+        {
             searchBooksImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/search_24dp_525FE1.png")));
         });
-        searchBooksButton.setOnMouseExited(event -> {
+        searchBooksButton.setOnMouseExited(event ->
+        {
             searchBooksImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/search_24dp_FFFFFF.png")));
         });
 
-        newBorrowButton.setOnMouseEntered(event -> {
+        newBorrowButton.setOnMouseEntered(event ->
+        {
             newBorrowImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/post_add_24dp_525FE1.png")));
         });
-        newBorrowButton.setOnMouseExited(event -> {
+        newBorrowButton.setOnMouseExited(event ->
+        {
             newBorrowImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/post_add_24dp_FFFFFF.png")));
         });
 
-        addSubscriberButton.setOnMouseEntered(event -> {
+        addSubscriberButton.setOnMouseEntered(event ->
+        {
             addSubscriberImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/person_add_24dp_525FE1.png")));
         });
-        addSubscriberButton.setOnMouseExited(event -> {
+        addSubscriberButton.setOnMouseExited(event ->
+        {
             addSubscriberImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/person_add_24dp_FFFFFF.png")));
         });
 
-        logoutButton.setOnMouseEntered(event -> {
+        logoutButton.setOnMouseEntered(event ->
+        {
             logoutImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/logout_24dp_525FE1.png")));
         });
-        logoutButton.setOnMouseExited(event -> {
+        logoutButton.setOnMouseExited(event ->
+        {
             logoutImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/logout_24dp_FFFFFF.png")));
         });
 
-        exitButton.setOnMouseEntered(event -> {
+        exitButton.setOnMouseEntered(event ->
+        {
             exitImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/close_24dp_525FE1.png")));
         });
-        exitButton.setOnMouseExited(event -> {
+        exitButton.setOnMouseExited(event ->
+        {
             exitImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/close_24dp_FFFFFF.png")));
         });
 
@@ -162,22 +180,34 @@ public class LibraryReports_Controller {
      *
      * @return A greeting message.
      */
-    private String getGreetingMessage() {
+    private String getGreetingMessage()
+    {
         int hour = java.time.LocalTime.now().getHour();
 
-        if (hour >= 5 && hour < 12) {
+        if (hour >= 5 && hour < 12)
+        {
             return "Good Morning";
-        } else if (hour >= 12 && hour < 17) {
+        }
+        else if (hour >= 12 && hour < 17)
+        {
             return "Good Afternoon";
-        } else if (hour >= 17 && hour < 21) {
+        }
+        else if (hour >= 17 && hour < 21)
+        {
             return "Good Evening";
-        } else {
+        }
+        else
+        {
             return "Good Night";
         }
     }
 
+    /**
+     * Handles the request to generate a report.
+     */
     @FXML
-    private void handleRequestReport() {
+    private void handleRequestReport()
+    {
         // Clear the previous report
         reportVBox.setVisible(false);
 
@@ -212,9 +242,12 @@ public class LibraryReports_Controller {
         reportVBox.getChildren().add(subscriberStatusReportChart);
 
         String reportType = reportChoiceBox.getValue();
-        if (reportType.equals("Borrowing Times")) {
+        if (reportType.equals("Borrowing Times"))
+        {
             reportType = "borrowingReport";
-        } else if (reportType.equals("Subscribers Status")) {
+        }
+        else if (reportType.equals("Subscribers Status"))
+        {
             reportType = "subscribersStatus";
         }
         String month = monthChoiceBox.getValue();
@@ -229,15 +262,22 @@ public class LibraryReports_Controller {
         int currentYear = now.getYear();
         int currentMonth = now.getMonthValue();
 
-        if (selectedYear > currentYear || (selectedYear == currentYear && selectedMonth > currentMonth)) {
+        if (selectedYear > currentYear || (selectedYear == currentYear && selectedMonth > currentMonth))
+        {
             showErrorAlert("Invalid Date", "You cannot generate a report for a future date. Please select a valid past month/year.");
-        } else if (selectedYear == currentYear && selectedMonth == currentMonth) {
+        }
+        else if (selectedYear == currentYear && selectedMonth == currentMonth)
+        {
             showErrorAlert("Report Not Available Yet", "The monthly report for the current month will only be available on the 1st of next month at 00:00.");
-        } else {
+        }
+        else
+        {
             reportsGeneratorController.setMonth(String.valueOf(selectedMonth));
             reportsGeneratorController.setYear(year);
-            if (reportsGeneratorController.checkIfReportIsReady(reportType)) {
-                if (reportType.equals("borrowingReport")) {
+            if (reportsGeneratorController.checkIfReportIsReady(reportType))
+            {
+                if (reportType.equals("borrowingReport"))
+                {
                     reportVBox.setVisible(true);
                     borrowingReportChart.setVisible(true);
                     borrowingReportChart.setManaged(true);
@@ -245,7 +285,9 @@ public class LibraryReports_Controller {
                     borrowingReportChart.prefWidthProperty().bind(reportVBox.widthProperty());
                     borrowingReportChart.prefHeightProperty().bind(reportVBox.heightProperty());
                     reportTitle.setText("Borrowing Times Report " + reportsGeneratorController.getMonth() + "/" + reportsGeneratorController.getYear());
-                } else if (reportType.equals("subscribersStatus")) {
+                }
+                else if (reportType.equals("subscribersStatus"))
+                {
                     reportVBox.setVisible(true);
                     subscriberStatusReportChart.setVisible(true);
                     subscriberStatusReportChart.setManaged(true);
@@ -254,7 +296,9 @@ public class LibraryReports_Controller {
                     subscriberStatusReportChart.prefHeightProperty().bind(reportVBox.heightProperty());
                     reportTitle.setText("Subscribers Status Report " + reportsGeneratorController.getMonth() + "/" + reportsGeneratorController.getYear());
                 }
-            } else {
+            }
+            else
+            {
                 showErrorAlert("Report Not Available", "The requested report is not exist in the system.");
             }
         }
@@ -266,8 +310,10 @@ public class LibraryReports_Controller {
      * @param monthName The month name (e.g., "January", "February").
      * @return The integer month value (1 = January, 2 = February, etc.)
      */
-    private int getMonthNumber(String monthName) {
-        switch (monthName) {
+    private int getMonthNumber(String monthName)
+    {
+        switch (monthName)
+        {
             case "January":
                 return 1;
             case "February":
@@ -302,7 +348,8 @@ public class LibraryReports_Controller {
      *
      * @return BarChart instance with the data.
      */
-    public BarChart<String, Number> generateBorrowingReportChart() {
+    public BarChart<String, Number> generateBorrowingReportChart()
+    {
         // Axes
         CategoryAxis xAxis = new CategoryAxis();
 
@@ -325,7 +372,8 @@ public class LibraryReports_Controller {
         BorrowingReport borrowingReport = reportsGeneratorController.getBorrowingReport();
         //add to graph the data for every book in the report
         Map<String, List<String>> borrowingData = borrowingReport.getBorrowingData();
-        for (Map.Entry<String, List<String>> entry : borrowingData.entrySet()) {
+        for (Map.Entry<String, List<String>> entry : borrowingData.entrySet())
+        {
             String bookTitle = splitTitle(entry.getKey());
 
             List<String> dataOfBook = entry.getValue();
@@ -338,29 +386,40 @@ public class LibraryReports_Controller {
         return barChart;
     }
 
-    public String splitTitle(String title) {
+    /**
+     * Splits a title into multiple lines to fit the chart.
+     *
+     * @param title The title to split.
+     * @return The formatted title.
+     */
+    public String splitTitle(String title)
+    {
         StringBuilder formattedTitle = new StringBuilder();
         String[] words = title.split(" ");  // Split the title into words based on spaces
 
         StringBuilder currentLine = new StringBuilder();  // Accumulate words for the current line
 
-        for (String word : words) {
+        for (String word : words)
+        {
             // If adding this word exceeds the maxLength, start a new line
-            if (currentLine.length() + word.length() + (currentLine.length() > 0 ? 1 : 0) > 8) {
+            if (currentLine.length() + word.length() + (currentLine.length() > 0 ? 1 : 0) > 8)
+            {
                 // Add the current line to the formattedTitle and start a new line
                 formattedTitle.append(currentLine.toString()).append("\n");
                 currentLine.setLength(0);  // Reset current line
             }
 
             // Add the word to the current line, with a space if it's not the first word
-            if (currentLine.length() > 0) {
+            if (currentLine.length() > 0)
+            {
                 currentLine.append(" ");
             }
             currentLine.append(word);
         }
 
         // Add the last line if it has any content
-        if (currentLine.length() > 0) {
+        if (currentLine.length() > 0)
+        {
             formattedTitle.append(currentLine.toString());
         }
 
@@ -372,7 +431,8 @@ public class LibraryReports_Controller {
      *
      * @return BarChart instance with example data.
      */
-    public BarChart<String, Number> generateSubscriberStatusReportChart() {
+    public BarChart<String, Number> generateSubscriberStatusReportChart()
+    {
         // Axes
         CategoryAxis xAxis = new CategoryAxis();
         xAxis.setLabel("Day of the Month");
@@ -399,7 +459,8 @@ public class LibraryReports_Controller {
         //add to graph the data for every book in the report
         List<String[]> dailyActiveData = subscriberStatusReport.getUsersActivityStatus();
 
-        for (int i = 0; i < dailyActiveData.size(); i++) {
+        for (int i = 0; i < dailyActiveData.size(); i++)
+        {
             String date = dailyActiveData.get(i)[0];
             numberOfSubscribersSeries.getData().add(new XYChart.Data<>(date, Integer.parseInt(dailyActiveData.get(i)[1]) + Integer.parseInt(dailyActiveData.get(i)[2])));
             activeSubscribersSeries.getData().add(new XYChart.Data<>(date, Integer.parseInt(dailyActiveData.get(i)[1])));
@@ -418,7 +479,8 @@ public class LibraryReports_Controller {
      * @param title   the title of the error alert
      * @param message the message displayed in the error alert
      */
-    private void showErrorAlert(String title, String message) {
+    private void showErrorAlert(String title, String message)
+    {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(null);
@@ -427,7 +489,14 @@ public class LibraryReports_Controller {
         alert.showAndWait();
     }
 
-    private void showInformationAlert(String title, String message) {
+    /**
+     * Displays an information alert with the specified title and message.
+     *
+     * @param title   the title of the information alert
+     * @param message the message displayed in the information alert
+     */
+    private void showInformationAlert(String title, String message)
+    {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
         alert.setHeaderText(null);
@@ -440,37 +509,62 @@ public class LibraryReports_Controller {
      * Logs out the current user and navigates to the Home Page.
      */
     @FXML
-    private void logout() {
+    private void logout()
+    {
         subscriberController.attemptLogOut();
     }
 
+    /**
+     * Navigates to the Home Page.
+     */
     @FXML
-    private void goToHomePage() {
+    private void goToHomePage()
+    {
         SceneManager.switchScene("/gui/common/homePage/HomePage_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Navigates to the Librarian Dashboard.
+     */
     @FXML
-    private void goToLibrarianDash() {
+    private void goToLibrarianDash()
+    {
         SceneManager.switchScene("/gui/librarian/librarianUI/LibrarianUI_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Navigates to the Search Books page.
+     */
     @FXML
-    private void goToSearch() {
+    private void goToSearch()
+    {
         SceneManager.switchScene("/gui/common/search/Search_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Navigates to the New Borrow page.
+     */
     @FXML
-    private void goToNewBorrow() {
+    private void goToNewBorrow()
+    {
         SceneManager.switchScene("/gui/librarian/newBorrow/NewBorrow_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Navigates to the Add Subscriber page.
+     */
     @FXML
-    private void goToAddSubscriber() {
+    private void goToAddSubscriber()
+    {
         SceneManager.switchScene("/gui/librarian/addSubscriber/AddSubscriber_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Exits the application.
+     */
     @FXML
-    private void exitApp() {
+    private void exitApp()
+    {
         ClientUI.chat.getClient().quit();
     }
 }

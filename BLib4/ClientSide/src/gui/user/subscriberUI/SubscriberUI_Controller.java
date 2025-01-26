@@ -1,7 +1,6 @@
 package gui.user.subscriberUI;
 
 import entities.logic.MessageType;
-import gui.user.viewHistory.ActivityEntry;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -21,8 +20,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
-public class SubscriberUI_Controller {
-
+public class SubscriberUI_Controller
+{
     // FXML fields
     @FXML
     private Text userGreeting;
@@ -94,8 +93,12 @@ public class SubscriberUI_Controller {
     private String selectedBorrowId;
     private String selectedDueDate;
 
+    /**
+     * Initializes the Subscriber UI.
+     */
     @FXML
-    public void initialize() {
+    public void initialize()
+    {
         // Get the singleton instance of Subscriber_Controller
         subscriberController = Subscriber_Controller.getInstance();
 
@@ -103,45 +106,57 @@ public class SubscriberUI_Controller {
         userGreeting.setText(getGreetingMessage() + " " + subscriberController.getLoggedSubscriber().getFirstName() + " !");
 
         // Set the icons for the buttons
-        homePageButton.setOnMouseEntered(event -> {
+        homePageButton.setOnMouseEntered(event ->
+        {
             homePageImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/home_24dp_525FE1.png")));
         });
-        homePageButton.setOnMouseExited(event -> {
+        homePageButton.setOnMouseExited(event ->
+        {
             homePageImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/home_24dp_FFFFFF.png")));
         });
 
-        searchBooksButton.setOnMouseEntered(event -> {
+        searchBooksButton.setOnMouseEntered(event ->
+        {
             searchBooksImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/search_24dp_525FE1.png")));
         });
-        searchBooksButton.setOnMouseExited(event -> {
+        searchBooksButton.setOnMouseExited(event ->
+        {
             searchBooksImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/search_24dp_FFFFFF.png")));
         });
 
-        viewHistoryButton.setOnMouseEntered(event -> {
+        viewHistoryButton.setOnMouseEntered(event ->
+        {
             viewHistoryImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/history_24dp_525FE1.png")));
         });
-        viewHistoryButton.setOnMouseExited(event -> {
+        viewHistoryButton.setOnMouseExited(event ->
+        {
             viewHistoryImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/history_24dp_FFFFFF.png")));
         });
 
-        editProfileButton.setOnMouseEntered(event -> {
+        editProfileButton.setOnMouseEntered(event ->
+        {
             editProfileImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/edit_24dp_525FE1.png")));
         });
-        editProfileButton.setOnMouseExited(event -> {
+        editProfileButton.setOnMouseExited(event ->
+        {
             editProfileImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/edit_24dp_FFFFFF.png")));
         });
 
-        logoutButton.setOnMouseEntered(event -> {
+        logoutButton.setOnMouseEntered(event ->
+        {
             logoutImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/logout_24dp_525FE1.png")));
         });
-        logoutButton.setOnMouseExited(event -> {
+        logoutButton.setOnMouseExited(event ->
+        {
             logoutImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/logout_24dp_FFFFFF.png")));
         });
 
-        exitButton.setOnMouseEntered(event -> {
+        exitButton.setOnMouseEntered(event ->
+        {
             exitImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/close_24dp_525FE1.png")));
         });
-        exitButton.setOnMouseExited(event -> {
+        exitButton.setOnMouseExited(event ->
+        {
             exitImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/close_24dp_FFFFFF.png")));
         });
 
@@ -167,7 +182,8 @@ public class SubscriberUI_Controller {
         dueDateColumn.setCellValueFactory(data -> data.getValue().dueDateProperty());
 
         // Add Extend button
-        extendColumn.setCellFactory(param -> new TableCell<BorrowEntry, Void>() {
+        extendColumn.setCellFactory(param -> new TableCell<BorrowEntry, Void>()
+        {
             private final Button extendButton = new Button("Extend");
 
             {
@@ -179,35 +195,46 @@ public class SubscriberUI_Controller {
                 extendButton.setPrefWidth(150.0);
 
                 // Set the action for the button
-                extendButton.setOnAction(event -> {
+                extendButton.setOnAction(event ->
+                {
                     BorrowEntry entry = getTableView().getItems().get(getIndex());
                     LocalDate dueDate = LocalDate.parse(entry.getDueDate(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
                     LocalDate today = LocalDate.now();
 
                     // Check if the due date is more than a week from today
-                    if (dueDate.isAfter(today.plusWeeks(1))) {
+                    if (dueDate.isAfter(today.plusWeeks(1)))
+                    {
                         showErrorAlert("Extend Not Allowed", "Extensions can only be requested within a week of the due date.");
-                    } else {
+                    }
+                    else
+                    {
                         handleExtendAction(entry);
                     }
                 });
             }
 
             @Override
-            protected void updateItem(Void item, boolean empty) {
+            protected void updateItem(Void item, boolean empty)
+            {
                 super.updateItem(item, empty);
 
-                if (empty) {
+                if (empty)
+                {
                     setGraphic(null); // Remove the button for empty rows
-                } else {
+                }
+                else
+                {
                     BorrowEntry entry = getTableView().getItems().get(getIndex());
                     LocalDate dueDate = LocalDate.parse(entry.getDueDate(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
                     LocalDate today = LocalDate.now();
 
                     // Disable and style the button if the due date is more than a week from today
-                    if (dueDate.isAfter(today.plusWeeks(1))) {
+                    if (dueDate.isAfter(today.plusWeeks(1)))
+                    {
                         extendButton.getStyleClass().add("disabled-button");
-                    } else {
+                    }
+                    else
+                    {
                         extendButton.getStyleClass().remove("disabled-button");
                     }
                     setGraphic(extendButton); // Add the button for non-empty rows
@@ -216,16 +243,22 @@ public class SubscriberUI_Controller {
         });
 
         borrowsTable.setPlaceholder(new Text("No borrows to display.")); // Set the placeholder text
-        bookTitleColumn.setCellFactory(column -> {
-            return new TableCell<BorrowEntry, String>() {
+        bookTitleColumn.setCellFactory(column ->
+        {
+            return new TableCell<BorrowEntry, String>()
+            {
                 private final Text text = new Text();
 
                 @Override
-                protected void updateItem(String item, boolean empty) {
+                protected void updateItem(String item, boolean empty)
+                {
                     super.updateItem(item, empty);
-                    if (empty || item == null) {
+                    if (empty || item == null)
+                    {
                         setGraphic(null);
-                    } else {
+                    }
+                    else
+                    {
                         text.setText(item);
                         text.wrappingWidthProperty().bind(bookTitleColumn.widthProperty().subtract(10)); // Wrap text within column width
                         setGraphic(text);
@@ -239,24 +272,32 @@ public class SubscriberUI_Controller {
         extendColumn.setSortable(false); // Disable sorting for the "Extend" column
 
         // Highlight rows based on due date
-        borrowsTable.setRowFactory(tv -> new TableRow<BorrowEntry>() {
+        borrowsTable.setRowFactory(tv -> new TableRow<BorrowEntry>()
+        {
             @Override
-            protected void updateItem(BorrowEntry item, boolean empty) {
+            protected void updateItem(BorrowEntry item, boolean empty)
+            {
                 super.updateItem(item, empty);
 
                 // Reset the style if the row is empty or null
-                if (empty || item == null) {
+                if (empty || item == null)
+                {
                     setStyle("");
-                } else {
+                }
+                else
+                {
                     // Parse the due date
                     LocalDate dueDate = LocalDate.parse(item.getDueDate(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
                     LocalDate today = LocalDate.now();
 
                     // Apply styles based on due date conditions
-                    if (dueDate.isBefore(today)) {
+                    if (dueDate.isBefore(today))
+                    {
                         // Hightlight the row if due date is in the past with a light red background
                         setStyle("-fx-background-color: #FFCCCC;");
-                    } else {
+                    }
+                    else
+                    {
                         // Reset to default if due date is in the future
                         setStyle("");
                     }
@@ -265,29 +306,39 @@ public class SubscriberUI_Controller {
         });
 
         // Set custom cell factory for the dueDateColumn
-        dueDateColumn.setCellFactory(column -> new TableCell<BorrowEntry, String>() {
+        dueDateColumn.setCellFactory(column -> new TableCell<BorrowEntry, String>()
+        {
             @Override
-            protected void updateItem(String dueDate, boolean empty) {
+            protected void updateItem(String dueDate, boolean empty)
+            {
                 super.updateItem(dueDate, empty);
 
                 // Clear the style for empty cells
-                if (empty || dueDate == null) {
+                if (empty || dueDate == null)
+                {
                     setText(null);
                     setStyle("");
-                } else {
+                }
+                else
+                {
                     setText(dueDate);
 
                     // Parse the due date and compare it with the current date
                     LocalDate parsedDueDate = LocalDate.parse(dueDate, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
                     LocalDate today = LocalDate.now();
 
-                    if (parsedDueDate.isEqual(today)) {
+                    if (parsedDueDate.isEqual(today))
+                    {
                         // Highlight for due today
                         setStyle("-fx-font-weight: bold; -fx-text-fill: #525FE1;");
-                    } else if (parsedDueDate.isBefore(today)) {
+                    }
+                    else if (parsedDueDate.isBefore(today))
+                    {
                         // Highlight for overdue
                         setStyle("-fx-font-weight: bold; -fx-text-fill: #E74C3C;");
-                    } else {
+                    }
+                    else
+                    {
                         // Reset to default if due date is in the future
                         setStyle("");
                     }
@@ -308,13 +359,16 @@ public class SubscriberUI_Controller {
         );
 
         // Set the factory for customizing day cells
-        newReturnDatePicker.setDayCellFactory(datePicker -> new DateCell() {
+        newReturnDatePicker.setDayCellFactory(datePicker -> new DateCell()
+        {
             @Override
-            public void updateItem(LocalDate item, boolean empty) {
+            public void updateItem(LocalDate item, boolean empty)
+            {
                 super.updateItem(item, empty);
 
-             // Disable dates before the current return date
-                if (item.isBefore(LocalDate.parse(selectedDueDate, DateTimeFormatter.ofPattern("dd/MM/yyyy")).plusDays(1))) {
+                // Disable dates before the current return date
+                if (item.isBefore(LocalDate.parse(selectedDueDate, DateTimeFormatter.ofPattern("dd/MM/yyyy")).plusDays(1)))
+                {
                     setDisable(true);
                     setStyle("-fx-background-color: #EEEEEE; -fx-text-fill: #999999;");
                 }
@@ -344,16 +398,22 @@ public class SubscriberUI_Controller {
         orderDateColumn.setCellValueFactory(data -> data.getValue().orderDateProperty());
 
         orderTable.setPlaceholder(new Text("No orders to display.")); // Set the placeholder text
-        orderBookTitleColumn.setCellFactory(column -> {
-            return new TableCell<OrderEntry, String>() {
+        orderBookTitleColumn.setCellFactory(column ->
+        {
+            return new TableCell<OrderEntry, String>()
+            {
                 private final Text text = new Text();
 
                 @Override
-                protected void updateItem(String item, boolean empty) {
+                protected void updateItem(String item, boolean empty)
+                {
                     super.updateItem(item, empty);
-                    if (empty || item == null) {
+                    if (empty || item == null)
+                    {
                         setGraphic(null);
-                    } else {
+                    }
+                    else
+                    {
                         text.setText(item);
                         text.wrappingWidthProperty().bind(orderBookTitleColumn.widthProperty().subtract(10)); // Wrap text within column width
                         setGraphic(text);
@@ -379,8 +439,13 @@ public class SubscriberUI_Controller {
         );
     }
 
-    private void loadBorrowsData() {
-        for (ArrayList<String> borrow : subscriberBorrows) {
+    /**
+     * Loads the borrow data into the table.
+     */
+    private void loadBorrowsData()
+    {
+        for (ArrayList<String> borrow : subscriberBorrows)
+        {
             BorrowEntry entry = new BorrowEntry(
                     borrow.get(0), // borrow id
                     borrow.get(1), // copy id
@@ -392,6 +457,9 @@ public class SubscriberUI_Controller {
         }
     }
 
+    /**
+     * Loads the order data into the table.
+     */
     private void loadOrderData()
     {
         for (ArrayList<String> order : subscriberOrders)
@@ -406,7 +474,13 @@ public class SubscriberUI_Controller {
         }
     }
 
-    private void handleExtendAction(BorrowEntry entry) {
+    /**
+     * Handles the extent action for a borrow entry.
+     *
+     * @param entry The borrow entry to extend.
+     */
+    private void handleExtendAction(BorrowEntry entry)
+    {
         extendFormHBox.setVisible(true);
         extendBookTitle.setText("Select a new return date for " +
                 entry.getBookTitle() + " (Copy ID: " + entry.getCopyId() + "):    ");
@@ -418,10 +492,12 @@ public class SubscriberUI_Controller {
      * Handles the submit action for extending a borrow.
      */
     @FXML
-    private void handleSubmitAction() {
+    private void handleSubmitAction()
+    {
         // Retrieve the selected date from the DatePicker
         LocalDate newReturnDate = newReturnDatePicker.getValue();
-        if (newReturnDate == null) {
+        if (newReturnDate == null)
+        {
             // Show an error alert if no date is selected
             showErrorAlert("Invalid Date", "Please select a new return date.");
             return;
@@ -433,11 +509,14 @@ public class SubscriberUI_Controller {
         // Attempt to extend the borrow via the subscriberController
         boolean isExtended = subscriberController.extendBorrowBySubscriber(selectedBorrowId, sqlNewReturnDate);
 
-        if (isExtended) {
+        if (isExtended)
+        {
             // Show a success message if the extension is approved
             showInformationAlert("Extension Approved", "The extension has been approved.");
             refreshBorrowsTable();
-        } else {
+        }
+        else
+        {
             // Show an error message if the extension is denied
             showErrorAlert("Extension Denied", "The extension cannot be processed as there are previous reservations for the book. Please return the copy on the due date.");
         }
@@ -448,15 +527,16 @@ public class SubscriberUI_Controller {
     /**
      * Refreshes the borrow table with updated data.
      */
-    private void refreshBorrowsTable() {
-    	// Get the subscriber's borrows
-    	ClientUI.chat.accept(new MessageType("110", subscriberController.getLoggedSubscriber().getId()));
+    private void refreshBorrowsTable()
+    {
+        // Get the subscriber's borrows
+        ClientUI.chat.accept(new MessageType("110", subscriberController.getLoggedSubscriber().getId()));
         subscriberBorrows = ChatClient.listOfBorrows;
         // Clear the previous entries before updating the table
-    	borrowEntries.clear();
-    	// Reload the borrow data
-        loadBorrowsData();  
-         // Set the updated list of borrows in the table
+        borrowEntries.clear();
+        // Reload the borrow data
+        loadBorrowsData();
+        // Set the updated list of borrows in the table
         borrowsTable.setItems(borrowEntries);
         borrowsTable.refresh();
 
@@ -473,7 +553,8 @@ public class SubscriberUI_Controller {
      * @param title   the title of the error alert
      * @param message the message displayed in the error alert
      */
-    private void showErrorAlert(String title, String message) {
+    private void showErrorAlert(String title, String message)
+    {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(null);
@@ -482,7 +563,14 @@ public class SubscriberUI_Controller {
         alert.showAndWait();
     }
 
-    private void showInformationAlert(String title, String message) {
+    /**
+     * Displays an information alert with the specified title and message.
+     *
+     * @param title   the title of the information alert
+     * @param message the message displayed in the information alert
+     */
+    private void showInformationAlert(String title, String message)
+    {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
         alert.setHeaderText(null);
@@ -496,16 +584,24 @@ public class SubscriberUI_Controller {
      *
      * @return A greeting message.
      */
-    private String getGreetingMessage() {
+    private String getGreetingMessage()
+    {
         int hour = java.time.LocalTime.now().getHour();
 
-        if (hour >= 5 && hour < 12) {
+        if (hour >= 5 && hour < 12)
+        {
             return "Good Morning";
-        } else if (hour >= 12 && hour < 17) {
+        }
+        else if (hour >= 12 && hour < 17)
+        {
             return "Good Afternoon";
-        } else if (hour >= 17 && hour < 21) {
+        }
+        else if (hour >= 17 && hour < 21)
+        {
             return "Good Evening";
-        } else {
+        }
+        else
+        {
             return "Good Night";
         }
     }
@@ -514,32 +610,53 @@ public class SubscriberUI_Controller {
      * Logs out the current user and navigates to the Home Page.
      */
     @FXML
-    private void logout() {
+    private void logout()
+    {
         subscriberController.attemptLogOut();
     }
 
+    /**
+     * Navigates to the Home Page.
+     */
     @FXML
-    private void goToHomePage() {
+    private void goToHomePage()
+    {
         SceneManager.switchScene("/gui/common/homePage/HomePage_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Navigates to the Search Page.
+     */
     @FXML
-    private void goToSearch() {
+    private void goToSearch()
+    {
         SceneManager.switchScene("/gui/common/search/Search_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Navigates to the View History Page.
+     */
     @FXML
-    private void goToViewHistory() {
+    private void goToViewHistory()
+    {
         SceneManager.switchScene("/gui/user/viewHistory/ViewHistory_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Navigates to the Edit Profile Page.
+     */
     @FXML
-    private void goToEditProfile() {
+    private void goToEditProfile()
+    {
         SceneManager.switchScene("/gui/user/editProfile/EditProfile_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Exits the application.
+     */
     @FXML
-    private void exitApp() {
+    private void exitApp()
+    {
         ClientUI.chat.getClient().quit();
     }
 }

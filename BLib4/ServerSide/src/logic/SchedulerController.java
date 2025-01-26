@@ -19,6 +19,7 @@ public class SchedulerController
     private final DbController dbController; // Controller for database interactions
     private final Notification_Controller notificationController;
     private final ReportsGenerator_Controller reportsGeneratorController;
+
     /**
      * Provides a singleton instance of SchedulerController.
      * Ensures thread-safe initialization.
@@ -161,7 +162,6 @@ public class SchedulerController
             reportsGeneratorController.autoGenerate_BorrowingReport();
         }
     }
-
 }
 
 

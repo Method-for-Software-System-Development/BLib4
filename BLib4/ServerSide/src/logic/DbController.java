@@ -81,7 +81,7 @@ public class DbController
      * The method run SQL query to get the subscriber from the db by id and password.
      *
      * @param subscriberId The id of the subscriber.
-     * @param password The password of the subscriber.
+     * @param password     The password of the subscriber.
      * @return The subscriber if found, else null.
      */
     public Subscriber handleSubscriberLogin(String subscriberId, String password)
@@ -118,7 +118,7 @@ public class DbController
      * The method run SQL query to get the librarian from the db by id and password.
      *
      * @param librarianId The id of the librarian.
-     * @param password The password of the librarian.
+     * @param password    The password of the librarian.
      * @return The librarian if found, else null.
      */
     public Librarian handleLibrarianLogin(String librarianId, String password)
@@ -1903,7 +1903,7 @@ public class DbController
      * The method run SQL query to update the history of a subscriber by his id.
      *
      * @param subscriberId The id of the subscriber.
-     * @param list The new history file.
+     * @param list         The new history file.
      */
     public void handleUpdateHistoryFileBySubscriberId(String subscriberId, List<String[]> list)
     {
@@ -2583,9 +2583,9 @@ public class DbController
      * Inserts an empty report into the monthly_reports table for the next month.
      * Each new report gets a unique report_id automatically.
      *
-     * @param data  [0] The report type
-     *              [1] The next month
-     *              [2] The year
+     * @param data [0] The report type
+     *             [1] The next month
+     *             [2] The year
      */
     public void insertEmptyMonthlyReport(List<String> data)
     {
@@ -2828,7 +2828,7 @@ public class DbController
      * The method run SQL query to save the subscriber missed sms in DB.
      *
      * @param subscriberId The id of the subscriber.
-     * @param message The message of the sms.
+     * @param message      The message of the sms.
      */
     public void handleSaveSubscriberMissedSms(String subscriberId, String message)
     {
@@ -2913,44 +2913,45 @@ public class DbController
 
         return subscriberName;
     }
-    
+
     /**
      * The method gets the active orders of a subscriber.
-     * 
+     *
      * @param subscriberId The id of the subscriber.
      * @return A list contains the orders and their details.
      */
     public List<List<String>> handleGetSubscriberActiveOrders(String subscriberId)
     {
-    	List<List<String>> ordersList = new ArrayList<>(); 
-    	String quary=
-    	"SELECT so.order_id, so.book_id, so.order_date, b.book_title " +
-    	"FROM subscriber_order so " +
-    	"JOIN book b ON so.book_id = b.book_id "+
-    	"WHERE so.subscriber_id = ? AND so.is_active = 1;";
-    	 
-         try
-         {
-             // get the active orders
-        	 PreparedStatement stmt = connection.prepareStatement(quary);
-             stmt.setString(1, subscriberId);
-             ResultSet rs = stmt.executeQuery();
-             //add all orders details to the list
-             while(rs.next()) {
-            	 List<String> oneOrderList=new ArrayList<>();
-            	 oneOrderList.add(String.valueOf(rs.getInt("order_id")));
-            	 oneOrderList.add(String.valueOf(rs.getInt("book_id")));
-            	 oneOrderList.add(rs.getString("book_title"));
-                 Timestamp orderDate = rs.getTimestamp("order_date");
-                 java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm");
-                 oneOrderList.add(sdf.format(orderDate));
-            	 ordersList.add(oneOrderList);
-             }
-         }
-         catch (SQLException e)
-         {
-             System.out.println("Error! get subscriber's active orders failed "+ e.getMessage());
-         }
+        List<List<String>> ordersList = new ArrayList<>();
+        String quary =
+                "SELECT so.order_id, so.book_id, so.order_date, b.book_title " +
+                        "FROM subscriber_order so " +
+                        "JOIN book b ON so.book_id = b.book_id " +
+                        "WHERE so.subscriber_id = ? AND so.is_active = 1;";
+
+        try
+        {
+            // get the active orders
+            PreparedStatement stmt = connection.prepareStatement(quary);
+            stmt.setString(1, subscriberId);
+            ResultSet rs = stmt.executeQuery();
+            //add all orders details to the list
+            while (rs.next())
+            {
+                List<String> oneOrderList = new ArrayList<>();
+                oneOrderList.add(String.valueOf(rs.getInt("order_id")));
+                oneOrderList.add(String.valueOf(rs.getInt("book_id")));
+                oneOrderList.add(rs.getString("book_title"));
+                Timestamp orderDate = rs.getTimestamp("order_date");
+                java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm");
+                oneOrderList.add(sdf.format(orderDate));
+                ordersList.add(oneOrderList);
+            }
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! get subscriber's active orders failed " + e.getMessage());
+        }
         return ordersList;
     }
 }

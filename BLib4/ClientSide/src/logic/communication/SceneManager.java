@@ -9,7 +9,8 @@ import javafx.stage.Stage;
  * SceneManager is a utility class that handles switching
  * between different FXML views within the primary Stage.
  */
-public class SceneManager {
+public class SceneManager
+{
 
     private static Stage primaryStage;
 
@@ -25,11 +26,14 @@ public class SceneManager {
      *
      * @param stage The primary stage to set.
      */
-    public static void setStage(Stage stage) {
+    public static void setStage(Stage stage)
+    {
         primaryStage = stage;
 
         // Set an initial empty scene to avoid resetting the stage on scene switch
-        Scene initialScene = new Scene(new Parent() {});
+        Scene initialScene = new Scene(new Parent()
+        {
+        });
         primaryStage.setScene(initialScene);
     }
 
@@ -38,7 +42,8 @@ public class SceneManager {
      *
      * @return The primary Stage object.
      */
-    public static Stage getStage() {
+    public static Stage getStage()
+    {
         return primaryStage;
     }
 
@@ -47,7 +52,8 @@ public class SceneManager {
      *
      * @return The current Scene object.
      */
-    public static Scene getCurrentScene() {
+    public static Scene getCurrentScene()
+    {
         return primaryStage.getScene();
     }
 
@@ -58,7 +64,8 @@ public class SceneManager {
      *
      * @return The current controller object (can be cast to the appropriate controller class).
      */
-    public static Object getCurrentController() {
+    public static Object getCurrentController()
+    {
         return currentController;
     }
 
@@ -69,8 +76,10 @@ public class SceneManager {
      * @param fxmlPath The path to the FXML file (relative to the SceneManager class).
      * @param title    The window title for the new scene.
      */
-    public static void switchScene(String fxmlPath, String title) {
-        try {
+    public static void switchScene(String fxmlPath, String title)
+    {
+        try
+        {
             FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource(fxmlPath));
             Parent root = loader.load();
 
@@ -83,7 +92,9 @@ public class SceneManager {
             // Update the stage title
             primaryStage.setTitle(title);
 
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             System.err.println("Error loading scene: " + e.getMessage());
         }
     }
@@ -95,8 +106,10 @@ public class SceneManager {
      * @param title    The window title for the new scene.
      * @param data     The data to pass to the new controller (if the controller implements DataReceiver).
      */
-    public static void switchSceneWithData(String fxmlPath, String title, Object data) {
-        try {
+    public static void switchSceneWithData(String fxmlPath, String title, Object data)
+    {
+        try
+        {
             FXMLLoader loader = new FXMLLoader(SceneManager.class.getResource(fxmlPath));
             Parent root = loader.load();
 
@@ -104,7 +117,8 @@ public class SceneManager {
             currentController = loader.getController();
 
             // Pass data to the controller if it implements DataReceiver
-            if (currentController instanceof DataReceiver) {
+            if (currentController instanceof DataReceiver)
+            {
                 ((DataReceiver) currentController).receiveData(data);
             }
 
@@ -114,7 +128,9 @@ public class SceneManager {
             // Update the stage title
             primaryStage.setTitle(title);
 
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             System.err.println("Error loading scene with data: " + e.getMessage());
         }
     }

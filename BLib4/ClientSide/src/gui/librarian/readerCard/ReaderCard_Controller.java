@@ -21,8 +21,8 @@ import logic.user.Subscriber_Controller;
 
 import java.util.ArrayList;
 
-public class ReaderCard_Controller implements DataReceiver {
-
+public class ReaderCard_Controller implements DataReceiver
+{
     // FXML fields
     @FXML
     private Text userGreeting;
@@ -77,9 +77,17 @@ public class ReaderCard_Controller implements DataReceiver {
     private ArrayList<ArrayList<String>> subscriberActivities;
     private final ObservableList<ActivityEntry> activityEntries = FXCollections.observableArrayList(); // List of activity entries (dynamic)
 
+
+    /**
+     * Receives data from the previous scene.
+     *
+     * @param data - The data received from the previous scene.
+     */
     @Override
-    public void receiveData(Object data) {
-        if (data instanceof String) {
+    public void receiveData(Object data)
+    {
+        if (data instanceof String)
+        {
             this.userId = (String) data;
             readerCardTitle.setText("Activity History (Reader Card) of Subscriber " + userId + ":");
             // Populate the table
@@ -88,8 +96,12 @@ public class ReaderCard_Controller implements DataReceiver {
         }
     }
 
+    /**
+     * Initializes the scene.
+     */
     @FXML
-    public void initialize() {
+    public void initialize()
+    {
         // Get the singleton instance of Subscriber_Controller
         subscriberController = Subscriber_Controller.getInstance();
 
@@ -97,59 +109,75 @@ public class ReaderCard_Controller implements DataReceiver {
         userGreeting.setText(getGreetingMessage() + " " + subscriberController.getLoggedLibrarian().getName() + " !");
 
         // Set the icons for the buttons
-        homePageButton.setOnMouseEntered(event -> {
+        homePageButton.setOnMouseEntered(event ->
+        {
             homePageImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/home_24dp_525FE1.png")));
         });
-        homePageButton.setOnMouseExited(event -> {
+        homePageButton.setOnMouseExited(event ->
+        {
             homePageImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/home_24dp_FFFFFF.png")));
         });
 
-        librarianDashButton.setOnMouseEntered(event -> {
+        librarianDashButton.setOnMouseEntered(event ->
+        {
             librarianDashImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/local_library_24dp_F86F03.png")));
         });
-        librarianDashButton.setOnMouseExited(event -> {
+        librarianDashButton.setOnMouseExited(event ->
+        {
             librarianDashImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/local_library_24dp_FFFFFF.png")));
         });
 
-        searchBooksButton.setOnMouseEntered(event -> {
+        searchBooksButton.setOnMouseEntered(event ->
+        {
             searchBooksImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/search_24dp_525FE1.png")));
         });
-        searchBooksButton.setOnMouseExited(event -> {
+        searchBooksButton.setOnMouseExited(event ->
+        {
             searchBooksImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/search_24dp_FFFFFF.png")));
         });
 
-        newBorrowButton.setOnMouseEntered(event -> {
+        newBorrowButton.setOnMouseEntered(event ->
+        {
             newBorrowImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/post_add_24dp_525FE1.png")));
         });
-        newBorrowButton.setOnMouseExited(event -> {
+        newBorrowButton.setOnMouseExited(event ->
+        {
             newBorrowImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/post_add_24dp_FFFFFF.png")));
         });
 
-        addSubscriberButton.setOnMouseEntered(event -> {
+        addSubscriberButton.setOnMouseEntered(event ->
+        {
             addSubscriberImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/person_add_24dp_525FE1.png")));
         });
-        addSubscriberButton.setOnMouseExited(event -> {
+        addSubscriberButton.setOnMouseExited(event ->
+        {
             addSubscriberImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/person_add_24dp_FFFFFF.png")));
         });
 
-        reportsButton.setOnMouseEntered(event -> {
+        reportsButton.setOnMouseEntered(event ->
+        {
             reportsImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/bar_chart_24dp_525FE1.png")));
         });
-        reportsButton.setOnMouseExited(event -> {
+        reportsButton.setOnMouseExited(event ->
+        {
             reportsImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/bar_chart_24dp_FFFFFF.png")));
         });
 
-        logoutButton.setOnMouseEntered(event -> {
+        logoutButton.setOnMouseEntered(event ->
+        {
             logoutImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/logout_24dp_525FE1.png")));
         });
-        logoutButton.setOnMouseExited(event -> {
+        logoutButton.setOnMouseExited(event ->
+        {
             logoutImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/logout_24dp_FFFFFF.png")));
         });
 
-        exitButton.setOnMouseEntered(event -> {
+        exitButton.setOnMouseEntered(event ->
+        {
             exitImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/close_24dp_525FE1.png")));
         });
-        exitButton.setOnMouseExited(event -> {
+        exitButton.setOnMouseExited(event ->
+        {
             exitImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/close_24dp_FFFFFF.png")));
         });
 
@@ -169,16 +197,22 @@ public class ReaderCard_Controller implements DataReceiver {
         activityDetailsColumn.setCellValueFactory(data -> data.getValue().activityDetailsProperty());
 
         activitiesTable.setPlaceholder(new Text("No activities to display.")); // Set the placeholder text
-        activityDetailsColumn.setCellFactory(column -> {
-            return new TableCell<ActivityEntry, String>() {
+        activityDetailsColumn.setCellFactory(column ->
+        {
+            return new TableCell<ActivityEntry, String>()
+            {
                 private final Text text = new Text();
 
                 @Override
-                protected void updateItem(String item, boolean empty) {
+                protected void updateItem(String item, boolean empty)
+                {
                     super.updateItem(item, empty);
-                    if (empty || item == null) {
+                    if (empty || item == null)
+                    {
                         setGraphic(null);
-                    } else {
+                    }
+                    else
+                    {
                         text.setText(item);
                         text.wrappingWidthProperty().bind(activityDetailsColumn.widthProperty().subtract(10)); // Wrap text within column width
                         setGraphic(text);
@@ -197,12 +231,19 @@ public class ReaderCard_Controller implements DataReceiver {
         );
     }
 
-    private void loadActivitiesData(String userId) {
+    /**
+     * Loads the subscriber's activities data.
+     *
+     * @param userId - The subscriber's ID.
+     */
+    private void loadActivitiesData(String userId)
+    {
         // Get the subscriber's activities
         ClientUI.chat.accept(new MessageType("112", userId));
         subscriberActivities = ChatClient.listOfActivities;
 
-        for (ArrayList<String> activity : subscriberActivities) {
+        for (ArrayList<String> activity : subscriberActivities)
+        {
             ActivityEntry entry = new ActivityEntry(
                     activity.get(0), // activity date
                     activity.get(1), // activity time
@@ -217,16 +258,24 @@ public class ReaderCard_Controller implements DataReceiver {
      *
      * @return A greeting message.
      */
-    private String getGreetingMessage() {
+    private String getGreetingMessage()
+    {
         int hour = java.time.LocalTime.now().getHour();
 
-        if (hour >= 5 && hour < 12) {
+        if (hour >= 5 && hour < 12)
+        {
             return "Good Morning";
-        } else if (hour >= 12 && hour < 17) {
+        }
+        else if (hour >= 12 && hour < 17)
+        {
             return "Good Afternoon";
-        } else if (hour >= 17 && hour < 21) {
+        }
+        else if (hour >= 17 && hour < 21)
+        {
             return "Good Evening";
-        } else {
+        }
+        else
+        {
             return "Good Night";
         }
     }
@@ -235,42 +284,71 @@ public class ReaderCard_Controller implements DataReceiver {
      * Logs out the current user and navigates to the Home Page.
      */
     @FXML
-    private void logout() {
+    private void logout()
+    {
         subscriberController.attemptLogOut();
     }
 
+    /**
+     * Navigates to the Home Page.
+     */
     @FXML
-    private void goToHomePage() {
+    private void goToHomePage()
+    {
         SceneManager.switchScene("/gui/common/homePage/HomePage_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Navigates to the Librarian Dashboard.
+     */
     @FXML
-    private void goToLibrarianDash() {
+    private void goToLibrarianDash()
+    {
         SceneManager.switchScene("/gui/librarian/librarianUI/LibrarianUI_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Navigates to the Search Books page.
+     */
     @FXML
-    private void goToSearch() {
+    private void goToSearch()
+    {
         SceneManager.switchScene("/gui/common/search/Search_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Navigates to the New Borrow page.
+     */
     @FXML
-    private void goToNewBorrow() {
+    private void goToNewBorrow()
+    {
         SceneManager.switchScene("/gui/librarian/newBorrow/NewBorrow_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Navigates to the Add Subscriber page.
+     */
     @FXML
-    private void goToAddSubscriber() {
+    private void goToAddSubscriber()
+    {
         SceneManager.switchScene("/gui/librarian/addSubscriber/AddSubscriber_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Navigates to the Library Reports page.
+     */
     @FXML
-    private void goToLibraryReports() {
+    private void goToLibraryReports()
+    {
         SceneManager.switchScene("/gui/librarian/libraryReports/LibraryReports_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Exits the application.
+     */
     @FXML
-    private void exitApp() {
+    private void exitApp()
+    {
         ClientUI.chat.getClient().quit();
     }
 }

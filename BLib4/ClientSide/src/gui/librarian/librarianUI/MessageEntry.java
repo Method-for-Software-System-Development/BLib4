@@ -6,41 +6,84 @@ import javafx.beans.property.StringProperty;
 /**
  * Represents a single message entry in the table.
  */
-public class MessageEntry {
+public class MessageEntry
+{
 
     private final StringProperty messageId;
     private final StringProperty messageDate;
     private final StringProperty messageContent;
 
-    public MessageEntry(String messageId, String messageDate, String messageContent) {
+    /**
+     * Constructor for a message entry.
+     *
+     * @param messageId      - The ID of the message.
+     * @param messageDate    - The date the message was sent.
+     * @param messageContent - The content of the message.
+     */
+    public MessageEntry(String messageId, String messageDate, String messageContent)
+    {
         this.messageId = new SimpleStringProperty(messageId);
         this.messageDate = new SimpleStringProperty(messageDate);
         this.messageContent = new SimpleStringProperty(messageContent);
     }
 
-    // Getters for properties
-    public StringProperty messageIdProperty() {
+    /**
+     * Getters for the properties id.
+     *
+     * @return - The property of the specified value.
+     */
+    public StringProperty messageIdProperty()
+    {
         return messageId;
     }
 
-    public StringProperty messageDateProperty() {
+    /**
+     * Getters for the property date.
+     *
+     * @return - The property of the specified value.
+     */
+    public StringProperty messageDateProperty()
+    {
         return messageDate;
     }
 
-    public StringProperty messageContentProperty() {
+    /**
+     * Getters for the property content.
+     *
+     * @return - The property of the specified value.
+     */
+    public StringProperty messageContentProperty()
+    {
         return messageContent;
     }
 
-    // Getters for values
-    public String getMessageId() {
+    /**
+     * Getters for the message ID.
+     *
+     * @return - The message ID.
+     */
+    public String getMessageId()
+    {
         return messageId.get();
     }
 
-    public String getMessageDate() {
+    /**
+     * Getters for the message date.
+     *
+     * @return - The message date.
+     */
+    public String getMessageDate()
+    {
         return messageDate.get();
     }
 
-    public String getMessageContent() {
+    /**
+     * Getters for the message content.
+     *
+     * @return - The message content.
+     */
+    public String getMessageContent()
+    {
         return messageContent.get();
     }
 }

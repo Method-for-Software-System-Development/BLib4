@@ -26,7 +26,6 @@ public class Notification
         this.content = content;
     }
 
-
     /**
      * Get the unique number identifying the notification
      *

@@ -21,6 +21,7 @@ public class MessageType implements Serializable
 
     /**
      * getter for the id
+     *
      * @return the id of the message
      */
     public String getId()
@@ -30,6 +31,7 @@ public class MessageType implements Serializable
 
     /**
      * getter for the data
+     *
      * @return the data object of the message
      */
     public Object getData()
@@ -39,6 +41,7 @@ public class MessageType implements Serializable
 
     /**
      * setter for the id of the message
+     *
      * @param id the id to set
      */
     public void setId(String id)
@@ -48,6 +51,7 @@ public class MessageType implements Serializable
 
     /**
      * setter for the data of the message
+     *
      * @param data the data to set
      */
     public void setData(Object data)

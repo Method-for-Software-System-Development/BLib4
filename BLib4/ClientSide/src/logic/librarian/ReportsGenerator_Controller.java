@@ -5,6 +5,7 @@ import entities.report.BorrowingReport;
 import entities.report.SubscriberStatusReport;
 import logic.communication.ChatClient;
 import logic.communication.ClientUI;
+
 import java.util.*;
 
 public class ReportsGenerator_Controller
@@ -48,7 +49,7 @@ public class ReportsGenerator_Controller
         dataOfReport.add("BorrowingReport");
         dataOfReport.add(month);
         dataOfReport.add(year);
-        // send message to server to get report id
+        // send message to server to get a report id
         ClientUI.chat.accept(new MessageType("125", dataOfReport));
         int reportNum = ChatClient.reportID;
         //if report id not found response is -1
@@ -92,7 +93,7 @@ public class ReportsGenerator_Controller
             System.out.println("No subscriber status report id found for: " + month + " " + year);
             return null;
         }
-        // send message to server to get blob data of a report
+        // send a message to server to get blob data of a report
         ClientUI.chat.accept(new MessageType("126", dataOfReport));
         //get response from server for blob data
         List<String[]> blobData = ChatClient.blobData;
@@ -124,26 +125,29 @@ public class ReportsGenerator_Controller
         }
         return mappedData;
     }
-    
+
     /**
      * This method checks if a specific report is ready for use.
+     *
      * @param reportType The type of the requested report.
      * @return The boolean response of the server if the report is ready.
      */
-    public boolean checkIfReportIsReady(String reportType) {
-        System.out.println("Checking if "+reportType+" report for: " + month + " " + year+ " is ready..");
+    public boolean checkIfReportIsReady(String reportType)
+    {
+        System.out.println("Checking if " + reportType + " report for: " + month + " " + year + " is ready..");
         // Create a list of data of the requested report to send to the server
         ArrayList<String> dataOfReport = new ArrayList<>();
         dataOfReport.add(reportType);
         dataOfReport.add(month);
         dataOfReport.add(year);
         //checks if the report is ready
-        ClientUI.chat.accept(new MessageType("127",dataOfReport));
+        ClientUI.chat.accept(new MessageType("127", dataOfReport));
         return ChatClient.serverResponse;
     }
 
     /**
      * The method gets the month and year of the report.
+     *
      * @return The month of the report.
      */
     public String getMonth()
@@ -153,7 +157,8 @@ public class ReportsGenerator_Controller
 
     /**
      * The method sets the month and year of the report.
-     * @param Month the month of the report.
+     *
+     * @param month the month of the report.
      */
     public void setMonth(String month)
     {
@@ -162,6 +167,7 @@ public class ReportsGenerator_Controller
 
     /**
      * The method gets the year of the report.
+     *
      * @return The year of the report.
      */
     public String getYear()
@@ -171,7 +177,8 @@ public class ReportsGenerator_Controller
 
     /**
      * The method sets the year of the report.
-     * @param Year the year of the report.
+     *
+     * @param year the year of the report.
      */
     public void setYear(String year)
     {

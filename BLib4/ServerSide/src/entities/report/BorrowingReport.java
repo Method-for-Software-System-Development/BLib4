@@ -1,6 +1,5 @@
 package entities.report;
 
-
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +23,6 @@ public class BorrowingReport extends Report
         super(reportNum, Month, Year, issueDate);
         this.borrowingData = borrowingData;
     }
-
 
     /**
      * Retrieves the borrowing data for a specific book.

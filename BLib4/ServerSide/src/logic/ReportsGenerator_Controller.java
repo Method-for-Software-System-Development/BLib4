@@ -58,7 +58,7 @@ public class ReportsGenerator_Controller
      */
     public Map<String, List<String>> fetchBorrowingReportData()
     {
-    	//fetch the data from db
+        //fetch the data from db
         Map<String, String> totalBorrowTimeMap = dbController.fetchTotalBorrowTime();
         Map<String, String> lateBorrowTimeMap = dbController.fetchLateBorrowTime();
         Map<String, List<String>> borrowingReportData = new HashMap<>();
@@ -76,7 +76,7 @@ public class ReportsGenerator_Controller
     /**
      * Updates the monthly SubscribersStatus report by adding today's data and fetching the updated report.
      *
-     * @param day The day of the month.
+     * @param day         The day of the month.
      * @param activeCount The number of active subscribers for the day.
      * @param frozenCount The number of frozen subscribers for the day.
      */
@@ -177,8 +177,8 @@ public class ReportsGenerator_Controller
      * Requests to add a new empty report the given month, year and report type.
      *
      * @param reportType The type of the generated report.
-     * @param month Month of the empty report.
-     * @param year Year of the empty report.
+     * @param month      Month of the empty report.
+     * @param year       Year of the empty report.
      */
     private void generateEmptyReportForTheMonth(String reportType, int month, int year)
     {

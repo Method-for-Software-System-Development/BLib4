@@ -102,6 +102,7 @@ public class Notification_Controller
             e.printStackTrace();
         }
     }
+
     /**
      * Sends a day-before return reminder via email and SMS.
      *

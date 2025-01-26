@@ -25,7 +25,8 @@ public class ClientUI extends Application
      * @param primaryStage - The primary stage of the application.
      */
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage)
+    {
         // Loading Montserrat fonts
         Font.loadFont(getClass().getResourceAsStream("/gui/assets/fonts/Montserrat/Montserrat-Black.ttf"), 14);
         Font.loadFont(getClass().getResourceAsStream("/gui/assets/fonts/Montserrat/Montserrat-BlackItalic.ttf"), 14);
@@ -83,7 +84,7 @@ public class ClientUI extends Application
      * This method is called to start the connection with the server.
      *
      * @param serverIp - The IP address of the server.
-     * @param portStr - The port number of the server.
+     * @param portStr  - The port number of the server.
      */
     public static void runClient(String serverIp, String portStr)
     {
@@ -115,7 +116,8 @@ public class ClientUI extends Application
      *
      * @param primaryStage The primary stage of the application.
      */
-    public static void openHomePage(Stage primaryStage) {
+    public static void openHomePage(Stage primaryStage)
+    {
         // Set the scene for the home page
         SceneManager.switchScene("/gui/common/homePage/HomePage_UI.fxml", "BLib.4 - Braude Library Management");
 
@@ -131,12 +133,16 @@ public class ClientUI extends Application
         final double[] lastHeight = {primaryStage.getHeight()};
 
         // Add listener to track changes in full-screen state
-        primaryStage.fullScreenProperty().addListener((observable, oldValue, isFullScreen) -> {
-            if (!isFullScreen) {
+        primaryStage.fullScreenProperty().addListener((observable, oldValue, isFullScreen) ->
+        {
+            if (!isFullScreen)
+            {
                 // Restore previous size when exiting full-screen
                 primaryStage.setWidth(lastWidth[0]);
                 primaryStage.setHeight(lastHeight[0]);
-            } else {
+            }
+            else
+            {
                 // Save the size before entering full-screen
                 lastWidth[0] = primaryStage.getWidth();
                 lastHeight[0] = primaryStage.getHeight();
@@ -158,8 +164,10 @@ public class ClientUI extends Application
         primaryStage.setFullScreenExitHint("Press ESC to exit full-screen mode");
 
         // Add listener to toggle full screen when maximized
-        primaryStage.maximizedProperty().addListener((observable, oldValue, isMaximized) -> {
-            if (isMaximized) {
+        primaryStage.maximizedProperty().addListener((observable, oldValue, isMaximized) ->
+        {
+            if (isMaximized)
+            {
                 primaryStage.setFullScreen(true);
             }
         });

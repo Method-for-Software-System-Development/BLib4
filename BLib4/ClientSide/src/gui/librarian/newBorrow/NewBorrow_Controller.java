@@ -16,8 +16,8 @@ import logic.user.Subscriber_Controller;
 
 import java.time.LocalDate;
 
-public class NewBorrow_Controller {
-
+public class NewBorrow_Controller
+{
     // FXML fields
     @FXML
     private Text userGreeting;
@@ -84,8 +84,12 @@ public class NewBorrow_Controller {
     private BorrowController borrowController;
     private int availability;
 
+    /**
+     * Initializes the scene.
+     */
     @FXML
-    public void initialize() {
+    public void initialize()
+    {
         // Get the singleton instance of Subscriber_Controller
         subscriberController = Subscriber_Controller.getInstance();
         // Get the singleton instance of BooksController
@@ -97,63 +101,80 @@ public class NewBorrow_Controller {
         userGreeting.setText(getGreetingMessage() + " " + subscriberController.getLoggedLibrarian().getName() + " !");
 
         // Set the icons for the buttons
-        homePageButton.setOnMouseEntered(event -> {
+        homePageButton.setOnMouseEntered(event ->
+        {
             homePageImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/home_24dp_525FE1.png")));
         });
-        homePageButton.setOnMouseExited(event -> {
+        homePageButton.setOnMouseExited(event ->
+        {
             homePageImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/home_24dp_FFFFFF.png")));
         });
 
-        librarianDashButton.setOnMouseEntered(event -> {
+        librarianDashButton.setOnMouseEntered(event ->
+        {
             librarianDashImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/local_library_24dp_F86F03.png")));
         });
-        librarianDashButton.setOnMouseExited(event -> {
+        librarianDashButton.setOnMouseExited(event ->
+        {
             librarianDashImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/local_library_24dp_FFFFFF.png")));
         });
 
-        searchBooksButton.setOnMouseEntered(event -> {
+        searchBooksButton.setOnMouseEntered(event ->
+        {
             searchBooksImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/search_24dp_525FE1.png")));
         });
-        searchBooksButton.setOnMouseExited(event -> {
+        searchBooksButton.setOnMouseExited(event ->
+        {
             searchBooksImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/search_24dp_FFFFFF.png")));
         });
 
-        addSubscriberButton.setOnMouseEntered(event -> {
+        addSubscriberButton.setOnMouseEntered(event ->
+        {
             addSubscriberImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/person_add_24dp_525FE1.png")));
         });
-        addSubscriberButton.setOnMouseExited(event -> {
+        addSubscriberButton.setOnMouseExited(event ->
+        {
             addSubscriberImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/person_add_24dp_FFFFFF.png")));
         });
 
-        reportsButton.setOnMouseEntered(event -> {
+        reportsButton.setOnMouseEntered(event ->
+        {
             reportsImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/bar_chart_24dp_525FE1.png")));
         });
-        reportsButton.setOnMouseExited(event -> {
+        reportsButton.setOnMouseExited(event ->
+        {
             reportsImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/bar_chart_24dp_FFFFFF.png")));
         });
 
-        logoutButton.setOnMouseEntered(event -> {
+        logoutButton.setOnMouseEntered(event ->
+        {
             logoutImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/logout_24dp_525FE1.png")));
         });
-        logoutButton.setOnMouseExited(event -> {
+        logoutButton.setOnMouseExited(event ->
+        {
             logoutImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/logout_24dp_FFFFFF.png")));
         });
 
-        exitButton.setOnMouseEntered(event -> {
+        exitButton.setOnMouseEntered(event ->
+        {
             exitImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/close_24dp_525FE1.png")));
         });
-        exitButton.setOnMouseExited(event -> {
+        exitButton.setOnMouseExited(event ->
+        {
             exitImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/close_24dp_FFFFFF.png")));
         });
 
         // Set the factory for customizing day cells
-        returnDatePicker.setDayCellFactory(datePicker -> new DateCell() {
+        returnDatePicker.setDayCellFactory(datePicker -> new DateCell()
+        {
             @Override
-            public void updateItem(LocalDate item, boolean empty) {
+            public void updateItem(LocalDate item, boolean empty)
+            {
                 super.updateItem(item, empty);
 
                 // Disable dates before today and two weeks from now
-                if (item.isBefore(LocalDate.now()) || item.isAfter(LocalDate.now().plusWeeks(2))) {
+                if (item.isBefore(LocalDate.now()) || item.isAfter(LocalDate.now().plusWeeks(2)))
+                {
                     setDisable(true);
                     setStyle("-fx-background-color: #EEEEEE; -fx-text-fill: #999999;");
                 }
@@ -161,8 +182,12 @@ public class NewBorrow_Controller {
         });
     }
 
+    /**
+     * Simulates scanning a barcode by allowing the librarian to enter a book copy number.
+     */
     @FXML
-    private void scanBarcode() {
+    private void scanBarcode()
+    {
         // Create a custom Alert
         Alert alert = new Alert(Alert.AlertType.NONE);
         alert.initOwner(SceneManager.getStage());
@@ -185,21 +210,31 @@ public class NewBorrow_Controller {
         alert.getButtonTypes().addAll(confirmButton, cancelButton);
 
         // Show the Alert and wait for a response
-        alert.showAndWait().ifPresent(response -> {
-            if (response == confirmButton) {
+        alert.showAndWait().ifPresent(response ->
+        {
+            if (response == confirmButton)
+            {
                 String enteredId = inputField.getText();
                 // Check if the ID is not empty
-                if (enteredId != null && !enteredId.trim().isEmpty()) {
+                if (enteredId != null && !enteredId.trim().isEmpty())
+                {
                     copyIdField.setText(enteredId);
-                } else {
+                }
+                else
+                {
                     showErrorAlert("Invalid Input", "Please enter a valid Copy ID.");
                 }
             }
         });
     }
 
+    /**
+     * Proceeds to the next step of the new borrow process.
+     * This method is called after the librarian enters the copy ID.
+     */
     @FXML
-    private void step1() {
+    private void step1()
+    {
         // Reset styles before validation
         copyIdField.getStyleClass().remove("error-text-field");
 
@@ -207,17 +242,23 @@ public class NewBorrow_Controller {
         String copyID = copyIdField.getText();
 
         // Validate copy ID
-        if (copyID == null || copyID.trim().isEmpty()) {
+        if (copyID == null || copyID.trim().isEmpty())
+        {
             copyIdField.setPromptText("Copy ID is required");
             copyIdField.getStyleClass().add("error-text-field");
-        } else if (!copyID.matches("\\d+")) {
+        }
+        else if (!copyID.matches("\\d+"))
+        {
             copyIdField.clear();
             copyIdField.setPromptText("Copy ID must contain only digits");
             copyIdField.getStyleClass().add("error-text-field");
-        } else {
+        }
+        else
+        {
             availability = booksController.checkAvailability(copyID);
 
-            if (availability == 0) {
+            if (availability == 0)
+            {
                 userIdText.setVisible(true);
                 userIdText.setManaged(true);
                 userIdField.setVisible(true);
@@ -232,7 +273,9 @@ public class NewBorrow_Controller {
                 scanBarcodeButton.getStyleClass().add("disabled-button");
                 nextButton1.setDisable(true);
                 nextButton1.getStyleClass().add("disabled-button");
-            } else if (availability == 1) {
+            }
+            else if (availability == 1)
+            {
                 showInformationAlert("Book Reserved", "Notice: All copies of the book are reserved. Only a subscriber who has received a notification that the copy is ready for borrowing at the library will be allowed to proceed with the process.");
                 userIdText.setVisible(true);
                 userIdText.setManaged(true);
@@ -248,15 +291,21 @@ public class NewBorrow_Controller {
                 scanBarcodeButton.getStyleClass().add("disabled-button");
                 nextButton1.setDisable(true);
                 nextButton1.getStyleClass().add("disabled-button");
-            } else if (availability == 2) {
+            }
+            else if (availability == 2)
+            {
                 showErrorAlert("Error", "The book copy already borrowed.");
             }
             else showErrorAlert("Error", "The book copy does not exist in the database.");
         }
     }
 
+    /**
+     * Checks if the subscriber is in the database and active.
+     */
     @FXML
-    private void checkUser() {
+    private void checkUser()
+    {
         // Reset styles before validation
         userIdField.getStyleClass().remove("error-text-field");
 
@@ -264,30 +313,47 @@ public class NewBorrow_Controller {
         String userID = userIdField.getText();
 
         // Validate user ID
-        if (userID == null || userID.trim().isEmpty()) {
+        if (userID == null || userID.trim().isEmpty())
+        {
             userIdField.setPromptText("User ID is required");
             userIdField.getStyleClass().add("error-text-field");
-        } else if (!userID.matches("\\d{9}")) {
+        }
+        else if (!userID.matches("\\d{9}"))
+        {
             userIdField.clear();
             userIdField.setPromptText("User ID must be 9 digits");
             userIdField.getStyleClass().add("error-text-field");
-        } else {
+        }
+        else
+        {
             ClientUI.chat.accept(new MessageType("116", userID));
             int subscriberStatus = ChatClient.subscriberStatus;
-            if (subscriberStatus == 0) {
+            if (subscriberStatus == 0)
+            {
                 showInformationAlert("Success", "The subscriber is in the database and active.");
-            } else if (subscriberStatus == 1) {
+            }
+            else if (subscriberStatus == 1)
+            {
                 showErrorAlert("Error", "The subscriber is not in the database.");
-            } else if (subscriberStatus == 2) {
+            }
+            else if (subscriberStatus == 2)
+            {
                 showErrorAlert("Subscriber is Frozen", "The subscriber is in the database but is frozen.");
-            } else {
+            }
+            else
+            {
                 showErrorAlert("Error", "An error occurred while checking the subscriber.");
             }
         }
     }
 
+    /**
+     * Proceeds to the next step of the new borrow process.
+     * This method is called after the librarian enters the subscriber ID.
+     */
     @FXML
-    private void step2() {
+    private void step2()
+    {
         // Reset styles before validation
         userIdField.getStyleClass().remove("error-text-field");
 
@@ -295,18 +361,25 @@ public class NewBorrow_Controller {
         String userID = userIdField.getText();
 
         // Validate user ID
-        if (userID == null || userID.trim().isEmpty()) {
+        if (userID == null || userID.trim().isEmpty())
+        {
             userIdField.setPromptText("User ID is required");
             userIdField.getStyleClass().add("error-text-field");
-        } else if (!userID.matches("\\d{9}")) {
+        }
+        else if (!userID.matches("\\d{9}"))
+        {
             userIdField.clear();
             userIdField.setPromptText("User ID must be 9 digits");
             userIdField.getStyleClass().add("error-text-field");
-        } else {
+        }
+        else
+        {
             ClientUI.chat.accept(new MessageType("116", userID));
             int subscriberStatus = ChatClient.subscriberStatus;
-            if (subscriberStatus == 0) {
-                if (availability == 0 || (availability == 1 && borrowController.isSubscriberInWaitList(userID))) {
+            if (subscriberStatus == 0)
+            {
+                if (availability == 0 || (availability == 1 && borrowController.isSubscriberInWaitList(userID)))
+                {
                     returnDateText.setVisible(true);
                     returnDateText.setManaged(true);
                     returnDatePicker.setVisible(true);
@@ -321,26 +394,42 @@ public class NewBorrow_Controller {
                     checkButton.getStyleClass().add("disabled-button");
                     nextButton2.setDisable(true);
                     nextButton2.getStyleClass().add("disabled-button");
-                } else {
+                }
+                else
+                {
                     showErrorAlert("Unable to Proceed", "The subscriber has not reserved the book or his turn in the waiting list hasn't arrived yet.");
                 }
-            } else if (subscriberStatus == 1) {
+            }
+            else if (subscriberStatus == 1)
+            {
                 showErrorAlert("Unable to proceed", "The subscriber is not in the database. Unable to proceed.");
-            } else if (subscriberStatus == 2) {
+            }
+            else if (subscriberStatus == 2)
+            {
                 showErrorAlert("Unable to proceed", "The subscriber is frozen. Unable to proceed.");
-            } else {
+            }
+            else
+            {
                 showErrorAlert("Error", "An error occurred while checking the subscriber.");
             }
         }
     }
 
+    /**
+     * Sets the return date to two weeks from today.
+     */
     @FXML
-    private void setInTwoWeeks() {
+    private void setInTwoWeeks()
+    {
         returnDatePicker.setValue(LocalDate.now().plusWeeks(2));
     }
 
+    /**
+     * Submits the new borrow request.
+     */
     @FXML
-    private void submitNewBorrow() {
+    private void submitNewBorrow()
+    {
         // Reset styles before validation
         returnDatePicker.getStyleClass().remove("error-text-field");
 
@@ -348,14 +437,18 @@ public class NewBorrow_Controller {
         LocalDate returnDate = returnDatePicker.getValue();
 
         // Validate return date
-        if (returnDate == null) {
+        if (returnDate == null)
+        {
             returnDatePicker.setPromptText("Return date is required");
             returnDatePicker.getStyleClass().add("error-text-field");
-        } else {
+        }
+        else
+        {
             String copyID = copyIdField.getText();
             String userID = userIdField.getText();
 
-            if (borrowController.createNewBorrow(userID, copyID, returnDate.toString())) {
+            if (borrowController.createNewBorrow(userID, copyID, returnDate.toString()))
+            {
                 showInformationAlert("Success", "The borrow has been successfully created.");
                 //back to the start of new borrow
                 SceneManager.switchScene("/gui/librarian/newBorrow/NewBorrow_UI.fxml", "BLib.4 - Braude Library Management");
@@ -364,9 +457,13 @@ public class NewBorrow_Controller {
                 showErrorAlert("Error", "Failed to create the borrow. Please try again.");
         }
     }
-    
+
+    /**
+     * Resets the form of the new borrow process.
+     */
     @FXML
-    private void reset_form() {
+    private void reset_form()
+    {
         // Reset the form by reloading the scene
         SceneManager.switchScene("/gui/librarian/newBorrow/NewBorrow_UI.fxml", "BLib.4 - Braude Library Management");
     }
@@ -376,16 +473,24 @@ public class NewBorrow_Controller {
      *
      * @return A greeting message.
      */
-    private String getGreetingMessage() {
+    private String getGreetingMessage()
+    {
         int hour = java.time.LocalTime.now().getHour();
 
-        if (hour >= 5 && hour < 12) {
+        if (hour >= 5 && hour < 12)
+        {
             return "Good Morning";
-        } else if (hour >= 12 && hour < 17) {
+        }
+        else if (hour >= 12 && hour < 17)
+        {
             return "Good Afternoon";
-        } else if (hour >= 17 && hour < 21) {
+        }
+        else if (hour >= 17 && hour < 21)
+        {
             return "Good Evening";
-        } else {
+        }
+        else
+        {
             return "Good Night";
         }
     }
@@ -396,7 +501,8 @@ public class NewBorrow_Controller {
      * @param title   the title of the error alert
      * @param message the message displayed in the error alert
      */
-    private void showErrorAlert(String title, String message) {
+    private void showErrorAlert(String title, String message)
+    {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(null);
@@ -405,7 +511,14 @@ public class NewBorrow_Controller {
         alert.showAndWait();
     }
 
-    private void showInformationAlert(String title, String message) {
+    /**
+     * Displays an information alert with the specified title and message.
+     *
+     * @param title   the title of the information alert
+     * @param message the message displayed in the information alert
+     */
+    private void showInformationAlert(String title, String message)
+    {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
         alert.setHeaderText(null);
@@ -418,37 +531,62 @@ public class NewBorrow_Controller {
      * Logs out the current user and navigates to the Home Page.
      */
     @FXML
-    private void logout() {
+    private void logout()
+    {
         subscriberController.attemptLogOut();
     }
 
+    /**
+     * Navigates to the Home Page.
+     */
     @FXML
-    private void goToHomePage() {
+    private void goToHomePage()
+    {
         SceneManager.switchScene("/gui/common/homePage/HomePage_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Navigates to the Librarian Dashboard.
+     */
     @FXML
-    private void goToLibrarianDash() {
+    private void goToLibrarianDash()
+    {
         SceneManager.switchScene("/gui/librarian/librarianUI/LibrarianUI_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Navigates to the Search Books page.
+     */
     @FXML
-    private void goToSearch() {
+    private void goToSearch()
+    {
         SceneManager.switchScene("/gui/common/search/Search_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Navigates to the Add Subscriber page.
+     */
     @FXML
-    private void goToAddSubscriber() {
+    private void goToAddSubscriber()
+    {
         SceneManager.switchScene("/gui/librarian/addSubscriber/AddSubscriber_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Navigates to the Library Reports page.
+     */
     @FXML
-    private void goToLibraryReports() {
+    private void goToLibraryReports()
+    {
         SceneManager.switchScene("/gui/librarian/libraryReports/LibraryReports_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Exits the application.
+     */
     @FXML
-    private void exitApp() {
+    private void exitApp()
+    {
         ClientUI.chat.getClient().quit();
     }
 }

@@ -10,8 +10,8 @@ public class MessageType implements Serializable
     /**
      * Default constructor
      *
-     * @param id
-     * @param data
+     * @param id  The id of the message
+     * @param data The data of the message
      */
     public MessageType(String id, Object data)
     {

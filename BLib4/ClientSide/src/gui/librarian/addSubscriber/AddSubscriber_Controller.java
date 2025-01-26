@@ -1,30 +1,16 @@
 package gui.librarian.addSubscriber;
 
-import entities.logic.MessageType;
-import entities.user.Librarian;
-import entities.user.Subscriber;
-import gui.user.subscriberUI.BorrowEntry;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
-import logic.communication.ChatClient;
 import logic.communication.ClientUI;
 import logic.communication.SceneManager;
 import logic.user.Subscriber_Controller;
 
-import java.sql.Date;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.regex.Pattern;
-
-public class AddSubscriber_Controller {
+public class AddSubscriber_Controller
+{
 
     // FXML fields
     @FXML
@@ -77,8 +63,12 @@ public class AddSubscriber_Controller {
     // Fields
     private Subscriber_Controller subscriberController;
 
+    /**
+     * Initializes the AddSubscriber_Controller.
+     */
     @FXML
-    public void initialize() {
+    public void initialize()
+    {
         // Get the singleton instance of Subscriber_Controller
         subscriberController = Subscriber_Controller.getInstance();
 
@@ -86,52 +76,66 @@ public class AddSubscriber_Controller {
         userGreeting.setText(getGreetingMessage() + " " + subscriberController.getLoggedLibrarian().getName() + " !");
 
         // Set the icons for the buttons
-        homePageButton.setOnMouseEntered(event -> {
+        homePageButton.setOnMouseEntered(event ->
+        {
             homePageImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/home_24dp_525FE1.png")));
         });
-        homePageButton.setOnMouseExited(event -> {
+        homePageButton.setOnMouseExited(event ->
+        {
             homePageImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/home_24dp_FFFFFF.png")));
         });
 
-        librarianDashButton.setOnMouseEntered(event -> {
+        librarianDashButton.setOnMouseEntered(event ->
+        {
             librarianDashImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/local_library_24dp_F86F03.png")));
         });
-        librarianDashButton.setOnMouseExited(event -> {
+        librarianDashButton.setOnMouseExited(event ->
+        {
             librarianDashImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/local_library_24dp_FFFFFF.png")));
         });
 
-        searchBooksButton.setOnMouseEntered(event -> {
+        searchBooksButton.setOnMouseEntered(event ->
+        {
             searchBooksImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/search_24dp_525FE1.png")));
         });
-        searchBooksButton.setOnMouseExited(event -> {
+        searchBooksButton.setOnMouseExited(event ->
+        {
             searchBooksImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/search_24dp_FFFFFF.png")));
         });
 
-        newBorrowButton.setOnMouseEntered(event -> {
+        newBorrowButton.setOnMouseEntered(event ->
+        {
             newBorrowImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/post_add_24dp_525FE1.png")));
         });
-        newBorrowButton.setOnMouseExited(event -> {
+        newBorrowButton.setOnMouseExited(event ->
+        {
             newBorrowImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/post_add_24dp_FFFFFF.png")));
         });
 
-        reportsButton.setOnMouseEntered(event -> {
+        reportsButton.setOnMouseEntered(event ->
+        {
             reportsImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/bar_chart_24dp_525FE1.png")));
         });
-        reportsButton.setOnMouseExited(event -> {
+        reportsButton.setOnMouseExited(event ->
+        {
             reportsImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/bar_chart_24dp_FFFFFF.png")));
         });
 
-        logoutButton.setOnMouseEntered(event -> {
+        logoutButton.setOnMouseEntered(event ->
+        {
             logoutImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/logout_24dp_525FE1.png")));
         });
-        logoutButton.setOnMouseExited(event -> {
+        logoutButton.setOnMouseExited(event ->
+        {
             logoutImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/logout_24dp_FFFFFF.png")));
         });
 
-        exitButton.setOnMouseEntered(event -> {
+        exitButton.setOnMouseEntered(event ->
+        {
             exitImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/close_24dp_525FE1.png")));
         });
-        exitButton.setOnMouseExited(event -> {
+        exitButton.setOnMouseExited(event ->
+        {
             exitImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/close_24dp_FFFFFF.png")));
         });
     }
@@ -141,22 +145,34 @@ public class AddSubscriber_Controller {
      *
      * @return A greeting message.
      */
-    private String getGreetingMessage() {
+    private String getGreetingMessage()
+    {
         int hour = java.time.LocalTime.now().getHour();
 
-        if (hour >= 5 && hour < 12) {
+        if (hour >= 5 && hour < 12)
+        {
             return "Good Morning";
-        } else if (hour >= 12 && hour < 17) {
+        }
+        else if (hour >= 12 && hour < 17)
+        {
             return "Good Afternoon";
-        } else if (hour >= 17 && hour < 21) {
+        }
+        else if (hour >= 17 && hour < 21)
+        {
             return "Good Evening";
-        } else {
+        }
+        else
+        {
             return "Good Night";
         }
     }
 
+    /**
+     * Validates the form fields and attempts to add a new subscriber.
+     */
     @FXML
-    public void validate_addSubscriber_form() {
+    public void validate_addSubscriber_form()
+    {
         // Reset styles before validation
         userIdField.getStyleClass().remove("error-text-field");
         firstNameField.getStyleClass().remove("error-text-field");
@@ -177,11 +193,14 @@ public class AddSubscriber_Controller {
         String password = passwordField.getText();
 
         // Validate user ID
-        if (userID == null || userID.trim().isEmpty()) {
+        if (userID == null || userID.trim().isEmpty())
+        {
             userIdField.setPromptText("ID is required");
             userIdField.getStyleClass().add("error-text-field");
             isValid = false;
-        } else if (!userID.matches("\\d{9}")) {
+        }
+        else if (!userID.matches("\\d{9}"))
+        {
             userIdField.clear();
             userIdField.setPromptText("ID must be 9 digits");
             userIdField.getStyleClass().add("error-text-field");
@@ -189,11 +208,14 @@ public class AddSubscriber_Controller {
         }
 
         // Validate first name
-        if (firstName == null || firstName.trim().isEmpty()) {
+        if (firstName == null || firstName.trim().isEmpty())
+        {
             firstNameField.setPromptText("First name is required");
             firstNameField.getStyleClass().add("error-text-field");
             isValid = false;
-        } else if (!firstName.matches("[a-zA-Z]+")) {
+        }
+        else if (!firstName.matches("[a-zA-Z]+"))
+        {
             firstNameField.clear();
             firstNameField.setPromptText("First name must contain only letters");
             firstNameField.getStyleClass().add("error-text-field");
@@ -201,11 +223,14 @@ public class AddSubscriber_Controller {
         }
 
         // Validate last name
-        if (lastName == null || lastName.trim().isEmpty()) {
+        if (lastName == null || lastName.trim().isEmpty())
+        {
             lastNameField.setPromptText("Last name is required");
             lastNameField.getStyleClass().add("error-text-field");
             isValid = false;
-        } else if (!lastName.matches("[a-zA-Z]+")) {
+        }
+        else if (!lastName.matches("[a-zA-Z]+"))
+        {
             lastNameField.clear();
             lastNameField.setPromptText("Last name must contain only letters");
             lastNameField.getStyleClass().add("error-text-field");
@@ -213,11 +238,14 @@ public class AddSubscriber_Controller {
         }
 
         // Validate phone number
-        if (phoneNumber == null || phoneNumber.trim().isEmpty()) {
+        if (phoneNumber == null || phoneNumber.trim().isEmpty())
+        {
             phoneNumberField.setPromptText("Phone number is required");
             phoneNumberField.getStyleClass().add("error-text-field");
             isValid = false;
-        } else if (!phoneNumber.matches("\\d{10}")) {
+        }
+        else if (!phoneNumber.matches("\\d{10}"))
+        {
             phoneNumberField.clear();
             phoneNumberField.setPromptText("Phone number must be 10 digits");
             phoneNumberField.getStyleClass().add("error-text-field");
@@ -225,11 +253,14 @@ public class AddSubscriber_Controller {
         }
 
         // Validate email
-        if (email == null || email.trim().isEmpty()) {
+        if (email == null || email.trim().isEmpty())
+        {
             emailField.setPromptText("Email is required");
             emailField.getStyleClass().add("error-text-field");
             isValid = false;
-        } else if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+        }
+        else if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"))
+        {
             emailField.clear();
             emailField.setPromptText("Invalid email format");
             emailField.getStyleClass().add("error-text-field");
@@ -237,11 +268,14 @@ public class AddSubscriber_Controller {
         }
 
         // Validate password
-        if (password == null || password.trim().isEmpty()) {
+        if (password == null || password.trim().isEmpty())
+        {
             passwordField.setPromptText("Password is required");
             passwordField.getStyleClass().add("error-text-field");
             isValid = false;
-        } else if (!password.equals(confirmPasswordField.getText())) {
+        }
+        else if (!password.equals(confirmPasswordField.getText()))
+        {
             passwordField.clear();
             confirmPasswordField.clear();
             passwordField.setPromptText("Passwords do not match");
@@ -251,20 +285,28 @@ public class AddSubscriber_Controller {
             isValid = false;
         }
 
-        if (isValid) {
+        if (isValid)
+        {
             boolean successful = subscriberController.addNewSubscriber(userID, firstName, lastName, phoneNumber, email, password);
 
-            if (successful) {
+            if (successful)
+            {
                 showInformationAlert("Success", "Subscriber added successfully.");
                 clear_form();
-            } else {
+            }
+            else
+            {
                 showErrorAlert("Error", "Failed to add subscriber. Please try again.");
             }
         }
     }
 
+    /**
+     * Clears the form fields.
+     */
     @FXML
-    public void clear_form() {
+    public void clear_form()
+    {
         userIdField.clear();
         firstNameField.clear();
         lastNameField.clear();
@@ -287,7 +329,8 @@ public class AddSubscriber_Controller {
      * @param title   the title of the error alert
      * @param message the message displayed in the error alert
      */
-    private void showErrorAlert(String title, String message) {
+    private void showErrorAlert(String title, String message)
+    {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(null);
@@ -296,7 +339,14 @@ public class AddSubscriber_Controller {
         alert.showAndWait();
     }
 
-    private void showInformationAlert(String title, String message) {
+    /**
+     * Displays an information alert with the specified title and message.
+     *
+     * @param title   the title of the information alert
+     * @param message the message displayed in the information alert
+     */
+    private void showInformationAlert(String title, String message)
+    {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
         alert.setHeaderText(null);
@@ -309,37 +359,62 @@ public class AddSubscriber_Controller {
      * Logs out the current user and navigates to the Home Page.
      */
     @FXML
-    private void logout() {
+    private void logout()
+    {
         subscriberController.attemptLogOut();
     }
 
+    /**
+     * Navigates to the Home Page.
+     */
     @FXML
-    private void goToHomePage() {
+    private void goToHomePage()
+    {
         SceneManager.switchScene("/gui/common/homePage/HomePage_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Navigates to the Librarian Dashboard.
+     */
     @FXML
-    private void goToLibrarianDash() {
+    private void goToLibrarianDash()
+    {
         SceneManager.switchScene("/gui/librarian/librarianUI/LibrarianUI_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Navigates to the Search Books page.
+     */
     @FXML
-    private void goToSearch() {
+    private void goToSearch()
+    {
         SceneManager.switchScene("/gui/common/search/Search_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Navigates to the New Borrow page.
+     */
     @FXML
-    private void goToNewBorrow() {
+    private void goToNewBorrow()
+    {
         SceneManager.switchScene("/gui/librarian/newBorrow/NewBorrow_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Navigates to the Library Reports page.
+     */
     @FXML
-    private void goToLibraryReports() {
+    private void goToLibraryReports()
+    {
         SceneManager.switchScene("/gui/librarian/libraryReports/LibraryReports_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Exits the application.
+     */
     @FXML
-    private void exitApp() {
+    private void exitApp()
+    {
         ClientUI.chat.getClient().quit();
     }
 }

@@ -39,6 +39,14 @@ public class BorrowController
         return instance;
     }
 
+    /**
+     * The method handles the creation of a new borrow
+     *
+     * @param enteredSubscriberID Subscriber ID entered by librarian
+     * @param enteredCopyBookID   Copy Book ID entered by librarian
+     * @param enteredReturnDate   Return Date entered by librarian
+     * @return true if the borrow was created successfully, false otherwise
+     */
     public boolean createNewBorrow(String enteredSubscriberID, String enteredCopyBookID, String enteredReturnDate)
     {
         // Building an ArrayList in order to send a MessageType Object in order to send to server
@@ -105,6 +113,7 @@ public class BorrowController
 
     /**
      * The method handles the return of a borrow
+     *
      * @param Borrow_id the borrow id to return
      * @return 1 if the book is returned successfully, no more than 1 week late
      */
@@ -138,6 +147,7 @@ public class BorrowController
 
     /**
      * The method handles the loss of a copy
+     *
      * @param borrowID the borrow id of the lost copy
      * @return true if the copy was lost successfully, false otherwise
      */

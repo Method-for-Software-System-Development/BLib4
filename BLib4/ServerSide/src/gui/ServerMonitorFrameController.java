@@ -119,7 +119,7 @@ public class ServerMonitorFrameController
      * to add him to the table
      *
      * @param host the host name of the client
-     * @param ip  the ip address of the client
+     * @param ip   the ip address of the client
      */
     private void addRow(String host, String ip)
     {

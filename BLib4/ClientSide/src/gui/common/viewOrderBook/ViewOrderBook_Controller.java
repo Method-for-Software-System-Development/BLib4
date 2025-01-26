@@ -30,7 +30,6 @@ import java.util.List;
  */
 public class ViewOrderBook_Controller implements DataReceiver
 {
-
     // FXML fields for seeIfNotLoggedIn
     @FXML
     private VBox seeIfNotLoggedIn;
@@ -136,6 +135,11 @@ public class ViewOrderBook_Controller implements DataReceiver
     private List<String> availability;
     private boolean canOrder;
 
+    /**
+     * Receives data from the server and processes it accordingly.
+     *
+     * @param data the data received from the server
+     */
     @Override
     public void receiveData(Object data)
     {
@@ -373,6 +377,11 @@ public class ViewOrderBook_Controller implements DataReceiver
         }
     }
 
+    /**
+     * The method is called when the user clicks on the show details button.
+     *
+     * @param book The book to show the details of.
+     */
     private void showBookDetails(Book book)
     {
         GridPane bookGrid = new GridPane();
@@ -380,7 +389,7 @@ public class ViewOrderBook_Controller implements DataReceiver
         bookGrid.setHgap(20); // Horizontal gap between elements
         bookGrid.setVgap(10); // Vertical gap between elements
 
-        // Set GridPane to fill the width of the HBox
+        // Set GridPane to fill the width with the HBox
         bookGrid.setMaxWidth(Double.MAX_VALUE);
 
         // Ensure HBox children grow
@@ -460,7 +469,7 @@ public class ViewOrderBook_Controller implements DataReceiver
         Text printDateTitle = new Text("Print Date:  ");
         printDateTitle.getStyleClass().add("small-bold-grey-text");
         // Format the Date object to a String
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy"); // Adjust format as needed
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy"); // Adjust a format as needed
         String formattedDate = dateFormat.format(book.getPrintDate());
         Text bookPrintDate = new Text(formattedDate);
         bookPrintDate.getStyleClass().add("small-grey-text");
@@ -510,7 +519,7 @@ public class ViewOrderBook_Controller implements DataReceiver
 
         if (canOrder && isSubscriberLoggedIn)
         { // only users can order books
-            // Create a spacer to push the order button to the right
+            // to Create a spacer to push the order button to the right
             Region orderButtonSpacer = new Region();
             HBox.setHgrow(orderButtonSpacer, Priority.ALWAYS);
             // Create a Button to open the order dialog
@@ -557,6 +566,11 @@ public class ViewOrderBook_Controller implements DataReceiver
         viewBookHBox.getChildren().add(bookGrid);
     }
 
+    /**
+     * Validates the login form fields for user ID, password, and account type selection.
+     * Attempts to log in as either a Subscriber or a Librarian based on the selected radio button.
+     * If the login is successful, navigates to the corresponding UI screen; otherwise, shows an error alert.
+     */
     @FXML
     private void validate_scanReaderCard_login()
     {
@@ -702,6 +716,12 @@ public class ViewOrderBook_Controller implements DataReceiver
         alert.showAndWait();
     }
 
+    /**
+     * Displays an information alert with the specified title and message.
+     *
+     * @param title   the title of the information alert
+     * @param message the message displayed in the information alert
+     */
     private void showInformationAlert(String title, String message)
     {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -721,6 +741,9 @@ public class ViewOrderBook_Controller implements DataReceiver
         subscriberController.attemptLogOut();
     }
 
+    /**
+     * Navigates to the Dashboard screen.
+     */
     @FXML
     private void goToDashboard()
     {
@@ -743,41 +766,63 @@ public class ViewOrderBook_Controller implements DataReceiver
         SceneManager.switchScene("/gui/common/search/Search_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Navigates to the View History screen.
+     */
     @FXML
     private void goToViewHistory()
     {
         SceneManager.switchScene("/gui/user/viewHistory/ViewHistory_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Navigates to the Edit Profile screen.
+     */
     @FXML
     private void goToEditProfile()
     {
         SceneManager.switchScene("/gui/user/editProfile/EditProfile_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Navigates to the Librarian Dashboard screen.
+     */
     @FXML
     private void goToLibrarianDash()
     {
         SceneManager.switchScene("/gui/librarian/librarianUI/LibrarianUI_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Navigates to the New Borrow screen.
+     */
     @FXML
     private void goToNewBorrow()
     {
         SceneManager.switchScene("/gui/librarian/newBorrow/NewBorrow_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Navigates to the Add Subscriber screen.
+     */
     @FXML
     private void goToAddSubscriber()
     {
         SceneManager.switchScene("/gui/librarian/addSubscriber/AddSubscriber_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Navigates to the Library Reports screen.
+     */
     @FXML
-    private void goToLibraryReports() {
+    private void goToLibraryReports()
+    {
         SceneManager.switchScene("/gui/librarian/libraryReports/LibraryReports_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Navigates to the Home Page.
+     */
     @FXML
     private void goToHomePage()
     {

@@ -10,7 +10,6 @@ import ocsf.client.AbstractClient;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class ChatClient extends AbstractClient
@@ -119,24 +118,24 @@ public class ChatClient extends AbstractClient
                 break;
 
             case "205":
-            	// list of books that matches the search of a book
+                // list of books that matches the search of a book
                 books = (List<Book>) receiveMsg.data;
                 break;
 
             case "206":
-            	//copy of a book availability and orders
+                //copy of a book availability and orders
                 availability = (List<String>) receiveMsg.getData();
                 break;
 
             case "207":
-            	//response for a new borrow
+                //response for a new borrow
                 serverResponse = (boolean) receiveMsg.getData();
                 break;
 
             case "208":
-            	//response for book order
+                //response for book order
             case "209":
-            	//response for book return
+                //response for book return
                 returnOutcome = (ArrayList<Boolean>) receiveMsg.getData();
                 break;
 
@@ -151,7 +150,7 @@ public class ChatClient extends AbstractClient
                 break;
 
             case "2111":
-            	//notification for librarian about borrow extension
+                //notification for librarian about borrow extension
                 Platform.runLater(() ->
                 {
                     messageData = (String) receiveMsg.data;
@@ -199,7 +198,7 @@ public class ChatClient extends AbstractClient
                 break;
 
             case "215":
-            	// all subscribers list
+                // all subscriber lists
                 subscribers = (List<Subscriber>) receiveMsg.getData();
                 listOfSubscribersForLibrarian = new ArrayList<>();
                 for (Subscriber sub : subscribers)
@@ -221,7 +220,7 @@ public class ChatClient extends AbstractClient
                 break;
 
             case "216":
-            	// status of a subscriber
+                // status of a subscriber
                 subscriberStatus = (int) receiveMsg.getData();
                 break;
 
@@ -237,18 +236,18 @@ public class ChatClient extends AbstractClient
 
             case "219":
                 // list of active orders of a book
-            	listOfOrders = (ArrayList<ArrayList<String>>)receiveMsg.data;
+                listOfOrders = (ArrayList<ArrayList<String>>) receiveMsg.data;
                 break;
 
             case "220":
-            	// list of 5 newest books in a library
+                // list of 5 newest books in a library
             case "221":
-            	// list of 5 most borrowed books in a library
+                // list of 5 most borrowed books in a library
                 books = (List<Book>) receiveMsg.data;
                 break;
 
             case "222":
-            	// SMS message to a subscriber
+                // SMS message to a subscriber
                 smsData = (List<String>) receiveMsg.data;
                 StringBuilder smsText = new StringBuilder();
                 for (int i = 0; i < smsData.size(); i++)
@@ -278,12 +277,12 @@ public class ChatClient extends AbstractClient
                 break;
 
             case "223":
-            	// book location or availability
+                // book location or availability
                 availability = (List<String>) receiveMsg.data;
                 break;
 
             case "224":
-            	// response about book availability for order
+                // response about book availability for order
                 serverResponse = (boolean) receiveMsg.getData();
                 break;
 
@@ -296,12 +295,12 @@ public class ChatClient extends AbstractClient
                 //response for blob data of report request
                 blobData = (List<String[]>) receiveMsg.data;
                 break;
-                
+
             case "227":
-            	//response for report status
+                //response for report status
                 serverResponse = (boolean) receiveMsg.getData();
-            	break;
-            	
+                break;
+
             case "228":
                 // list of unread librarian messages
                 listOfMessages = (ArrayList<ArrayList<String>>) receiveMsg.getData();
@@ -353,6 +352,8 @@ public class ChatClient extends AbstractClient
 
     /**
      * This method terminates the client.
+     * It sends a log-out request to the server if the client is logged in.
+     * Then it sends a disconnect request to the server and closes the connection.
      */
     public void quit()
     {
@@ -413,6 +414,5 @@ public class ChatClient extends AbstractClient
             clientUI.display("Could not send log out request to server: " + e);
         }
     }
-
 }
 //End of ChatClient class

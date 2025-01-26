@@ -1,14 +1,12 @@
 package gui.librarian.librarianUI;
 
 import entities.logic.MessageType;
-import gui.user.subscriberUI.BorrowEntry;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import logic.communication.ChatClient;
@@ -16,14 +14,10 @@ import logic.communication.ClientUI;
 import logic.communication.SceneManager;
 import logic.user.Subscriber_Controller;
 
-import java.sql.Date;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 
-public class LibrarianUI_Controller {
-
+public class LibrarianUI_Controller
+{
     // FXML fields
     @FXML
     private Text userGreeting;
@@ -93,8 +87,12 @@ public class LibrarianUI_Controller {
     private ArrayList<ArrayList<String>> subscribers;
     private final ObservableList<SubscriberEntry> subscriberEntries = FXCollections.observableArrayList(); // List of message entries (dynamic)subscribers;
 
+    /**
+     * Initializes the Librarian UI scene.
+     */
     @FXML
-    public void initialize() {
+    public void initialize()
+    {
         // Get the singleton instance of Subscriber_Controller
         subscriberController = Subscriber_Controller.getInstance();
 
@@ -102,52 +100,66 @@ public class LibrarianUI_Controller {
         userGreeting.setText(getGreetingMessage() + " " + subscriberController.getLoggedLibrarian().getName() + " !");
 
         // Set the icons for the buttons
-        homePageButton.setOnMouseEntered(event -> {
+        homePageButton.setOnMouseEntered(event ->
+        {
             homePageImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/home_24dp_525FE1.png")));
         });
-        homePageButton.setOnMouseExited(event -> {
+        homePageButton.setOnMouseExited(event ->
+        {
             homePageImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/home_24dp_FFFFFF.png")));
         });
 
-        searchBooksButton.setOnMouseEntered(event -> {
+        searchBooksButton.setOnMouseEntered(event ->
+        {
             searchBooksImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/search_24dp_525FE1.png")));
         });
-        searchBooksButton.setOnMouseExited(event -> {
+        searchBooksButton.setOnMouseExited(event ->
+        {
             searchBooksImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/search_24dp_FFFFFF.png")));
         });
 
-        newBorrowButton.setOnMouseEntered(event -> {
+        newBorrowButton.setOnMouseEntered(event ->
+        {
             newBorrowImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/post_add_24dp_525FE1.png")));
         });
-        newBorrowButton.setOnMouseExited(event -> {
+        newBorrowButton.setOnMouseExited(event ->
+        {
             newBorrowImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/post_add_24dp_FFFFFF.png")));
         });
 
-        addSubscriberButton.setOnMouseEntered(event -> {
+        addSubscriberButton.setOnMouseEntered(event ->
+        {
             addSubscriberImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/person_add_24dp_525FE1.png")));
         });
-        addSubscriberButton.setOnMouseExited(event -> {
+        addSubscriberButton.setOnMouseExited(event ->
+        {
             addSubscriberImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/person_add_24dp_FFFFFF.png")));
         });
 
-        reportsButton.setOnMouseEntered(event -> {
+        reportsButton.setOnMouseEntered(event ->
+        {
             reportsImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/bar_chart_24dp_525FE1.png")));
         });
-        reportsButton.setOnMouseExited(event -> {
+        reportsButton.setOnMouseExited(event ->
+        {
             reportsImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/bar_chart_24dp_FFFFFF.png")));
         });
 
-        logoutButton.setOnMouseEntered(event -> {
+        logoutButton.setOnMouseEntered(event ->
+        {
             logoutImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/logout_24dp_525FE1.png")));
         });
-        logoutButton.setOnMouseExited(event -> {
+        logoutButton.setOnMouseExited(event ->
+        {
             logoutImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/logout_24dp_FFFFFF.png")));
         });
 
-        exitButton.setOnMouseEntered(event -> {
+        exitButton.setOnMouseEntered(event ->
+        {
             exitImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/close_24dp_525FE1.png")));
         });
-        exitButton.setOnMouseExited(event -> {
+        exitButton.setOnMouseExited(event ->
+        {
             exitImageView.setImage(new Image(getClass().getResourceAsStream("/gui/assets/icons/close_24dp_FFFFFF.png")));
         });
 
@@ -173,8 +185,10 @@ public class LibrarianUI_Controller {
         messageContentColumn.setCellValueFactory(data -> data.getValue().messageContentProperty());
 
         // Add Confirm button
-        confirmColumn.setCellFactory(param -> new TableCell<MessageEntry, Void>() {
+        confirmColumn.setCellFactory(param -> new TableCell<MessageEntry, Void>()
+        {
             private final Button confirmButton = new Button("Confirm");
+
             {
                 // Set the CSS class for the button
                 confirmButton.getStyleClass().add("small-orange-orange-button");
@@ -184,24 +198,32 @@ public class LibrarianUI_Controller {
                 confirmButton.setPrefWidth(90.0);
 
                 // Set the action for the button
-                confirmButton.setOnAction(event -> {
+                confirmButton.setOnAction(event ->
+                {
                     MessageEntry entry = getTableView().getItems().get(getIndex());
                     String messageId = entry.getMessageId();
                     ClientUI.chat.accept(new MessageType("129", messageId));
-                    if (ChatClient.serverResponse) {
+                    if (ChatClient.serverResponse)
+                    {
                         refreshMessagesTable();
-                    } else {
+                    }
+                    else
+                    {
                         showErrorAlert("Error", "Failed to confirm message.");
                     }
                 });
             }
 
             @Override
-            protected void updateItem(Void item, boolean empty) {
+            protected void updateItem(Void item, boolean empty)
+            {
                 super.updateItem(item, empty);
-                if (empty) {
+                if (empty)
+                {
                     setGraphic(null); // Clear the cell for empty rows
-                } else {
+                }
+                else
+                {
                     setGraphic(confirmButton); // Add the button for non-empty rows
                 }
             }
@@ -211,7 +233,8 @@ public class LibrarianUI_Controller {
         messagesTable.setSelectionModel(null); // Disable row selection
 
         // Hide the table header
-        messagesTable.widthProperty().addListener((obs, oldVal, newVal) -> {
+        messagesTable.widthProperty().addListener((obs, oldVal, newVal) ->
+        {
             messagesTable.lookup("TableHeaderRow").setVisible(false);
         });
 
@@ -253,8 +276,10 @@ public class LibrarianUI_Controller {
         statusColumn.setCellValueFactory(data -> data.getValue().statusProperty());
 
         // Add Borrows button
-        borrowsColumn.setCellFactory(param -> new TableCell<SubscriberEntry, Void>() {
+        borrowsColumn.setCellFactory(param -> new TableCell<SubscriberEntry, Void>()
+        {
             private final Button borrowsButton = new Button("Active Borrows");
+
             {
                 // Set the CSS class for the button
                 borrowsButton.getStyleClass().add("small-purple-transparent-button");
@@ -264,7 +289,8 @@ public class LibrarianUI_Controller {
                 borrowsButton.setPrefWidth(150.0);
 
                 // Set the action for the button
-                borrowsButton.setOnAction(event -> {
+                borrowsButton.setOnAction(event ->
+                {
                     SubscriberEntry entry = getTableView().getItems().get(getIndex());
                     String userId = entry.getUserId();
                     SceneManager.switchSceneWithData("/gui/librarian/subscriberBorrows/SubscriberBorrows_UI.fxml", "BLib.4 - Braude Library Management", userId);
@@ -272,19 +298,25 @@ public class LibrarianUI_Controller {
             }
 
             @Override
-            protected void updateItem(Void item, boolean empty) {
+            protected void updateItem(Void item, boolean empty)
+            {
                 super.updateItem(item, empty);
-                if (empty) {
+                if (empty)
+                {
                     setGraphic(null); // Clear the cell for empty rows
-                } else {
+                }
+                else
+                {
                     setGraphic(borrowsButton); // Add the button for non-empty rows
                 }
             }
         });
 
         // Add Reader Card button
-        readerCardColumn.setCellFactory(param -> new TableCell<SubscriberEntry, Void>() {
+        readerCardColumn.setCellFactory(param -> new TableCell<SubscriberEntry, Void>()
+        {
             private final Button readerCardButton = new Button("Reader Card");
+
             {
                 // Set the CSS class for the button
                 readerCardButton.getStyleClass().add("small-purple-transparent-button");
@@ -294,7 +326,8 @@ public class LibrarianUI_Controller {
                 readerCardButton.setPrefWidth(150.0);
 
                 // Set the action for the button
-                readerCardButton.setOnAction(event -> {
+                readerCardButton.setOnAction(event ->
+                {
                     SubscriberEntry entry = getTableView().getItems().get(getIndex());
                     String userId = entry.getUserId();
                     SceneManager.switchSceneWithData("/gui/librarian/readerCard/ReaderCard_UI.fxml", "BLib.4 - Braude Library Management", userId);
@@ -302,11 +335,15 @@ public class LibrarianUI_Controller {
             }
 
             @Override
-            protected void updateItem(Void item, boolean empty) {
+            protected void updateItem(Void item, boolean empty)
+            {
                 super.updateItem(item, empty);
-                if (empty) {
+                if (empty)
+                {
                     setGraphic(null); // Clear the cell for empty rows
-                } else {
+                }
+                else
+                {
                     setGraphic(readerCardButton); // Add the button for non-empty rows
                 }
             }
@@ -323,8 +360,13 @@ public class LibrarianUI_Controller {
         subscribersTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
 
-    private void loadMessagesData() {
-        for (ArrayList<String> message : messages) {
+    /**
+     * Loads the message data into the message table.
+     */
+    private void loadMessagesData()
+    {
+        for (ArrayList<String> message : messages)
+        {
             MessageEntry entry = new MessageEntry(
                     message.get(0), // Message ID
                     message.get(1), // Message Date
@@ -335,8 +377,13 @@ public class LibrarianUI_Controller {
         messagesTable.setItems(messageEntries);
     }
 
-    private void loadSubscribersData() {
-        for (ArrayList<String> subscriber : subscribers) {
+    /**
+     * Loads the subscriber data into the subscriber table.
+     */
+    private void loadSubscribersData()
+    {
+        for (ArrayList<String> subscriber : subscribers)
+        {
             SubscriberEntry entry = new SubscriberEntry(
                     subscriber.get(0), // User ID
                     subscriber.get(1), // First Name
@@ -347,8 +394,12 @@ public class LibrarianUI_Controller {
         }
     }
 
-    public void refreshMessagesTable() {
-        // Refresh the messages table by reloading the scene
+    /**
+     * Refreshes the message table by reloading the scene.
+     */
+    public void refreshMessagesTable()
+    {
+        // Refresh the message table by reloading the scene
         SceneManager.switchScene("/gui/librarian/librarianUI/LibrarianUI_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
@@ -357,16 +408,24 @@ public class LibrarianUI_Controller {
      *
      * @return A greeting message.
      */
-    private String getGreetingMessage() {
+    private String getGreetingMessage()
+    {
         int hour = java.time.LocalTime.now().getHour();
 
-        if (hour >= 5 && hour < 12) {
+        if (hour >= 5 && hour < 12)
+        {
             return "Good Morning";
-        } else if (hour >= 12 && hour < 17) {
+        }
+        else if (hour >= 12 && hour < 17)
+        {
             return "Good Afternoon";
-        } else if (hour >= 17 && hour < 21) {
+        }
+        else if (hour >= 17 && hour < 21)
+        {
             return "Good Evening";
-        } else {
+        }
+        else
+        {
             return "Good Night";
         }
     }
@@ -377,7 +436,8 @@ public class LibrarianUI_Controller {
      * @param title   the title of the error alert
      * @param message the message displayed in the error alert
      */
-    private void showErrorAlert(String title, String message) {
+    private void showErrorAlert(String title, String message)
+    {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(null);
@@ -390,37 +450,62 @@ public class LibrarianUI_Controller {
      * Logs out the current user and navigates to the Home Page.
      */
     @FXML
-    private void logout() {
+    private void logout()
+    {
         subscriberController.attemptLogOut();
     }
 
+    /**
+     * Navigates to the Home Page.
+     */
     @FXML
-    private void goToHomePage() {
+    private void goToHomePage()
+    {
         SceneManager.switchScene("/gui/common/homePage/HomePage_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Navigates to the Search Books page.
+     */
     @FXML
-    private void goToSearch() {
+    private void goToSearch()
+    {
         SceneManager.switchScene("/gui/common/search/Search_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Navigates to the New Borrow page.
+     */
     @FXML
-    private void goToNewBorrow() {
+    private void goToNewBorrow()
+    {
         SceneManager.switchScene("/gui/librarian/newBorrow/NewBorrow_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Navigates to the Add Subscriber page.
+     */
     @FXML
-    private void goToAddSubscriber() {
+    private void goToAddSubscriber()
+    {
         SceneManager.switchScene("/gui/librarian/addSubscriber/AddSubscriber_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Navigates to the Library Reports page.
+     */
     @FXML
-    private void goToLibraryReports() {
+    private void goToLibraryReports()
+    {
         SceneManager.switchScene("/gui/librarian/libraryReports/LibraryReports_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    /**
+     * Exits the application.
+     */
     @FXML
-    private void exitApp() {
+    private void exitApp()
+    {
         ClientUI.chat.getClient().quit();
     }
 }
