@@ -29,6 +29,8 @@ public class ServerPortFrameController
      * Ensures both fields are not empty before attempting to connect.
      * If validation passes, try to initiate the connection.
      * Displays an error alert in case of failure.
+     *
+     * @param event the event that triggered this method
      */
     @FXML
     public void validate_connect_form(ActionEvent event)

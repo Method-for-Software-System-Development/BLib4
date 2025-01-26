@@ -51,6 +51,8 @@ public class DocumentationController
      *                   For example, the book title, the new phone number, etc.
      * @param obj2       The second object to be documented.
      *                   For example, the new email, the new return date, etc.
+     *
+     * @return The updated reader card.
      */
     public List<String[]> documentOnReaderCard(String id, List<String[]> readerCard, String obj, String obj2)
     {

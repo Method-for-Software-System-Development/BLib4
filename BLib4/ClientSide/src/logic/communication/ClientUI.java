@@ -11,8 +11,8 @@ public class ClientUI extends Application
     /**
      * This method is the entry point when the program is run as an application.
      *
-     * @param args
-     * @throws Exception
+     * @param args - The command line arguments.
+     * @throws Exception - If an exception occurs.
      */
     public static void main(String args[]) throws Exception
     {

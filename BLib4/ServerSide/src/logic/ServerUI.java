@@ -58,6 +58,8 @@ public class ServerUI extends Application
      * The method open the server monitor window and start the server
      *
      * @param p the port number
+     *
+     * @throws IOException if an I/O error occurs when opening the server
      */
     public static void runServer(String p) throws IOException
     {

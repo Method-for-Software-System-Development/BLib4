@@ -56,9 +56,9 @@ public class Notification_Controller
         // Email signature
         String signature = "<br><br>BLib 4 - Advanced Library Management System<br>" +
                 "Efficient management of books, subscribers, and library data<br><br>" +
-                "📚 Team: Group 4<br>" +
-                "✉️ Email: blib.4.braude@gmail.com<br>" +
-                "📞 Phone: +972-528797979<br><br>" +
+                "Team: Group 4<br>" +
+                "Email: blib.4.braude@gmail.com<br>" +
+                "Phone: +972-528797979<br><br>" +
                 "\"BLib 4 - The smart and simple way to manage your library.\"";
 
         // Combine the content with the signature

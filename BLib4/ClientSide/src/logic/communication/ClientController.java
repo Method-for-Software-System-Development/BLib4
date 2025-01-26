@@ -53,6 +53,7 @@ public class ClientController implements ChatIF
     /**
      * This method waits for input from the console.  Once it is
      * received, it sends it to the client's message handler.
+     * @param str - the message to be sent
      */
     public void accept(MessageType str)
     {
