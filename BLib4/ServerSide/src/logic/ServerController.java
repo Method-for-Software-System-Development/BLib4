@@ -362,6 +362,10 @@ public class ServerController extends AbstractServer
                     dbController.handleUpdateHistoryFileBySubscriberId(subscriberId, newHistoryList);
                 }
                 break;
+            case "119":
+            	// Request to get the list of active orders of a subscriber
+                responseMsg = new MessageType("219", dbController.handleGetSubscriberActiveOrders((String) receiveMsg.data));
+            	break;
 
             case "120":
                 // Request from the client to get 5 newest books in the library
