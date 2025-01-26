@@ -231,6 +231,12 @@ public class ServerController extends AbstractServer
                     List<String[]> newHistoryList = documentationController.documentOnReaderCard("111-1", historyList, bookName, ((List<String>) receiveMsg.getData()).get(1));
                     // Updating a subscriber history file in DB
                     dbController.handleUpdateHistoryFileBySubscriberId(subscriberId, newHistoryList);
+                    
+                    // get subscriber name by id
+                    String subscriberName = dbController.GetSubscriberNameById(subscriberId);
+                    
+                    // send notification to the librarian
+                    HandleSendExtensionNotificationToLibrarian("Subscriber " + subscriberName + " requested to extend borrow of book " + bookName);
                 }
                 else
                 {
@@ -239,12 +245,6 @@ public class ServerController extends AbstractServer
                     // Updating a subscriber history file in DB
                     dbController.handleUpdateHistoryFileBySubscriberId(subscriberId, newHistoryList);
                 }
-
-                // get subscriber name by id
-                String subscriberName = dbController.GetSubscriberNameById(subscriberId);
-
-                // send notification to the librarian
-                HandleSendExtensionNotificationToLibrarian("Subscriber " + subscriberName + " requested to extend borrow of book " + bookName);
                 break;
 
             case "112":
@@ -362,6 +362,10 @@ public class ServerController extends AbstractServer
                     dbController.handleUpdateHistoryFileBySubscriberId(subscriberId, newHistoryList);
                 }
                 break;
+            case "119":
+            	// Request to get the list of active orders of a subscriber
+                responseMsg = new MessageType("219", dbController.handleGetSubscriberActiveOrders((String) receiveMsg.data));
+            	break;
 
             case "120":
                 // Request from the client to get 5 newest books in the library

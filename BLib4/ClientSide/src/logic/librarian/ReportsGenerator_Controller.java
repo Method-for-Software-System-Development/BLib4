@@ -7,21 +7,18 @@ import logic.communication.ChatClient;
 import logic.communication.ClientUI;
 import java.util.*;
 
-/**
- * Controller responsible for generating, saving, and displaying reports in the library system.
- */
 public class ReportsGenerator_Controller
 {
 
-    // Singleton instance of BooksController
+    // Singleton instance of ReportsGenerator_Controller
     private static volatile ReportsGenerator_Controller instance = null;
     private String month;
     private String year;
 
     /**
-     * get the instance of the ReportsGenerator_Controller for singleton
+     * Get the instance of the ReportsGenerator_Controller for singleton.
      *
-     * @return the instance of the ReportsGenerator_Controller
+     * @return The instance of the ReportsGenerator_Controller.
      */
     public static ReportsGenerator_Controller getInstance()
     {
@@ -112,8 +109,8 @@ public class ReportsGenerator_Controller
     /**
      * Maps report data from List<String[]> to a Map<String, List<String>>.
      *
-     * @param reportData report data as a List<String[]>
-     * @return report data as Map<String, List<String>>
+     * @param reportData Report data as a List<String[]>.
+     * @return Report data as Map<String, List<String>>.
      */
     private Map<String, List<String>> mapBorrowReportData(List<String[]> reportData)
     {
@@ -128,6 +125,11 @@ public class ReportsGenerator_Controller
         return mappedData;
     }
     
+    /**
+     * This method checks if a specific report is ready for use.
+     * @param reportType The type of the requested report.
+     * @return The boolean response of the server if the report is ready.
+     */
     public boolean checkIfReportIsReady(String reportType) {
         System.out.println("Checking if "+reportType+" report for: " + month + " " + year+ " is ready..");
         // Create a list of data of the requested report to send to the server
@@ -141,8 +143,8 @@ public class ReportsGenerator_Controller
     }
 
     /**
-     * The method gets the month and year of the report
-     * @return the month of the report
+     * The method gets the month and year of the report.
+     * @return The month of the report.
      */
     public String getMonth()
     {
@@ -150,8 +152,8 @@ public class ReportsGenerator_Controller
     }
 
     /**
-     * The method sets the month and year of the report
-     * @param month the month of the report
+     * The method sets the month and year of the report.
+     * @param Month the month of the report.
      */
     public void setMonth(String month)
     {
@@ -159,8 +161,8 @@ public class ReportsGenerator_Controller
     }
 
     /**
-     * The method gets the year of the report
-     * @return the year of the report
+     * The method gets the year of the report.
+     * @return The year of the report.
      */
     public String getYear()
     {
@@ -168,8 +170,8 @@ public class ReportsGenerator_Controller
     }
 
     /**
-     * The method sets the year of the report
-     * @param year the year of the report
+     * The method sets the year of the report.
+     * @param Year the year of the report.
      */
     public void setYear(String year)
     {

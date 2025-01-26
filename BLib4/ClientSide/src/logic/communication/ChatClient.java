@@ -33,6 +33,7 @@ public class ChatClient extends AbstractClient
     public static boolean awaitResponse = false;
     public static Librarian librarian;
     public static ArrayList<Boolean> returnOutcome;
+    public static List<List<String>> listOfOrders;
     public static ArrayList<ArrayList<String>> listOfBorrows;
     public static ArrayList<ArrayList<String>> listOfActivities;
     public static ArrayList<ArrayList<String>> listOfMessages;
@@ -118,19 +119,24 @@ public class ChatClient extends AbstractClient
                 break;
 
             case "205":
+            	// list of books that matches the search of a book
                 books = (List<Book>) receiveMsg.data;
                 break;
 
             case "206":
+            	//copy of a book availability and orders
                 availability = (List<String>) receiveMsg.getData();
                 break;
 
             case "207":
+            	//response for a new borrow
                 serverResponse = (boolean) receiveMsg.getData();
                 break;
 
             case "208":
+            	//response for book order
             case "209":
+            	//response for book return
                 returnOutcome = (ArrayList<Boolean>) receiveMsg.getData();
                 break;
 
@@ -145,6 +151,7 @@ public class ChatClient extends AbstractClient
                 break;
 
             case "2111":
+            	//notification for librarian about borrow extension
                 Platform.runLater(() ->
                 {
                     messageData = (String) receiveMsg.data;
@@ -162,7 +169,6 @@ public class ChatClient extends AbstractClient
                 {
                     Platform.runLater(() -> ((LibrarianUI_Controller) controller).refreshMessagesTable());
                 }
-
                 break;
 
             case "212":
@@ -193,6 +199,7 @@ public class ChatClient extends AbstractClient
                 break;
 
             case "215":
+            	// all subscribers list
                 subscribers = (List<Subscriber>) receiveMsg.getData();
                 listOfSubscribersForLibrarian = new ArrayList<>();
                 for (Subscriber sub : subscribers)
@@ -214,6 +221,7 @@ public class ChatClient extends AbstractClient
                 break;
 
             case "216":
+            	// status of a subscriber
                 subscriberStatus = (int) receiveMsg.getData();
                 break;
 
@@ -228,15 +236,19 @@ public class ChatClient extends AbstractClient
                 break;
 
             case "219":
-                //ToDo: implement (active order)
+                // list of active orders of a book
+            	listOfOrders = (List<List<String>>)receiveMsg.data;
                 break;
 
             case "220":
+            	// list of 5 newest books in library
             case "221":
+            	// list of 5 most borrowed books in library
                 books = (List<Book>) receiveMsg.data;
                 break;
 
             case "222":
+            	// SMS message to a subscriber
                 smsData = (List<String>) receiveMsg.data;
                 StringBuilder smsText = new StringBuilder();
                 for (int i = 0; i < smsData.size(); i++)
@@ -266,10 +278,12 @@ public class ChatClient extends AbstractClient
                 break;
 
             case "223":
+            	// book location or availability
                 availability = (List<String>) receiveMsg.data;
                 break;
 
             case "224":
+            	// response about book availability for order
                 serverResponse = (boolean) receiveMsg.getData();
                 break;
 
@@ -302,7 +316,6 @@ public class ChatClient extends AbstractClient
                 System.out.println("Invalid message received from server");
                 break;
         }
-
     }
 
     /**

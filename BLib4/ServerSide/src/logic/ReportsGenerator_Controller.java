@@ -13,6 +13,9 @@ public class ReportsGenerator_Controller
 
     private final DbController dbController;
 
+    /**
+     * ReportsGenerator_Controller constructor.
+     */
     public ReportsGenerator_Controller()
     {
         this.dbController = DbController.getInstance();
@@ -37,7 +40,6 @@ public class ReportsGenerator_Controller
 
     /**
      * Updates the daily status of subscribers in the database.
-     * For example, it tracks active or frozen subscribers for reporting purposes.
      */
     public void dbDailyUpdate_SubscriberStatus()
     {
@@ -50,16 +52,17 @@ public class ReportsGenerator_Controller
 
     /**
      * Fetches borrowing report data from the database and returns it as a Map.
-     * The map contains book titles as keys and a map of borrowing data as values.
+     * The map contains book titles as keys and a list of borrowing data as values.
      *
      * @return A map of borrowing report data.
      */
     public Map<String, List<String>> fetchBorrowingReportData()
     {
+    	//fetch the data from db
         Map<String, String> totalBorrowTimeMap = dbController.fetchTotalBorrowTime();
         Map<String, String> lateBorrowTimeMap = dbController.fetchLateBorrowTime();
         Map<String, List<String>> borrowingReportData = new HashMap<>();
-
+        //put the data in a map
         for (String bookTitle : totalBorrowTimeMap.keySet())
         {
             List<String> bookData = new ArrayList<>();
@@ -67,14 +70,13 @@ public class ReportsGenerator_Controller
             bookData.add(lateBorrowTimeMap.getOrDefault(bookTitle, "0"));
             borrowingReportData.put(bookTitle, bookData);
         }
-
         return borrowingReportData;
     }
 
     /**
      * Updates the monthly SubscribersStatus report by adding today's data and fetching the updated report.
      *
-     * @param day         The day of the month.
+     * @param day The day of the month.
      * @param activeCount The number of active subscribers for the day.
      * @param frozenCount The number of frozen subscribers for the day.
      */
@@ -82,14 +84,14 @@ public class ReportsGenerator_Controller
     {
         System.out.println("Updating and fetching the monthly report...");
 
-        // Step 1: Fetch an existing report
+        // Fetch an existing report
         List<String[]> reportData = dbController.fetchMonthlySubscribersStatusReport();
 
-        // Step 2: Add today's data
+        // Add today's data
         String[] newRow = {day, activeCount, frozenCount};
         reportData.add(newRow);
 
-        // Step 3: Update the report in the database
+        // Update the report in the database
         try
         {
             byte[] updatedBlob = BlobUtil.convertListToBlob(reportData);
@@ -101,11 +103,9 @@ public class ReportsGenerator_Controller
         }
     }
 
-
     /**
-     * Generates an empty borrowing time report for the previous month.
-     * This method is triggered on the first day of the month.
      * Generates a borrowing report based on data from the database and saves it to monthly_reports.
+     * This method is triggered on the first day of the month.
      */
     public void autoGenerate_BorrowingReport()
     {
@@ -166,7 +166,7 @@ public class ReportsGenerator_Controller
         int currentMonth = LocalDate.now().getMonthValue();
         int year = LocalDate.now().getYear();
 
-        // set is ready flag to 1
+        // set is_ready flag to 1
         dbController.handleUpdateSubscriberReportToReady();
 
         //create a new empty report for the coming month
@@ -174,11 +174,11 @@ public class ReportsGenerator_Controller
     }
 
     /**
-     * requests to add a new empty report the given month, year and report type.
+     * Requests to add a new empty report the given month, year and report type.
      *
-     * @param reportType the type of the generated report
-     * @param month      month of the empty report
-     * @param year       year of the empty report
+     * @param reportType The type of the generated report.
+     * @param month Month of the empty report.
+     * @param year Year of the empty report.
      */
     private void generateEmptyReportForTheMonth(String reportType, int month, int year)
     {
