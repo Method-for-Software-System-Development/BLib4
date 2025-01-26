@@ -845,6 +845,7 @@ public class DbController
         boolean validFlag = true;
         PreparedStatement stmt;
         String copyId;
+        String subscriberId = "";
 
         // check if the borrow is active
         try
@@ -915,25 +916,11 @@ public class DbController
                     stmt.setString(1, borrowId);
                     rs = stmt.executeQuery();
                     rs.next();
-                    String subscriberId = rs.getString(1);
+                    subscriberId = rs.getString(1);
 
                     // update the subscriber status to be frozen
                     stmt = connection.prepareStatement("UPDATE subscriber SET is_active = false WHERE subscriber_id = ?;");
                     stmt.setString(1, subscriberId);
-                    stmt.executeUpdate();
-
-                    // get the current id of the scheduler
-                    stmt = connection.prepareStatement("SELECT MAX(scheduler_id) FROM scheduler_triggers;");
-                    rs = stmt.executeQuery();
-                    rs.next();
-                    int schedulerId = rs.getInt(1) + 1;
-
-                    // add trigger to the table
-                    stmt = connection.prepareStatement("INSERT INTO scheduler_triggers (scheduler_id, trigger_date, trigger_operation, relevant_id) VALUES (?,?, ?, ?);");
-                    stmt.setString(1, String.valueOf(schedulerId));
-                    stmt.setDate(2, Date.valueOf(LocalDate.now().plusMonths(1)));
-                    stmt.setString(3, "unfrozen");
-                    stmt.setString(4, subscriberId);
                     stmt.executeUpdate();
 
                     returnValue.add(true);
@@ -945,11 +932,10 @@ public class DbController
                     returnValue.add(true);
                     returnValue.add(false);
                 }
-
             }
             catch (SQLException e)
             {
-                System.out.println("Error! return borrowed book failed - cant update the borrow in the db");
+                System.out.println("Error! return borrowed book failed - cant update the borrow in the db " + e.getMessage());
                 returnValue.add(false);
                 returnValue.add(false);
             }
@@ -957,10 +943,24 @@ public class DbController
             // update the scheduler trigger to be triggered (no need to send reminder email)
             try
             {
+                // get the current id of the scheduler
+                stmt = connection.prepareStatement("SELECT MAX(scheduler_id) FROM scheduler_triggers;");
+                ResultSet rs = stmt.executeQuery();
+                rs.next();
+                int schedulerId = rs.getInt(1) + 1;
+
+                // add trigger to the table
+                stmt = connection.prepareStatement("INSERT INTO scheduler_triggers (scheduler_id, trigger_date, trigger_operation, relevant_id) VALUES (?,?, ?, ?);");
+                stmt.setString(1, String.valueOf(schedulerId));
+                stmt.setDate(2, Date.valueOf(LocalDate.now().plusMonths(1)));
+                stmt.setString(3, "unfrozen");
+                stmt.setString(4, subscriberId);
+                stmt.executeUpdate();
+
                 // update the scheduler trigger to be triggered (no need to send reminder email)
                 stmt = connection.prepareStatement("SELECT scheduler_id FROM scheduler_triggers WHERE trigger_operation = 'notifyDayBeforeReturnDate' AND relevant_id = ? AND is_triggered = 0;");
                 stmt.setString(1, borrowId);
-                ResultSet rs = stmt.executeQuery();
+                rs = stmt.executeQuery();
                 rs.next();
 
                 stmt = connection.prepareStatement("UPDATE scheduler_triggers SET is_triggered = 1 WHERE scheduler_id = ?;");
