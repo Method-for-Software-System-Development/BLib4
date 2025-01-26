@@ -222,6 +222,15 @@ public class ChatClient extends AbstractClient
                 serverResponse = (boolean) receiveMsg.getData();
                 break;
 
+            case "218":
+                // status of update in the db, in format boolean
+                serverResponse = (boolean) receiveMsg.getData();
+                break;
+
+            case "219":
+                //ToDo: implement (active order)
+                break;
+
             case "220":
             case "221":
                 books = (List<Book>) receiveMsg.data;
