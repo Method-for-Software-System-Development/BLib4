@@ -19,7 +19,12 @@ public class SchedulerController
     private final DbController dbController; // Controller for database interactions
     private final Notification_Controller notificationController;
     private final ReportsGenerator_Controller reportsGeneratorController;
-
+    /**
+     * Provides a singleton instance of SchedulerController.
+     * Ensures thread-safe initialization.
+     *
+     * @return the singleton instance of SchedulerController
+     */
     public static SchedulerController getInstance()
     {
         if (instance == null)
@@ -36,8 +41,8 @@ public class SchedulerController
     }
 
     /**
-     * Constructor for SchedulerController.
-     * Initializes the scheduler and database controller.
+     * Private constructor for SchedulerController.
+     * Initializes the scheduler and associated controllers.
      */
     private SchedulerController()
     {
