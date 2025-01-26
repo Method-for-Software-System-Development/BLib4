@@ -13,6 +13,7 @@ public class SubscriberStatusReport extends Report
      * @param reportNum           The report number
      * @param month               The report's month
      * @param year                The report's year
+     * @param issueDate           The report's issue date
      * @param usersActivityStatus The report's users' activity status
      */
     public SubscriberStatusReport(int reportNum, String month, String year, Date issueDate, List<String[]> usersActivityStatus)

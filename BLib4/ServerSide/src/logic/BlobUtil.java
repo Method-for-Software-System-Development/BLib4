@@ -11,10 +11,10 @@ import java.util.Scanner;
 public class BlobUtil
 {
     /**
-     * The method converts a Blob object to List<String[]>
+     * The method converts a Blob object to List(String[])
      *
      * @param blobData - the Blob object to convert
-     * @return - the List<String[]> object
+     * @return - the List(String[]) object
      */
     public static List<String[]> convertBlobToList(byte[] blobData)
     {
@@ -30,9 +30,9 @@ public class BlobUtil
     }
 
     /**
-     * The method converts a List<String[]> to a Blob object
+     * The method converts a List (String[]) to a Blob object
      *
-     * @param rows - the List<String[]> object to convert
+     * @param rows - the List (String[]) object to convert
      * @return - the Blob object
      * @throws IOException - if an I/O error occurs
      */

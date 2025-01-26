@@ -383,7 +383,7 @@ public class DbController
      * The method run SQL query to get the subscriber history from the db.
      *
      * @param subscriber_id The id of the subscriber.
-     * @return The subscriber history as List<String[]>.
+     * @return The subscriber history as List (String[]).
      */
     public List<String[]> handleReturnSubscriberHistory(String subscriber_id)
     {
@@ -692,7 +692,7 @@ public class DbController
      *
      * @param orderDetails [0] The subscriber id
      *                     [1] The book id
-     * @return List<Boolean> - [0] true if the order succeeds, else false.
+     * @return List(Boolean) - [0] true if the order succeeds, else false.
      * [1] true if the subscriber is frozen, else false.
      */
     public List<Boolean> handleOrderBook(List<String> orderDetails)
@@ -836,7 +836,7 @@ public class DbController
      * The method run SQL query to handle the return of a borrowed book.
      *
      * @param borrowId The id of the borrow.
-     * @return List<Boolean> - [0] true if the return succeeds, else false.
+     * @return List(Boolean) - [0] true if the return succeeds, else false.
      * [1] true if the subscriber is frozen, else false.
      */
     public List<Boolean> handleReturnBorrowedBook(String borrowId)
@@ -2366,7 +2366,7 @@ public class DbController
     /**
      * Fetches the monthly subscriber status report for the current month.
      *
-     * @return List<String [ ]> Where each row contains frozen_count, active_count, and day.
+     * @return List (String [ ]) Where each row contains frozen_count, active_count, and day.
      */
     public List<String[]> fetchMonthlySubscribersStatusReport()
     {
@@ -2435,7 +2435,7 @@ public class DbController
     /**
      * Fetches the monthly borrowing report for the current month - total borrow time.
      *
-     * @return Map<String, String> Where the key is the book title and the value is the total borrow time.
+     * @return Map (String, String) Where the key is the book title, and the value is the total borrow time.
      */
     public Map<String, String> fetchTotalBorrowTime()
     {
@@ -2487,7 +2487,7 @@ public class DbController
     /**
      * Fetches the monthly borrowing report for the current month - late borrow time.
      *
-     * @return Map<String, String> Where the key is the book title and the value is the late borrow time.
+     * @return Map(String, String) Where the key is the book title, and the value is the late borrow time.
      */
     public Map<String, String> fetchLateBorrowTime()
     {
