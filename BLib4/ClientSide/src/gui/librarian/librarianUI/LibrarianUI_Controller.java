@@ -58,7 +58,7 @@ public class LibrarianUI_Controller
     @FXML
     private TableColumn<MessageEntry, String> messageIdColumn;
     @FXML
-    private TableColumn<MessageEntry, String> messageDateColumn;
+    private TableColumn<MessageEntry, String> messageDateTimeColumn;
     @FXML
     private TableColumn<MessageEntry, String> messageContentColumn;
     @FXML
@@ -181,7 +181,7 @@ public class LibrarianUI_Controller
 
         // Initialize table columns
         messageIdColumn.setCellValueFactory(data -> data.getValue().messageIdProperty());
-        messageDateColumn.setCellValueFactory(data -> data.getValue().messageDateProperty());
+        messageDateTimeColumn.setCellValueFactory(data -> data.getValue().messageDateTimeProperty());
         messageContentColumn.setCellValueFactory(data -> data.getValue().messageContentProperty());
 
         // Add Confirm button
@@ -248,7 +248,7 @@ public class LibrarianUI_Controller
         // Ensure the messageContentColumn fills the remaining space
         messageContentColumn.prefWidthProperty().bind(
                 messagesTable.widthProperty()
-                        .subtract(170) // Subtract the total width of fixed columns
+                        .subtract(220) // Subtract the total width of fixed columns
                         .subtract(110)
                         .subtract(2) // Subtract the border width
                         .subtract(messagesTable.getItems().size() > 7 ? 20 : 0) // Subtract 20 if more than 7 rows for the scrollbar

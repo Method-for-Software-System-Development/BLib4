@@ -10,6 +10,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import logic.communication.ChatClient;
 import logic.communication.ClientUI;
 import logic.communication.SceneManager;
@@ -73,6 +74,8 @@ public class SubscriberUI_Controller
     private TableColumn<BorrowEntry, Void> extendColumn;
 
     // Order Table FXML fields
+    @FXML
+    private Text activeOrdersTitle;
     @FXML
     private TableView<OrderEntry> orderTable;
     @FXML
@@ -243,6 +246,8 @@ public class SubscriberUI_Controller
         });
 
         borrowsTable.setPlaceholder(new Text("No borrows to display.")); // Set the placeholder text
+
+        // Set custom cell factory for the bookTitleColumn
         bookTitleColumn.setCellFactory(column ->
         {
             return new TableCell<BorrowEntry, String>()
@@ -260,6 +265,7 @@ public class SubscriberUI_Controller
                     else
                     {
                         text.setText(item);
+                        text.setTextAlignment(TextAlignment.CENTER);
                         text.wrappingWidthProperty().bind(bookTitleColumn.widthProperty().subtract(10)); // Wrap text within column width
                         setGraphic(text);
                     }
@@ -355,7 +361,7 @@ public class SubscriberUI_Controller
                 borrowsTable.widthProperty()
                         .subtract(170 * 5) // Subtract the total width of fixed columns
                         .subtract(2) // Subtract the border width
-                        .subtract(borrowsTable.getItems().size() > 7 ? 20 : 0) // Subtract 20 if more than 7 rows for the scrollbar
+                        .subtract(borrowsTable.getItems().size() > 4 ? 20 : 0) // Subtract 20 if more than 4 rows for the scrollbar
         );
 
         // Set the factory for customizing day cells
@@ -366,8 +372,8 @@ public class SubscriberUI_Controller
             {
                 super.updateItem(item, empty);
 
-                // Disable dates before the current return date
-                if (item.isBefore(LocalDate.parse(selectedDueDate, DateTimeFormatter.ofPattern("dd/MM/yyyy")).plusDays(1)))
+                // Disable dates before the current return date and two weeks after
+                if (item.isBefore(LocalDate.parse(selectedDueDate, DateTimeFormatter.ofPattern("dd/MM/yyyy")).plusDays(1)) || item.isAfter(LocalDate.parse(selectedDueDate, DateTimeFormatter.ofPattern("dd/MM/yyyy")).plusWeeks(2)))
                 {
                     setDisable(true);
                     setStyle("-fx-background-color: #EEEEEE; -fx-text-fill: #999999;");
@@ -375,9 +381,9 @@ public class SubscriberUI_Controller
             }
         });
 
-        // Order Table
+        // *** Order Table ***
 
-        // Get the subscriber's borrows
+        // Get the subscriber's orders
         ClientUI.chat.accept(new MessageType("119", subscriberController.getLoggedSubscriber().getId()));
         subscriberOrders = ChatClient.listOfOrders;
 
@@ -398,6 +404,8 @@ public class SubscriberUI_Controller
         orderDateColumn.setCellValueFactory(data -> data.getValue().orderDateProperty());
 
         orderTable.setPlaceholder(new Text("No orders to display.")); // Set the placeholder text
+
+        // Set custom cell factory for the bookTitleColumn
         orderBookTitleColumn.setCellFactory(column ->
         {
             return new TableCell<OrderEntry, String>()
@@ -415,6 +423,7 @@ public class SubscriberUI_Controller
                     else
                     {
                         text.setText(item);
+                        text.setTextAlignment(TextAlignment.CENTER);
                         text.wrappingWidthProperty().bind(orderBookTitleColumn.widthProperty().subtract(10)); // Wrap text within column width
                         setGraphic(text);
                     }
@@ -432,10 +441,10 @@ public class SubscriberUI_Controller
         // Ensure the bookTitleColumn fills the remaining space
         orderBookTitleColumn.prefWidthProperty().bind(
                 orderTable.widthProperty()
-                        .subtract(200 * 2) // Subtract the total width of fixed columns
-                        .subtract(300)
+                        .subtract(170 * 2) // Subtract the total width of fixed columns
+                        .subtract(220)
                         .subtract(2) // Subtract the border width
-                        .subtract(orderTable.getItems().size() > 7 ? 20 : 0) // Subtract 20 if more than 7 rows for the scrollbar
+                        .subtract(orderTable.getItems().size() > 3 ? 20 : 0) // Subtract 20 if more than 3 rows for the scrollbar
         );
     }
 
@@ -482,6 +491,11 @@ public class SubscriberUI_Controller
     private void handleExtendAction(BorrowEntry entry)
     {
         extendFormHBox.setVisible(true);
+        extendFormHBox.setManaged(true);
+        activeOrdersTitle.setVisible(false);
+        orderTable.setVisible(false);
+        orderTable.setManaged(false);
+
         extendBookTitle.setText("Select a new return date for " +
                 entry.getBookTitle() + " (Copy ID: " + entry.getCopyId() + "):    ");
         selectedBorrowId = entry.getBorrowId();
@@ -522,6 +536,10 @@ public class SubscriberUI_Controller
         }
 
         extendFormHBox.setVisible(false);
+        extendFormHBox.setManaged(false);
+        activeOrdersTitle.setVisible(true);
+        orderTable.setVisible(true);
+        orderTable.setManaged(true);
     }
 
     /**

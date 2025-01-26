@@ -199,7 +199,7 @@
             <TableView fx:id="messagesTable" prefHeight="141" styleClass="messages-table">
                 <columns>
                     <TableColumn fx:id="messageIdColumn" prefWidth="170" resizable="false"/>
-                    <TableColumn fx:id="messageDateColumn" prefWidth="170" resizable="false"/>
+                    <TableColumn fx:id="messageDateTimeColumn" prefWidth="220" resizable="false"/>
                     <TableColumn fx:id="messageContentColumn" resizable="false" style="-fx-alignment: CENTER-LEFT"/>
                     <TableColumn fx:id="confirmColumn" prefWidth="110" resizable="false"/>
                 </columns>

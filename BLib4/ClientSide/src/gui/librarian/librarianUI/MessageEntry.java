@@ -10,20 +10,20 @@ public class MessageEntry
 {
 
     private final StringProperty messageId;
-    private final StringProperty messageDate;
+    private final StringProperty messageDateTime;
     private final StringProperty messageContent;
 
     /**
      * Constructor for a message entry.
      *
      * @param messageId      - The ID of the message.
-     * @param messageDate    - The date the message was sent.
+     * @param messageDateTime    - The date and time the message was sent.
      * @param messageContent - The content of the message.
      */
-    public MessageEntry(String messageId, String messageDate, String messageContent)
+    public MessageEntry(String messageId, String messageDateTime, String messageContent)
     {
         this.messageId = new SimpleStringProperty(messageId);
-        this.messageDate = new SimpleStringProperty(messageDate);
+        this.messageDateTime = new SimpleStringProperty(messageDateTime);
         this.messageContent = new SimpleStringProperty(messageContent);
     }
 
@@ -38,13 +38,13 @@ public class MessageEntry
     }
 
     /**
-     * Getters for the property date.
+     * Getters for the property date and time.
      *
      * @return - The property of the specified value.
      */
-    public StringProperty messageDateProperty()
+    public StringProperty messageDateTimeProperty()
     {
-        return messageDate;
+        return messageDateTime;
     }
 
     /**
@@ -68,13 +68,13 @@ public class MessageEntry
     }
 
     /**
-     * Getters for the message date.
+     * Getters for the message date and time.
      *
-     * @return - The message date.
+     * @return - The message date and time.
      */
-    public String getMessageDate()
+    public String getMessageDateTime()
     {
-        return messageDate.get();
+        return messageDateTime.get();
     }
 
     /**

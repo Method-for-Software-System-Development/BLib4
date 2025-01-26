@@ -199,8 +199,8 @@
             </VBox.margin>
         </Text>
 
-        <!-- Table View -->
-        <TableView fx:id="borrowsTable" prefHeight="492" styleClass="custom-table">
+        <!-- Active Borrows Table View -->
+        <TableView fx:id="borrowsTable" prefHeight="352" styleClass="custom-table">
             <columns>
                 <TableColumn fx:id="borrowIdColumn" prefWidth="140" resizable="false" text="Borrow ID"/>
                 <TableColumn fx:id="copyIdColumn" prefWidth="140" resizable="false" text="Book Copy ID"/>
@@ -219,7 +219,7 @@
             </VBox.margin>
         </TableView>
 
-        <HBox fx:id="extendFormHBox" alignment="CENTER_LEFT" styleClass="whiteContainer" visible="false">
+        <HBox fx:id="extendFormHBox" alignment="CENTER_LEFT" styleClass="whiteContainer" visible="false" managed="false">
 
             <Text fx:id="extendBookTitle"/>
             <DatePicker fx:id="newReturnDatePicker" prefHeight="50.0" promptText="Select date" styleClass="grey-date-picker"/>
@@ -230,29 +230,23 @@
 
         </HBox>
 
+        <!-- Spacer Region -->
+        <Region VBox.vgrow="ALWAYS"/>
+
         <!-- Active order table View -->
         <Text fx:id="activeOrdersTitle" styleClass="main-title">
             <VBox.margin>
                 <Insets bottom="15.0"/>
             </VBox.margin>
         </Text>
-        <TableView fx:id="orderTable" prefHeight="492" styleClass="custom-table">
+        <TableView fx:id="orderTable" prefHeight="282" styleClass="custom-table">
             <columns>
-                <TableColumn fx:id="orderIdColumn" prefWidth="200" resizable="false" text="Borrow ID"/>
-                <TableColumn fx:id="orderBookIdColumn" prefWidth="200" resizable="false" text="Book Copy ID"/>
-                <TableColumn fx:id="orderBookTitleColumn" resizable="false" style="-fx-alignment: CENTER-RIGHT" text="Book Title" />
-                <TableColumn fx:id="orderDateColumn" prefWidth="300" resizable="false" text="Borrow Date"/>
+                <TableColumn fx:id="orderIdColumn" prefWidth="170" resizable="false" text="Order ID"/>
+                <TableColumn fx:id="orderBookIdColumn" prefWidth="170" resizable="false" text="Book Copy ID"/>
+                <TableColumn fx:id="orderBookTitleColumn" resizable="false" text="Book Title" />
+                <TableColumn fx:id="orderDateColumn" prefWidth="220" resizable="false" text="Order Date &amp; Time"/>
             </columns>
-            <opaqueInsets>
-                <Insets/>
-            </opaqueInsets>
-            <VBox.margin>
-                <Insets bottom="25.0"/>
-            </VBox.margin>
         </TableView>
-
-        <!-- Extend Form -->
-
 
     </VBox>
 </GridPane>

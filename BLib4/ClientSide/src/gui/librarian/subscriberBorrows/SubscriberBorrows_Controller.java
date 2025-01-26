@@ -12,6 +12,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import logic.communication.ChatClient;
 import logic.communication.ClientUI;
 import logic.communication.DataReceiver;
@@ -462,7 +463,7 @@ public class SubscriberBorrows_Controller implements DataReceiver
                         .subtract(170 * 4) // Subtract the total width of fixed columns
                         .subtract(140 * 3)
                         .subtract(2) // Subtract the border width
-                        .subtract(borrowsTable.getItems().size() > 7 ? 20 : 0) // Subtract 20 if more than 7 rows for the scrollbar
+                        .subtract(borrowsTable.getItems().size() > 4 ? 20 : 0) // Subtract 20 if more than 4 rows for the scrollbar
         );
 
         // Set the factory for customizing day cells
@@ -473,8 +474,8 @@ public class SubscriberBorrows_Controller implements DataReceiver
             {
                 super.updateItem(item, empty);
 
-                // Disable dates before the current return date
-                if (item.isBefore(LocalDate.parse(selectedDueDate, DateTimeFormatter.ofPattern("dd/MM/yyyy")).plusDays(1)))
+                // Disable dates before the current return date and two weeks after
+                if (item.isBefore(LocalDate.parse(selectedDueDate, DateTimeFormatter.ofPattern("dd/MM/yyyy")).plusDays(1)) || item.isAfter(LocalDate.parse(selectedDueDate, DateTimeFormatter.ofPattern("dd/MM/yyyy")).plusWeeks(2)))
                 {
                     setDisable(true);
                     setStyle("-fx-background-color: #EEEEEE; -fx-text-fill: #999999;");
@@ -482,7 +483,7 @@ public class SubscriberBorrows_Controller implements DataReceiver
             }
         });
 
-        // Order Table
+        // *** Order Table ***
 
         // Add rounded corners to the TableView
         Rectangle clip1 = new Rectangle();
@@ -501,6 +502,8 @@ public class SubscriberBorrows_Controller implements DataReceiver
         orderDateColumn.setCellValueFactory(data -> data.getValue().orderDateProperty());
 
         orderTable.setPlaceholder(new Text("No orders to display.")); // Set the placeholder text
+
+        // Set custom cell factory for the orderBookTitleColumn
         orderBookTitleColumn.setCellFactory(column ->
         {
             return new TableCell<OrderEntry, String>()
@@ -518,6 +521,7 @@ public class SubscriberBorrows_Controller implements DataReceiver
                     else
                     {
                         text.setText(item);
+                        text.setTextAlignment(TextAlignment.CENTER);
                         text.wrappingWidthProperty().bind(orderBookTitleColumn.widthProperty().subtract(10)); // Wrap text within column width
                         setGraphic(text);
                     }
@@ -531,10 +535,10 @@ public class SubscriberBorrows_Controller implements DataReceiver
         // Ensure the bookTitleColumn fills the remaining space
         orderBookTitleColumn.prefWidthProperty().bind(
                 orderTable.widthProperty()
-                        .subtract(200 * 2) // Subtract the total width of fixed columns
-                        .subtract(300)
+                        .subtract(170 * 2) // Subtract the total width of fixed columns
+                        .subtract(220)
                         .subtract(2) // Subtract the border width
-                        .subtract(orderTable.getItems().size() > 7 ? 20 : 0) // Subtract 20 if more than 7 rows for the scrollbar
+                        .subtract(orderTable.getItems().size() > 3 ? 20 : 0) // Subtract 20 if more than 3 rows for the scrollbar
         );
     }
 
@@ -571,7 +575,6 @@ public class SubscriberBorrows_Controller implements DataReceiver
     {
         // Get the subscriber's orders
         ClientUI.chat.accept(new MessageType("119", userId));
-
         ArrayList<ArrayList<String>> subscriberOrders = ChatClient.listOfOrders;
 
         for (ArrayList<String> order : subscriberOrders)
@@ -617,6 +620,12 @@ public class SubscriberBorrows_Controller implements DataReceiver
      */
     private void handleExtendAction(BorrowEntry entry)
     {
+        extendFormHBox.setVisible(true);
+        extendFormHBox.setManaged(true);
+        activeOrdersTitle.setVisible(false);
+        orderTable.setVisible(false);
+        orderTable.setManaged(false);
+
         extendFormHBox.setVisible(true);
         extendBookTitle.setText("Select a new return date for " +
                 entry.getBookTitle() + " (Copy ID: " + entry.getCopyId() + "):    ");
@@ -672,6 +681,10 @@ public class SubscriberBorrows_Controller implements DataReceiver
         }
 
         extendFormHBox.setVisible(false);
+        extendFormHBox.setManaged(false);
+        activeOrdersTitle.setVisible(true);
+        orderTable.setVisible(true);
+        orderTable.setManaged(true);
     }
 
     /**
