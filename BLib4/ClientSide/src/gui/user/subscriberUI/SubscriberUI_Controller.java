@@ -364,8 +364,17 @@ public class SubscriberUI_Controller {
      * Refreshes the borrow table with updated data.
      */
     private void refreshBorrowsTable() {
-        // Refresh the messages table by reloading the scene
-        SceneManager.switchScene("/gui/user/subscriberUI/SubscriberUI_UI.fxml", "BLib.4 - Braude Library Management");
+    	// Get the subscriber's borrows
+    	ClientUI.chat.accept(new MessageType("110", subscriberController.getLoggedSubscriber().getId()));
+        subscriberBorrows = ChatClient.listOfBorrows;
+        // Clear the previous entries before updating the table
+    	borrowEntries.clear();
+    	// Reload the borrows data
+        loadBorrowsData();  
+         // Set the updated list of borrows in the table
+        borrowsTable.setItems(borrowEntries); 
+        
+        borrowsTable.refresh();
     }
 
     /**

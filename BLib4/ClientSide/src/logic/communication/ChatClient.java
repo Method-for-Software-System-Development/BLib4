@@ -33,7 +33,7 @@ public class ChatClient extends AbstractClient
     public static boolean awaitResponse = false;
     public static Librarian librarian;
     public static ArrayList<Boolean> returnOutcome;
-    public static List<List<String>> listOfOrders;
+    public static ArrayList<ArrayList<String>> listOfOrders;
     public static ArrayList<ArrayList<String>> listOfBorrows;
     public static ArrayList<ArrayList<String>> listOfActivities;
     public static ArrayList<ArrayList<String>> listOfMessages;
@@ -237,13 +237,13 @@ public class ChatClient extends AbstractClient
 
             case "219":
                 // list of active orders of a book
-            	listOfOrders = (List<List<String>>)receiveMsg.data;
+            	listOfOrders = (ArrayList<ArrayList<String>>)receiveMsg.data;
                 break;
 
             case "220":
-            	// list of 5 newest books in library
+            	// list of 5 newest books in a library
             case "221":
-            	// list of 5 most borrowed books in library
+            	// list of 5 most borrowed books in a library
                 books = (List<Book>) receiveMsg.data;
                 break;
 

@@ -2,6 +2,7 @@ package gui.librarian.subscriberBorrows;
 
 import entities.logic.MessageType;
 import gui.user.subscriberUI.BorrowEntry;
+import gui.user.subscriberUI.OrderEntry;
 import gui.user.viewHistory.ActivityEntry;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -64,6 +65,8 @@ public class SubscriberBorrows_Controller implements DataReceiver {
     @FXML
     private Text activeBorrowsTitle;
     @FXML
+    private Text activeOrdersTitle;
+    @FXML
     private HBox extendFormHBox;
     @FXML
     private Text extendBookTitle;
@@ -90,12 +93,25 @@ public class SubscriberBorrows_Controller implements DataReceiver {
     @FXML
     private TableColumn<BorrowEntry, Void> lostColumn;
 
+    // Order Table FXML fields
+    @FXML
+    private TableView<OrderEntry> orderTable;
+    @FXML
+    private TableColumn<OrderEntry, String> orderIdColumn;
+    @FXML
+    private TableColumn<OrderEntry, String> orderBookIdColumn;
+    @FXML
+    private TableColumn<OrderEntry, String> orderBookTitleColumn;
+    @FXML
+    private TableColumn<OrderEntry, String> orderDateColumn;
+
     // Fields
     private Subscriber_Controller subscriberController;
     private BorrowController borrowController;
     private String userId;
     private ArrayList<ArrayList<String>> subscriberBorrows;
     private final ObservableList<BorrowEntry> borrowEntries = FXCollections.observableArrayList(); // List of borrow entries (dynamic)
+    private final ObservableList<OrderEntry> orderEntries = FXCollections.observableArrayList(); // List of order entries (dynamic)
     private String selectedBorrowId;
     private String selectedDueDate;
 
@@ -107,6 +123,11 @@ public class SubscriberBorrows_Controller implements DataReceiver {
             // Populate the table
             loadBorrowsData(userId);
             borrowsTable.setItems(borrowEntries);
+
+            activeOrdersTitle.setText("Active Orders of Subscriber " + userId + ":");
+            // Populate the table
+            loadOrderData(userId);
+            orderTable.setItems(orderEntries);
         }
     }
 
@@ -390,6 +411,57 @@ public class SubscriberBorrows_Controller implements DataReceiver {
                 }
             }
         });
+
+        // Order Table
+
+        // Add rounded corners to the TableView
+        Rectangle clip1 = new Rectangle();
+        clip1.setArcWidth(20);  // Set horizontal corner radius
+        clip1.setArcHeight(20); // Set vertical corner radius
+        // Bind the clip's size to the TableView's size
+        clip1.widthProperty().bind(orderTable.widthProperty());
+        clip1.heightProperty().bind(orderTable.heightProperty());
+        // Apply the clip to the TableView
+        orderTable.setClip(clip1);
+
+        // Initialize table columns
+        orderIdColumn.setCellValueFactory(data -> data.getValue().orderIdProperty());
+        orderBookIdColumn.setCellValueFactory(data -> data.getValue().bookIdProperty());
+        orderBookTitleColumn.setCellValueFactory(data -> data.getValue().bookTitleProperty());
+        orderDateColumn.setCellValueFactory(data -> data.getValue().orderDateProperty());
+
+        orderTable.setPlaceholder(new Text("No orders to display.")); // Set the placeholder text
+        orderBookTitleColumn.setCellFactory(column -> {
+            return new TableCell<OrderEntry, String>() {
+                private final Text text = new Text();
+
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setGraphic(null);
+                    } else {
+                        text.setText(item);
+                        text.wrappingWidthProperty().bind(orderBookTitleColumn.widthProperty().subtract(10)); // Wrap text within column width
+                        setGraphic(text);
+                    }
+                }
+            };
+        });
+
+        orderTable.setFixedCellSize(70); // Set the row height
+        orderTable.setSelectionModel(null); // Disable row selection
+
+        //ToDo: fix the space between the columns
+        // Ensure the bookTitleColumn fills the remaining space
+        orderBookTitleColumn.prefWidthProperty().bind(
+                orderTable.widthProperty()
+                        .subtract(200 * 2) // Subtract the total width of fixed columns
+                        .subtract(300)
+                        .subtract(2) // Subtract the border width
+                        .subtract(orderTable.getItems().size() > 7 ? 20 : 0) // Subtract 20 if more than 7 rows for the scrollbar
+        );
+
     }
 
     private void loadBorrowsData(String userId) {
@@ -406,6 +478,25 @@ public class SubscriberBorrows_Controller implements DataReceiver {
                     borrow.get(4)  // due date
             );
             borrowEntries.add(entry);
+        }
+    }
+
+    private void loadOrderData(String userId)
+    {
+        // Get the subscriber's orders
+        ClientUI.chat.accept(new MessageType("119", userId));
+
+        ArrayList<ArrayList<String>> subscriberOrders = ChatClient.listOfOrders;
+
+        for (ArrayList<String> order : subscriberOrders)
+        {
+            OrderEntry entry = new OrderEntry(
+                    order.get(0), // order id
+                    order.get(1), // book id
+                    order.get(2), // book title
+                    order.get(3)  // order date
+            );
+            orderEntries.add(entry);
         }
     }
 
@@ -458,6 +549,7 @@ public class SubscriberBorrows_Controller implements DataReceiver {
         if (isExtended) {
             showInformationAlert("Extension Successful", "The borrow has been extended successfully.");
             refreshBorrowsTable();
+            
         } else {
             showErrorAlert("Extension Denied", "The extension cannot be processed as there are previous reservations for the book.");
         }
@@ -469,8 +561,15 @@ public class SubscriberBorrows_Controller implements DataReceiver {
      * Refreshes the borrow table with updated data.
      */
     private void refreshBorrowsTable() {
-        // Refresh the messages table by reloading the scene
-        SceneManager.switchScene("/gui/librarian/subscriberBorrows/SubscriberBorrows_UI.fxml", "BLib.4 - Braude Library Management");
+    	// Clear the previous entries before updating the table
+        borrowEntries.clear(); 
+        
+        // Reload the borrows data
+        loadBorrowsData(userId);
+        loadOrderData(userId);
+        
+        // Set the updated list of borrows in the table
+        borrowsTable.setItems(borrowEntries);
     }
 
     /**
