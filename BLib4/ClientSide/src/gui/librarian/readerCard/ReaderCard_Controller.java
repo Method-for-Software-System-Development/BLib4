@@ -193,7 +193,7 @@ public class ReaderCard_Controller implements DataReceiver {
                 activitiesTable.widthProperty()
                         .subtract(170 * 2) // Subtract the total width of fixed columns
                         .subtract(2) // Subtract the border width
-                        .subtract(activitiesTable.getItems().size() > 14 ? 20 : 0) // Subtract 20 if more than 7 rows for the scrollbar
+                        .subtract(activitiesTable.getItems().size() > 14 ? 20 : 0) // Subtract 20 if more than 14 rows for the scrollbar
         );
     }
 
@@ -262,6 +262,11 @@ public class ReaderCard_Controller implements DataReceiver {
     @FXML
     private void goToAddSubscriber() {
         SceneManager.switchScene("/gui/librarian/addSubscriber/AddSubscriber_UI.fxml", "BLib.4 - Braude Library Management");
+    }
+
+    @FXML
+    private void goToLibraryReports() {
+        SceneManager.switchScene("/gui/librarian/libraryReports/LibraryReports_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
     @FXML

@@ -25,7 +25,7 @@
          </Label>
       </children>
    </AnchorPane>
-        <BarChart fx:id="subscriberStatusReportChart" title="Subscriber Status Report">
+        <BarChart fx:id="subscriberStatusReportChart" title="Subscriber Status Report" visible="false" managed="false">
         <xAxis>
             <CategoryAxis label="Day of the Month" />
         </xAxis>

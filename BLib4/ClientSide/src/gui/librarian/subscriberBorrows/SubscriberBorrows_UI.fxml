@@ -109,7 +109,7 @@
             </VBox.margin>
         </Button>
 
-        <Button fx:id="reportsButton" maxWidth="Infinity" prefHeight="50.0" styleClass="transparent-button"
+        <Button fx:id="reportsButton" maxWidth="Infinity" onAction="#goToLibraryReports" prefHeight="50.0" styleClass="transparent-button"
                 text="Library Reports">
             <graphic>
                 <ImageView fx:id="reportsImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">

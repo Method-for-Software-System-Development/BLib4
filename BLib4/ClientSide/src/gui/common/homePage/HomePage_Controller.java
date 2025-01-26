@@ -578,6 +578,11 @@ public class HomePage_Controller {
         SceneManager.switchScene("/gui/librarian/addSubscriber/AddSubscriber_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
+    @FXML
+    private void goToLibraryReports() {
+        SceneManager.switchScene("/gui/librarian/libraryReports/LibraryReports_UI.fxml", "BLib.4 - Braude Library Management");
+    }
+
     /**
      * Exits the application by quitting the client connection.
      */
