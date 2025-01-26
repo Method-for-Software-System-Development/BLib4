@@ -70,6 +70,7 @@ public class Notification_Controller
         properties.put("mail.smtp.starttls.enable", "true");// Enable STARTTLS
         properties.put("mail.smtp.host", "smtp.gmail.com");// SMTP server address
         properties.put("mail.smtp.port", "587");// SMTP server port
+        properties.put("mail.smtp.ssl.trust", "smtp.gmail.com");
 
         // Create a session with an authenticator
         Session session = Session.getInstance(properties, new Authenticator()

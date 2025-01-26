@@ -96,7 +96,7 @@ public class SchedulerController
             for (List<String> reminder : remindersList)
             {
                 // Create a notification
-                String message = "Hello " + reminder.get(1) + "\n\nReminder: You have a book: \"" + reminder.get(3) + "\" is due tomorrow.";
+                String message = "Hello " + reminder.get(1) + "<br><br>Reminder: You have a book: \"" + reminder.get(3) + "\" is due tomorrow.";
 
 
                 Notification notification = new Notification(
