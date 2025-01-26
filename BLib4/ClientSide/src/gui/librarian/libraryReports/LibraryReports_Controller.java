@@ -1,38 +1,28 @@
 package gui.librarian.libraryReports;
 
-import entities.logic.MessageType;
 import entities.report.BorrowingReport;
 import entities.report.SubscriberStatusReport;
-import entities.user.Librarian;
-import entities.user.Subscriber;
-import gui.user.subscriberUI.BorrowEntry;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
-import logic.communication.ChatClient;
 import logic.communication.ClientUI;
 import logic.communication.SceneManager;
 import logic.librarian.ReportsGenerator_Controller;
 import logic.user.Subscriber_Controller;
 
-import java.sql.Date;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 public class LibraryReports_Controller {
 
@@ -241,31 +231,30 @@ public class LibraryReports_Controller {
 
         if (selectedYear > currentYear || (selectedYear == currentYear && selectedMonth > currentMonth)) {
             showErrorAlert("Invalid Date", "You cannot generate a report for a future date. Please select a valid past month/year.");
-        }
-        else if (selectedYear == currentYear && selectedMonth == currentMonth) {
+        } else if (selectedYear == currentYear && selectedMonth == currentMonth) {
             showErrorAlert("Report Not Available Yet", "The monthly report for the current month will only be available on the 1st of next month at 00:00.");
-        }
-        else
-        {
+        } else {
             reportsGeneratorController.setMonth(String.valueOf(selectedMonth));
             reportsGeneratorController.setYear(year);
-            if(reportsGeneratorController.checkIfReportIsReady(reportType)) {
-                if(reportType.equals("borrowingReport")) {
+            if (reportsGeneratorController.checkIfReportIsReady(reportType)) {
+                if (reportType.equals("borrowingReport")) {
                     reportVBox.setVisible(true);
                     borrowingReportChart.setVisible(true);
                     borrowingReportChart.setManaged(true);
                     borrowingReportChart.getData().setAll(generateBorrowingReportChart().getData());
-                    reportTitle.setText(reportsGeneratorController.getMonth()+"/"+reportsGeneratorController.getYear());
-                }
-                else if (reportType.equals("subscribersStatus")) {
+                    borrowingReportChart.prefWidthProperty().bind(reportVBox.widthProperty());
+                    borrowingReportChart.prefHeightProperty().bind(reportVBox.heightProperty());
+                    reportTitle.setText("Borrowing Times Report " + reportsGeneratorController.getMonth() + "/" + reportsGeneratorController.getYear());
+                } else if (reportType.equals("subscribersStatus")) {
                     reportVBox.setVisible(true);
                     subscriberStatusReportChart.setVisible(true);
                     subscriberStatusReportChart.setManaged(true);
                     subscriberStatusReportChart.getData().setAll(generateSubscriberStatusReportChart().getData());
-                    reportTitle.setText(reportsGeneratorController.getMonth()+"/"+reportsGeneratorController.getYear());
+                    subscriberStatusReportChart.prefWidthProperty().bind(reportVBox.widthProperty());
+                    subscriberStatusReportChart.prefHeightProperty().bind(reportVBox.heightProperty());
+                    reportTitle.setText("Subscribers Status Report " + reportsGeneratorController.getMonth() + "/" + reportsGeneratorController.getYear());
                 }
-            }
-            else {
+            } else {
                 showErrorAlert("Report Not Available", "The requested report is not exist in the system.");
             }
         }
@@ -279,18 +268,30 @@ public class LibraryReports_Controller {
      */
     private int getMonthNumber(String monthName) {
         switch (monthName) {
-            case "January":   return 1;
-            case "February":  return 2;
-            case "March":     return 3;
-            case "April":     return 4;
-            case "May":       return 5;
-            case "June":      return 6;
-            case "July":      return 7;
-            case "August":    return 8;
-            case "September": return 9;
-            case "October":   return 10;
-            case "November":  return 11;
-            case "December":  return 12;
+            case "January":
+                return 1;
+            case "February":
+                return 2;
+            case "March":
+                return 3;
+            case "April":
+                return 4;
+            case "May":
+                return 5;
+            case "June":
+                return 6;
+            case "July":
+                return 7;
+            case "August":
+                return 8;
+            case "September":
+                return 9;
+            case "October":
+                return 10;
+            case "November":
+                return 11;
+            case "December":
+                return 12;
             default:
                 throw new IllegalArgumentException("Invalid month name: " + monthName);
         }
@@ -322,11 +323,12 @@ public class LibraryReports_Controller {
 
         // load data
         //get the correct report
-        BorrowingReport borrowingReport=reportsGeneratorController.getBorrowingReport();
+        BorrowingReport borrowingReport = reportsGeneratorController.getBorrowingReport();
         //add to graph the data for every book in the report
-        Map<String, List<String>> borrowingData=borrowingReport.getBorrowingData();
+        Map<String, List<String>> borrowingData = borrowingReport.getBorrowingData();
         for (Map.Entry<String, List<String>> entry : borrowingData.entrySet()) {
-            String bookTitle = entry.getKey();
+            String bookTitle = splitTitle(entry.getKey());
+
             List<String> dataOfBook = entry.getValue();
             totalBorrowTimeSeries.getData().add(new XYChart.Data<>(bookTitle, Integer.parseInt(dataOfBook.get(0))));
             lateReturnTimeSeries.getData().add(new XYChart.Data<>(bookTitle, Integer.parseInt(dataOfBook.get(1))));
@@ -335,6 +337,35 @@ public class LibraryReports_Controller {
         barChart.getData().addAll(totalBorrowTimeSeries, lateReturnTimeSeries);
 
         return barChart;
+    }
+
+    public String splitTitle(String title) {
+        StringBuilder formattedTitle = new StringBuilder();
+        String[] words = title.split(" ");  // Split the title into words based on spaces
+
+        StringBuilder currentLine = new StringBuilder();  // Accumulate words for the current line
+
+        for (String word : words) {
+            // If adding this word exceeds the maxLength, start a new line
+            if (currentLine.length() + word.length() + (currentLine.length() > 0 ? 1 : 0) > 8) {
+                // Add the current line to the formattedTitle and start a new line
+                formattedTitle.append(currentLine.toString()).append("\n");
+                currentLine.setLength(0);  // Reset current line
+            }
+
+            // Add the word to the current line, with a space if it's not the first word
+            if (currentLine.length() > 0) {
+                currentLine.append(" ");
+            }
+            currentLine.append(word);
+        }
+
+        // Add the last line if it has any content
+        if (currentLine.length() > 0) {
+            formattedTitle.append(currentLine.toString());
+        }
+
+        return formattedTitle.toString();
     }
 
     /**
@@ -349,7 +380,6 @@ public class LibraryReports_Controller {
 
         NumberAxis yAxis = new NumberAxis();
         yAxis.setLabel("Number of Subscribers");
-        yAxis.setLowerBound(30.0);
 
         // Chart
         BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
@@ -366,13 +396,13 @@ public class LibraryReports_Controller {
 
         // load data
         //get the correct report
-        SubscriberStatusReport subscriberStatusReport=reportsGeneratorController.getSubscriberStatusReport();
+        SubscriberStatusReport subscriberStatusReport = reportsGeneratorController.getSubscriberStatusReport();
         //add to graph the data for every book in the report
-        List<String[]> dailyActiveData=subscriberStatusReport.getUsersActivityStatus();
+        List<String[]> dailyActiveData = subscriberStatusReport.getUsersActivityStatus();
 
-        for (int i=0;i<dailyActiveData.size();i++) {
+        for (int i = 0; i < dailyActiveData.size(); i++) {
             String date = dailyActiveData.get(i)[0];
-            numberOfSubscribersSeries.getData().add(new XYChart.Data<>(date, Integer.parseInt(dailyActiveData.get(i)[1])+Integer.parseInt(dailyActiveData.get(i)[2])));
+            numberOfSubscribersSeries.getData().add(new XYChart.Data<>(date, Integer.parseInt(dailyActiveData.get(i)[1]) + Integer.parseInt(dailyActiveData.get(i)[2])));
             activeSubscribersSeries.getData().add(new XYChart.Data<>(date, Integer.parseInt(dailyActiveData.get(i)[1])));
             frozenSubscribersSeries.getData().add(new XYChart.Data<>(date, Integer.parseInt(dailyActiveData.get(i)[2])));
         }

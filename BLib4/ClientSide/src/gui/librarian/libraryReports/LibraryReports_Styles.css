@@ -45,6 +45,10 @@
     -fx-font-family: "Roboto Medium";
     -fx-font-size: 20px;
 }
+.chart-legend-item {
+    -fx-padding: 15px;
+}
 .chart-legend-item-symbol {
-    -fx-padding: 10px;
+    -fx-border-radius: 3px;
+    -fx-background-radius: 3px;
 }

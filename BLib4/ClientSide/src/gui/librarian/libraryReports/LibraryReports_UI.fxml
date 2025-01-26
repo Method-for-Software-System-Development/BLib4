@@ -205,7 +205,7 @@
 
         </HBox>
 
-        <VBox fx:id="reportVBox" alignment="CENTER" styleClass="whiteContainer" visible="false">
+        <VBox fx:id="reportVBox" alignment="CENTER" styleClass="whiteContainer" visible="false" VBox.vgrow="ALWAYS">
 
             <Text fx:id="reportTitle" styleClass="main-title">
                 <VBox.margin>
@@ -228,7 +228,7 @@
                     <CategoryAxis label="Day of the Month"/>
                 </xAxis>
                 <yAxis>
-                    <NumberAxis label="Number of Subscribers" lowerBound="30.0"/>
+                    <NumberAxis label="Number of Subscribers"/>
                 </yAxis>
             </BarChart>
 
