@@ -458,6 +458,7 @@ public class SubscriberBorrows_Controller implements DataReceiver {
         if (isExtended) {
             showInformationAlert("Extension Successful", "The borrow has been extended successfully.");
             refreshBorrowsTable();
+            
         } else {
             showErrorAlert("Extension Denied", "The extension cannot be processed as there are previous reservations for the book.");
         }
@@ -469,8 +470,14 @@ public class SubscriberBorrows_Controller implements DataReceiver {
      * Refreshes the borrow table with updated data.
      */
     private void refreshBorrowsTable() {
-        // Refresh the messages table by reloading the scene
-        SceneManager.switchScene("/gui/librarian/subscriberBorrows/SubscriberBorrows_UI.fxml", "BLib.4 - Braude Library Management");
+    	// Clear the previous entries before updating the table
+        borrowEntries.clear(); 
+        
+        // Reload the borrows data
+        loadBorrowsData(userId); 
+        
+        // Set the updated list of borrows in the table
+        borrowsTable.setItems(borrowEntries);
     }
 
     /**
