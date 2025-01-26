@@ -20,7 +20,7 @@ public class DbController
     private Connection connection;
 
     /**
-     * private constructor for the dbController
+     * Private constructor for the dbController.
      */
     private DbController()
     {
@@ -28,9 +28,9 @@ public class DbController
     }
 
     /**
-     * get the instance of the dbController for singleton
+     * Get the instance of the dbController for singleton.
      *
-     * @return the instance of the dbController
+     * @return The instance of the dbController.
      */
     public static DbController getInstance()
     {
@@ -48,7 +48,7 @@ public class DbController
     }
 
     /**
-     * The method creates a connection to the db
+     * The method creates a connection to the db.
      */
     public void connect()
     {
@@ -78,11 +78,11 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to get the subscriber from the db by id and password
+     * The method run SQL query to get the subscriber from the db by id and password.
      *
-     * @param subscriberId - the id of the subscriber
-     * @param password     - the password of the subscriber
-     * @return - the subscriber if found, else null
+     * @param subscriberId The id of the subscriber.
+     * @param password The password of the subscriber.
+     * @return The subscriber if found, else null.
      */
     public Subscriber handleSubscriberLogin(String subscriberId, String password)
     {
@@ -115,11 +115,11 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to get the librarian from the db by id and password
+     * The method run SQL query to get the librarian from the db by id and password.
      *
-     * @param librarianId - the id of the librarian
-     * @param password    - the password of the librarian
-     * @return - the librarian if found, else null
+     * @param librarianId The id of the librarian.
+     * @param password The password of the librarian.
+     * @return The librarian if found, else null.
      */
     public Librarian handleLibrarianLogin(String librarianId, String password)
     {
@@ -150,10 +150,10 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to get the subscriber from the db by id
+     * The method run SQL query to get the subscriber from the db by id.
      *
-     * @param subscriberID subscriber reader code - the ID of subscriber
-     * @return the subscriber if log in succeed and null if not
+     * @param subscriberID Subscriber reader code - the ID of subscriber.
+     * @return The subscriber if log in succeed and null if not.
      */
     public Subscriber handleLogInSubscriberByCard(String subscriberID)
     {
@@ -184,10 +184,10 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to create a new subscriber in the db
+     * The method run SQL query to create a new subscriber in the db.
      *
-     * @param data - the data of the new subscriber
-     * @return - true if the subscriber created, else false
+     * @param data The data of the new subscriber.
+     * @return True if the subscriber created, else false.
      */
     public boolean handleSubscriberSignUp(List<String> data)
     {
@@ -255,10 +255,10 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to search for a book by name
+     * The method run SQL query to search for a book by name.
      *
-     * @param name - the name of the book to search
-     * @return - list of books with the name
+     * @param name The name of the book to search.
+     * @return List of books with the name.
      */
     public List<Book> handleBookSearchByName(String name)
     {
@@ -285,10 +285,10 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to search for a book by category
+     * The method run SQL query to search for a book by category.
      *
-     * @param category - the category of the book to search
-     * @return - list of books with the category
+     * @param category The category of the book to search.
+     * @return List of books with the category.
      */
     public List<Book> handleBookSearchByCategory(String category)
     {
@@ -315,10 +315,10 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to search for a book by free text
+     * The method run SQL query to search for a book by free text.
      *
-     * @param text - the text to search
-     * @return - list of books that related to the text
+     * @param text The text to search.
+     * @return List of books that related to the text.
      */
     public List<Book> handleBookSearchByFreeText(String text)
     {
@@ -344,10 +344,10 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to get the books from the result set
+     * The method run SQL query to get the books from the result set.
      *
-     * @param rs - the result set
-     * @return - list of books
+     * @param rs The result set.
+     * @return List of books.
      */
     private List<Book> getBooksFromResultSet(ResultSet rs) throws SQLException
     {
@@ -380,10 +380,10 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to get the subscriber history from the db
+     * The method run SQL query to get the subscriber history from the db.
      *
-     * @param subscriber_id - the id of the subscriber
-     * @return - the subscriber history as List<String[]>
+     * @param subscriber_id The id of the subscriber.
+     * @return The subscriber history as List<String[]>.
      */
     public List<String[]> handleReturnSubscriberHistory(String subscriber_id)
     {
@@ -417,10 +417,10 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to update the subscriber details
+     * The method run SQL query to update the subscriber details.
      *
-     * @param subscriber - the new details of the subscriber
-     * @return - true if the update succeeds, else false
+     * @param subscriber The new details of the subscriber.
+     * @return True if the update succeeds, else false.
      */
     public boolean handleUpdateSubscriberDetails(Subscriber subscriber)
     {
@@ -446,10 +446,10 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to update the subscriber password
+     * The method run SQL query to update the subscriber password.
      *
-     * @param data - the subscriber id and new password
-     * @return - true if the update succeeds, else false
+     * @param data The subscriber id and new password.
+     * @return True if the update succeeds, else false.
      */
     public boolean handleUpdateSubscriberPassword(List<String> data)
     {
@@ -474,9 +474,9 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to get all the subscribers in the db
+     * The method run SQL query to get all the subscribers in the db.
      *
-     * @return - list of all the subscribers
+     * @return List of all the subscribers.
      */
     public List<Subscriber> handleGetAllSubscribers()
     {
@@ -511,15 +511,16 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to check if a copy of the book is available to borrow (not borrowed and not ordered)
+     * The method run SQL query to check if a copy of the book is available to borrow (not borrowed and not ordered).
      *
-     * @param copyId - the id of the copy to check
-     * @return - return 1 in index 0 if available , 2 and waiting list if the copy is available for waitlist only, 3 if copy exists but not available for order, 4 if copy not exist
+     * @param copyId The id of the copy to check
+     * @return Return 1 in index 0 if available, two and waiting lists if the copy is available for waitlist only,
+     * 3 if copy exists but not available for order, 4 if copy not exist.
      */
     public List<String> handleCheckBorrowedBookAvailability(String copyId)
     {
         PreparedStatement stmt;
-        String returnValue="";
+        String returnValue = "";
         String bookId = "";
         ResultSet rs;
         List<String> returnList = new ArrayList<>();
@@ -538,16 +539,18 @@ public class DbController
                 returnList.add(returnValue);
                 return returnList;
             }
-            else {
+            else
+            {
                 // save the book id for the next query
                 bookId = rs.getString("book_id");
                 //if the book copy is borrowed
-                if (rs.getInt("is_available") == 0) {
+                if (rs.getInt("is_available") == 0)
+                {
                     returnValue = "3";
                     returnList.add(returnValue);
                     return returnList;
                 }
-                else returnValue ="1"; //book copy available 
+                else returnValue = "1"; //book copy available
             }
         }
         catch (SQLException e)
@@ -586,34 +589,34 @@ public class DbController
             }
         }
         returnList.add(returnValue);
-        
+
         // Add all the subscribers that have active orders for the book and got notified
         try
         {
-        	stmt = connection.prepareStatement("SELECT subscriber_id FROM subscriber_order WHERE book_id = ? AND is_active = true AND is_his_turn = true;");
-        	stmt.setString(1, bookId);
-        	rs = stmt.executeQuery();
-        	while (rs.next())
-        	{
-        		returnList.add(rs.getString("subscriber_id"));
-        	}
+            stmt = connection.prepareStatement("SELECT subscriber_id FROM subscriber_order WHERE book_id = ? AND is_active = true AND is_his_turn = true;");
+            stmt.setString(1, bookId);
+            rs = stmt.executeQuery();
+            while (rs.next())
+            {
+                returnList.add(rs.getString("subscriber_id"));
+            }
         }
         catch (SQLException e)
         {
-        	System.out.println("Error! check borrowed book availability failed - cant get the subscribers that have active orders for the book");
+            System.out.println("Error! check borrowed book availability failed - cant get the subscribers that have active orders for the book");
         }
         return returnList;
     }
 
     /**
-     * The method run SQL query to handle the borrow of a book
+     * The method run SQL query to handle the borrow of a book.
      *
-     * @param borrowDetails - the details of the borrow
+     * @param borrowDetails The details of the borrow:
      *                      [0] the subscriber id
      *                      [1] the copy id
      *                      [2] the due date
      * @return - 0 if the borrow succeeds, 1 if the subscriber not found,
-     * 2 if the subscriber is frozen, 3 if the borrow failed due to db error
+     * 2 if the subscriber is frozen, 3 if the borrow failed due to db error.
      */
     public Boolean handleBorrowBook(List<String> borrowDetails)
     {
@@ -685,12 +688,12 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to handle book order by the subscriber
+     * The method run SQL query to handle book order by the subscriber.
      *
-     * @param orderDetails - [0] the subscriber id
-     *                     [1] the book id
-     * @return - List<Boolean> [0] true if the order succeeds, else false
-     * [1] true if the subscriber is frozen, else false
+     * @param orderDetails [0] The subscriber id
+     *                     [1] The book id
+     * @return List<Boolean> - [0] true if the order succeeds, else false.
+     * [1] true if the subscriber is frozen, else false.
      */
     public List<Boolean> handleOrderBook(List<String> orderDetails)
     {
@@ -711,6 +714,7 @@ public class DbController
                 {
                     returnValue.add(false);
                     returnValue.add(true);
+                    returnValue.add(false);
                     return returnValue;
                 }
             }
@@ -718,6 +722,7 @@ public class DbController
         catch (SQLException e)
         {
             System.out.println("Error! order book failed - cant check if the subscriber is frozen");
+            returnValue.add(false);
             returnValue.add(false);
             returnValue.add(false);
             validFlag = false;
@@ -737,6 +742,7 @@ public class DbController
                 {
                     returnValue.add(false);
                     returnValue.add(false);
+                    returnValue.add(true);
 
                     validFlag = false;
                 }
@@ -744,6 +750,7 @@ public class DbController
             catch (SQLException e)
             {
                 System.out.println("Error! order book failed - cant check if the subscriber already ordered the book");
+                returnValue.add(false);
                 returnValue.add(false);
                 returnValue.add(false);
                 validFlag = false;
@@ -776,6 +783,7 @@ public class DbController
                 {
                     returnValue.add(false);
                     returnValue.add(false);
+                    returnValue.add(false);
 
                     validFlag = false;
                 }
@@ -784,6 +792,7 @@ public class DbController
             catch (SQLException e)
             {
                 System.out.println("Error! order book failed - cant check if we have enough copies of the book that are not ordered");
+                returnValue.add(false);
                 returnValue.add(false);
                 returnValue.add(false);
                 validFlag = false;
@@ -810,25 +819,25 @@ public class DbController
 
                 returnValue.add(true);
                 returnValue.add(false);
+                returnValue.add(false);
             }
             catch (SQLException e)
             {
                 System.out.println("Error! order book failed - cant add the order to the db");
                 returnValue.add(false);
                 returnValue.add(false);
+                returnValue.add(false);
             }
-
         }
-
         return returnValue;
     }
 
     /**
-     * The method run SQL query to handle the return of a borrowed book
+     * The method run SQL query to handle the return of a borrowed book.
      *
-     * @param borrowId - the id of the borrow
-     * @return - List<Boolean> [0] true if the return succeeds, else false
-     * [1] true if the subscriber is frozen, else false
+     * @param borrowId The id of the borrow.
+     * @return List<Boolean> - [0] true if the return succeeds, else false.
+     * [1] true if the subscriber is frozen, else false.
      */
     public List<Boolean> handleReturnBorrowedBook(String borrowId)
     {
@@ -982,10 +991,9 @@ public class DbController
     }
 
     /**
-     * The method run SQL query
-     * to handle sending email to the subscriber that has ordered a book and when the book is available
+     * The method run SQL query to handle sending email to the subscriber that has ordered a book and when the book is available.
      *
-     * @param bookId - the id of the book that is available
+     * @param bookId The id of the book that is available.
      */
     public void handleBookOrderWhenCopyAvailable(String bookId)
     {
@@ -1034,10 +1042,10 @@ public class DbController
 
 
     /**
-     * The method run SQL query to get the subscriber active borrow list
+     * The method run SQL query to get the subscriber active borrow list.
      *
-     * @param subscriberId - the id of the subscriber
-     * @return - list of the active borrows
+     * @param subscriberId The id of the subscriber.
+     * @return List of the active borrows.
      */
     public List<List<String>> handleGetSubscriberBorrowList(String subscriberId)
     {
@@ -1078,11 +1086,11 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to extend the borrow period of a book by the subscriber
+     * The method run SQL query to extend the borrow period of a book by the subscriber.
      *
-     * @param extensionRequest - [0] the borrow id
-     *                         [1] the new due date
-     * @return - true if the extent succeeds, else false
+     * @param extensionRequest [0] The borrow id
+     *                         [1] The new due date
+     * @return True if the extent succeeds, else false.
      */
     public boolean handleSubscriberExtendBorrow(List<String> extensionRequest)
     {
@@ -1206,10 +1214,10 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to check if the subscriber exists in the db
+     * The method run SQL query to check if the subscriber exists in the db.
      *
-     * @param subscriberId - the id of the subscriber to check
-     * @return - true if the subscriber exists, else false
+     * @param subscriberId The id of the subscriber to check.
+     * @return True if the subscriber exists, else false.
      */
     public int handleCheckSubscriberStatus(String subscriberId)
     {
@@ -1248,12 +1256,12 @@ public class DbController
 
 
     /**
-     * The method run SQL query to extend the borrow period of a book by the librarian
+     * The method run SQL query to extend the borrow period of a book by the librarian.
      *
-     * @param extensionRequest - [0] the borrow id
-     *                         [1] the new due date
-     *                         [2] the librarian id
-     * @return - true if the extension succeeds, else false
+     * @param extensionRequest [0] The borrow id
+     *                         [1] The new due date
+     *                         [2] The librarian id
+     * @return True if the extension succeeds, else false.
      */
     public boolean handleLibrarianExtendBorrow(List<String> extensionRequest)
     {
@@ -1382,10 +1390,10 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to handle update book copy to lost status
+     * The method run SQL query to handle update book copy to lost status.
      *
-     * @param borrowId - the id of the borrow that lost
-     * @return - true if the update succeeds, else false
+     * @param borrowId The id of the borrow that lost.
+     * @return True if the update succeeds, else false.
      */
     public boolean handleUpdateBookCopyToLost(String borrowId)
     {
@@ -1434,9 +1442,9 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to get the five newest books in the library
+     * The method run SQL query to get the five newest books in the library.
      *
-     * @return - list of the five newest books
+     * @return List of the five newest books.
      */
     public List<Book> handleGetFiveNewestBooks()
     {
@@ -1478,9 +1486,9 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to get the five most popular books in the library
+     * The method run SQL query to get the five most popular books in the library.
      *
-     * @return - list of the five most popular books
+     * @return List of the five most popular books.
      */
     public List<Book> handleGetFiveMostPopularBooks()
     {
@@ -1512,13 +1520,13 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to get all the borrow details that the return date is tomorrow
+     * The method run SQL query to get all the borrow details that the return date is tomorrow.
      *
-     * @return - list of the borrow details
-     *              [0] - the subscriber id
-     *              [1] - the subscriber name
-     *              [2] - the subscriber email
-     *              [3] - the book title
+     * @return List of the borrow details:
+     * [0] - The subscriber id
+     * [1] - The subscriber name
+     * [2] - The subscriber email
+     * [3] - The book title
      */
     public List<List<String>> handleGetReminderDayBeforeDetails()
     {
@@ -1721,9 +1729,38 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to check if we need to update the daily report and create trigger for tomorrow
+     * The method checks if a specific report is ready.
      *
-     * @return - true if we need to update the daily report, else false
+     * @param data [0] The report type
+     *             [1] The month
+     *             [2] The year
+     * @return The boolean response if the report is ready or not.
+     */
+    public boolean checkIfReportIsReady(List<String> data)
+    {
+        PreparedStatement stmt;
+        ResultSet rs;
+        try
+        {
+            stmt = connection.prepareStatement("SELECT * FROM monthly_reports WHERE report_type = ? AND report_month = ? AND report_year = ? AND is_ready = 1;");
+            stmt.setString(1, data.get(0));
+            stmt.setInt(2, Integer.parseInt(data.get(1)));
+            stmt.setInt(3, Integer.parseInt(data.get(2)));
+            rs = stmt.executeQuery();
+            if (rs.next())
+                return true;
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Error! cannot get the status of the report.");
+        }
+        return false;
+    }
+
+    /**
+     * The method run SQL query to check if we need to update the daily report and create trigger for tomorrow.
+     *
+     * @return True if we need to update the daily report, else false.
      */
     public boolean handleGetTriggerOfDailyReportUpdate()
     {
@@ -1765,9 +1802,9 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to check if we need to update the monthly report and create trigger for next month
+     * The method run SQL query to check if we need to update the monthly report and create trigger for next month.
      *
-     * @return - true if we need to update the monthly report, else false
+     * @return True if we need to update the monthly report, else false.
      */
     public boolean handleGetTriggerOfMonthlyReportUpdate()
     {
@@ -1808,52 +1845,11 @@ public class DbController
         return false;
     }
 
-
     /**
-     * Fetches the subscriber's name and the book title for their order.*
+     * The method run SQL query to get the history of a subscriber by his id.
      *
-     * @param subscriberID The ID of the subscriber.
-     * @return A map containing the subscriber's name and the book title.
-     */
-    public Map<String, String> fetchOrderDetails(String subscriberID)
-    {
-        Map<String, String> details = new HashMap<>();
-        PreparedStatement stmt;
-        ResultSet rs;
-
-        try
-        {
-            String query = "SELECT s.subscriber_first_name, s.subscriber_last_name, b.book_title\n" +
-                    "FROM subscriber_order so\n" +
-                    "         JOIN subscriber s ON so.subscriber_id = s.subscriber_id\n" +
-                    "         JOIN book b ON so.book_id = b.book_id\n" +
-                    "WHERE so.subscriber_id = ?\n" +
-                    "  AND so.is_active = 1";
-
-            stmt = connection.prepareStatement(query);
-            stmt.setString(1, subscriberID);
-
-            rs = stmt.executeQuery();
-            if (rs.next())
-            {
-                details.put("subscriberName", rs.getString("subscriber_first_name") + " " + rs.getString("subscriber_last_name"));
-                details.put("bookTitle", rs.getString("book_title"));
-            }
-        }
-        catch (SQLException e)
-        {
-            System.out.println("Error! fetch order details failed");
-        }
-
-        return details;
-    }
-
-
-    /**
-     * The method run SQL query to get the history of a subscriber by his id
-     *
-     * @param history_id - the id of the history
-     * @return - the history of the subscriber in byte array
+     * @param history_id The id of the history.
+     * @return The history of the subscriber in byte array.
      */
     public List<String[]> HandleGetHistoryFileById(String history_id)
     {
@@ -1880,10 +1876,10 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to get the history of a subscriber by his id
+     * The method run SQL query to get the history of a subscriber by his id.
      *
-     * @param subscriberId - the id of the subscriber
-     * @return - the history of the subscriber in byte array
+     * @param subscriberId The id of the subscriber.
+     * @return The history of the subscriber in byte array.
      */
     public List<String[]> getHistoryFileBySubscriberId(String subscriberId)
     {
@@ -1896,10 +1892,10 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to update the history of a subscriber by his id
+     * The method run SQL query to update the history of a subscriber by his id.
      *
-     * @param subscriberId - the id of the subscriber
-     * @param list         - the new history file
+     * @param subscriberId The id of the subscriber.
+     * @param list The new history file.
      */
     public void handleUpdateHistoryFileBySubscriberId(String subscriberId, List<String[]> list)
     {
@@ -1926,10 +1922,10 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to get the history id by the subscriber id
+     * The method run SQL query to get the history id by the subscriber id.
      *
-     * @param subscriberId - the id of the subscriber
-     * @return - the history id
+     * @param subscriberId The id of the subscriber.
+     * @return The history id.
      */
     private String getHistoryIdBySubscriberId(String subscriberId)
     {
@@ -1955,10 +1951,10 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to get the book by book id
+     * The method run SQL query to get the book by book id.
      *
-     * @param bookId - the id of the book to get
-     * @return - Book object with the book details
+     * @param bookId The id of the book to get.
+     * @return Book object with the book details.
      */
     public Book getBookByBookId(String bookId)
     {
@@ -1988,10 +1984,10 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to get the book by copy id
+     * The method run SQL query to get the book by copy id.
      *
-     * @param copyId - the id of the copy to get the book
-     * @return - Book object with the book details
+     * @param copyId The id of the copy to get the book.
+     * @return Book object with the book details.
      */
     public Book getBookByCopyId(String copyId)
     {
@@ -2019,10 +2015,10 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to get the subscriber id by the borrow id
+     * The method run SQL query to get the subscriber id by the borrow id.
      *
-     * @param borrowId - the id of the borrow
-     * @return - the subscriber id
+     * @param borrowId The id of the borrow.
+     * @return The subscriber id.
      */
     public String getSubscriberIdFromBorrowId(String borrowId)
     {
@@ -2050,10 +2046,10 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to get the subscriber by subscriber id
+     * The method run SQL query to get the subscriber by subscriber id.
      *
-     * @param subscriberId - the id of the subscriber
-     * @return - Subscriber object with the subscriber details
+     * @param subscriberId The id of the subscriber.
+     * @return Subscriber object with the subscriber details.
      */
     public Subscriber getSubscriberBySubscriberId(String subscriberId)
     {
@@ -2083,10 +2079,10 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to get the book object by the borrow id
+     * The method run SQL query to get the book object by the borrow id.
      *
-     * @param borrowId - the id of the borrow
-     * @return - Book object with the book details
+     * @param borrowId The id of the borrow.
+     * @return Book object with the book details.
      */
     public Book getBookDetailsByBorrowId(String borrowId)
     {
@@ -2120,10 +2116,10 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to get the book location by the book id
+     * The method run SQL query to get the book location by the book id.
      *
-     * @param bookId - the id of the book
-     * @return - The location in the library / the date the book will be available
+     * @param bookId The id of the book.
+     * @return The location in the library / the date the book will be available.
      */
     public List<String> handleGetBookLocation(String bookId)
     {
@@ -2237,10 +2233,10 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to check if the book is available for order
+     * The method run SQL query to check if the book is available for order.
      *
-     * @param bookId - the id of the book
-     * @return - true if the book is available for order, false otherwise
+     * @param bookId The id of the book.
+     * @return True if the book is available for order, false otherwise.
      */
     public boolean handleCheckIfBookIsAvailableForOrder(String bookId)
     {
@@ -2314,9 +2310,9 @@ public class DbController
 
 
     /**
-     * The method run SQL query to get the active subscribers count
+     * The method run SQL query to get the active subscribers count.
      *
-     * @return - the number of active subscribers
+     * @return The number of active subscribers.
      */
     public int fetchActiveSubscribersCount()
     {
@@ -2337,9 +2333,9 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to get the frozen subscribers count
+     * The method run SQL query to get the frozen subscribers count.
      *
-     * @return - the number of frozen subscribers
+     * @return The number of frozen subscribers.
      */
     public int fetchFrozenSubscribersCount()
     {
@@ -2362,7 +2358,7 @@ public class DbController
     /**
      * Fetches the monthly subscriber status report for the current month.
      *
-     * @return List<String [ ]> where each row contains frozen_count, active_count, and day.
+     * @return List<String [ ]> Where each row contains frozen_count, active_count, and day.
      */
     public List<String[]> fetchMonthlySubscribersStatusReport()
     {
@@ -2431,7 +2427,7 @@ public class DbController
     /**
      * Fetches the monthly borrowing report for the current month - total borrow time.
      *
-     * @return - Map<String, String> where the key is the book title and the value is the total borrow time.
+     * @return Map<String, String> Where the key is the book title and the value is the total borrow time.
      */
     public Map<String, String> fetchTotalBorrowTime()
     {
@@ -2483,7 +2479,7 @@ public class DbController
     /**
      * Fetches the monthly borrowing report for the current month - late borrow time.
      *
-     * @return - Map<String, String> where the key is the book title and the value is the late borrow time.
+     * @return Map<String, String> Where the key is the book title and the value is the late borrow time.
      */
     public Map<String, String> fetchLateBorrowTime()
     {
@@ -2579,9 +2575,9 @@ public class DbController
      * Inserts an empty report into the monthly_reports table for the next month.
      * Each new report gets a unique report_id automatically.
      *
-     * @param data- [0] the report type
-     *              [1] the next month
-     *              [2] the year
+     * @param data  [0] The report type
+     *              [1] The next month
+     *              [2] The year
      */
     public void insertEmptyMonthlyReport(List<String> data)
     {
@@ -2619,7 +2615,7 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to update the subscriber report from last month to ready
+     * The method run SQL query to update the subscriber report from last month to ready.
      */
     public void handleUpdateSubscriberReportToReady()
     {
@@ -2647,9 +2643,9 @@ public class DbController
     /**
      * Fetches the report ID for a given type, month, and year.
      *
-     * @param data- [0] the report type
-     *              [1] the month
-     *              [2] the year
+     * @param data- [0] The report type
+     *              [1] The month
+     *              [2] The year
      * @return The report ID, or -1 if not found.
      */
     public int fetchReportId(List<String> data)
@@ -2681,9 +2677,9 @@ public class DbController
     /**
      * Fetches the Blob data for a specific report from the database.
      *
-     * @param data - [0] the report type
-     *             [1] the month
-     *             [2] the year
+     * @param data [0] The report type
+     *             [1] The month
+     *             [2] The year
      * @return The Blob data as a byte array, or null if not found.
      */
     public byte[] fetchReportBlob(List<String> data)
@@ -2713,9 +2709,9 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to get all the librarian unread messages
+     * The method run SQL query to get all the librarian unread messages.
      *
-     * @return - list of all the unread messages
+     * @return List of all the unread messages.
      */
     public List<List<String>> handleGetUnreadLibrarianMessages()
     {
@@ -2760,10 +2756,10 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to update the librarian message to read
+     * The method run SQL query to update the librarian message to read.
      *
-     * @param notificationId - the id of the message to update
-     * @return - true if the update was successful, false otherwise
+     * @param notificationId The id of the message to update.
+     * @return True if the update was successful, false otherwise.
      */
     public boolean handleMarkLibrarianNotificationAsRead(String notificationId)
     {
@@ -2785,10 +2781,10 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to get all the subscriber unread messages and then update them to read
+     * The method run SQL query to get all the subscriber unread messages and then update them to read.
      *
-     * @param subscriberId - the id of the subscriber
-     * @return - list of all the unread messages
+     * @param subscriberId The id of the subscriber.
+     * @return List of all the unread messages.
      */
     public List<String> handleGetSubscriberMissedSms(String subscriberId)
     {
@@ -2821,10 +2817,10 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to save the subscriber missed sms in DB
+     * The method run SQL query to save the subscriber missed sms in DB.
      *
-     * @param subscriberId - the id of the subscriber
-     * @param message      - the message of the sms
+     * @param subscriberId The id of the subscriber.
+     * @param message The message of the sms.
      */
     public void handleSaveSubscriberMissedSms(String subscriberId, String message)
     {
@@ -2852,9 +2848,9 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to save the librarian message in DB
+     * The method run SQL query to save the librarian message in DB.
      *
-     * @param message - the message of the librarian
+     * @param message The message of the librarian.
      */
     public void handleSaveLibrarianMessage(String message)
     {
@@ -2880,10 +2876,10 @@ public class DbController
     }
 
     /**
-     * The method run SQL query to get the subscriber name by his id
+     * The method run SQL query to get the subscriber name by his id.
      *
-     * @param subscriberId - the id of the subscriber to get his name
-     * @return - the full name of the subscriber
+     * @param subscriberId The id of the subscriber to get his name.
+     * @return The full name of the subscriber.
      */
     public String GetSubscriberNameById(String subscriberId)
     {
@@ -2908,5 +2904,45 @@ public class DbController
         }
 
         return subscriberName;
+    }
+    
+    /**
+     * The method gets the active orders of a subscriber.
+     * 
+     * @param subscriberId The id of the subscriber.
+     * @return A list contains the orders and their details.
+     */
+    public List<List<String>> handleGetSubscriberActiveOrders(String subscriberId)
+    {
+    	List<List<String>> ordersList = new ArrayList<>(); 
+    	String quary=
+    	"SELECT so.order_id, so.book_id, so.order_date, b.book_title " +
+    	"FROM subscriber_order so " +
+    	"JOIN book b ON so.book_id = b.book_id "+
+    	"WHERE so.subscriber_id = ? AND so.is_active = 1;";
+    	 
+         try
+         {
+             // get the active orders
+        	 PreparedStatement stmt = connection.prepareStatement(quary);
+             stmt.setString(1, subscriberId);
+             ResultSet rs = stmt.executeQuery();
+             //add all orders details to the list
+             while(rs.next()) {
+            	 List<String> oneOrderList=new ArrayList<>();
+            	 oneOrderList.add(String.valueOf(rs.getInt("order_id")));
+            	 oneOrderList.add(String.valueOf(rs.getInt("book_id")));
+            	 oneOrderList.add(rs.getString("book_title"));
+                 Timestamp orderDate = rs.getTimestamp("order_date");
+                 java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                 oneOrderList.add(sdf.format(orderDate));
+            	 ordersList.add(oneOrderList);
+             }
+         }
+         catch (SQLException e)
+         {
+             System.out.println("Error! get subscriber's active orders failed "+ e.getMessage());
+         }
+        return ordersList;
     }
 }

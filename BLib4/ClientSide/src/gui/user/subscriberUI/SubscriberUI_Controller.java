@@ -1,6 +1,7 @@
 package gui.user.subscriberUI;
 
 import entities.logic.MessageType;
+import gui.user.viewHistory.ActivityEntry;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -201,6 +202,24 @@ public class SubscriberUI_Controller {
         });
 
         borrowsTable.setPlaceholder(new Text("No borrows to display.")); // Set the placeholder text
+        bookTitleColumn.setCellFactory(column -> {
+            return new TableCell<BorrowEntry, String>() {
+                private final Text text = new Text();
+
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setGraphic(null);
+                    } else {
+                        text.setText(item);
+                        text.wrappingWidthProperty().bind(bookTitleColumn.widthProperty().subtract(10)); // Wrap text within column width
+                        setGraphic(text);
+                    }
+                }
+            };
+        });
+
         borrowsTable.setFixedCellSize(70); // Set the row height
         borrowsTable.setSelectionModel(null); // Disable row selection
         extendColumn.setSortable(false); // Disable sorting for the "Extend" column
@@ -345,8 +364,17 @@ public class SubscriberUI_Controller {
      * Refreshes the borrow table with updated data.
      */
     private void refreshBorrowsTable() {
-        // Refresh the messages table by reloading the scene
-        SceneManager.switchScene("/gui/user/subscriberUI/SubscriberUI_UI.fxml", "BLib.4 - Braude Library Management");
+    	// Get the subscriber's borrows
+    	ClientUI.chat.accept(new MessageType("110", subscriberController.getLoggedSubscriber().getId()));
+        subscriberBorrows = ChatClient.listOfBorrows;
+        // Clear the previous entries before updating the table
+    	borrowEntries.clear();
+    	// Reload the borrows data
+        loadBorrowsData();  
+         // Set the updated list of borrows in the table
+        borrowsTable.setItems(borrowEntries); 
+        
+        borrowsTable.refresh();
     }
 
     /**

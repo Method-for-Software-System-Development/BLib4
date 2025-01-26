@@ -2,6 +2,7 @@ package gui.librarian.subscriberBorrows;
 
 import entities.logic.MessageType;
 import gui.user.subscriberUI.BorrowEntry;
+import gui.user.viewHistory.ActivityEntry;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -86,6 +87,8 @@ public class SubscriberBorrows_Controller implements DataReceiver {
     private TableColumn<BorrowEntry, Void> returnColumn;
     @FXML
     private TableColumn<BorrowEntry, Void> extendColumn;
+    @FXML
+    private TableColumn<BorrowEntry, Void> lostColumn;
 
     // Fields
     private Subscriber_Controller subscriberController;
@@ -252,10 +255,61 @@ public class SubscriberBorrows_Controller implements DataReceiver {
             }
         });
 
+        // Add Lost button
+        lostColumn.setCellFactory(param -> new TableCell<BorrowEntry, Void>() {
+            private final Button lostButton = new Button("Lost");
+
+            {
+                // Set the CSS class for the button
+                lostButton.getStyleClass().add("orange-orange-button");
+
+                // Set preferred size for the button
+                lostButton.setPrefHeight(50.0);
+                lostButton.setPrefWidth(150.0);
+
+                // Set the action for the button
+                lostButton.setOnAction(event -> {
+                    BorrowEntry entry = getTableView().getItems().get(getIndex());
+                    String borrowId = entry.getBorrowId();
+                    handleLostAction(borrowId);
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null); // Clear the cell for empty rows
+                } else {
+                    setGraphic(lostButton); // Add the button for non-empty rows
+                }
+            }
+        });
+
         borrowsTable.setPlaceholder(new Text("No borrows to display.")); // Set the placeholder text
+        bookTitleColumn.setCellFactory(column -> {
+            return new TableCell<BorrowEntry, String>() {
+                private final Text text = new Text();
+
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setGraphic(null);
+                    } else {
+                        text.setText(item);
+                        text.wrappingWidthProperty().bind(bookTitleColumn.widthProperty().subtract(10)); // Wrap text within column width
+                        setGraphic(text);
+                    }
+                }
+            };
+        });
+
         borrowsTable.setFixedCellSize(70); // Set the row height
         borrowsTable.setSelectionModel(null); // Disable row selection
         extendColumn.setSortable(false); // Disable sorting for the "Extend" column
+        returnColumn.setSortable(false); // Disable sorting for the "Return" column
+        lostColumn.setSortable(false); // Disable sorting for the "Lost" column
 
         // Highlight rows based on due date
         borrowsTable.setRowFactory(tv -> new TableRow<BorrowEntry>() {
@@ -317,7 +371,8 @@ public class SubscriberBorrows_Controller implements DataReceiver {
         // Ensure the bookTitleColumn fills the remaining space
         bookTitleColumn.prefWidthProperty().bind(
                 borrowsTable.widthProperty()
-                        .subtract(170 * 6) // Subtract the total width of fixed columns
+                        .subtract(170 * 4) // Subtract the total width of fixed columns
+                        .subtract(140 * 3)
                         .subtract(2) // Subtract the border width
                         .subtract(borrowsTable.getItems().size() > 7 ? 20 : 0) // Subtract 20 if more than 7 rows for the scrollbar
         );
@@ -375,6 +430,15 @@ public class SubscriberBorrows_Controller implements DataReceiver {
         selectedBorrowId = entry.getBorrowId();
     }
 
+    private void handleLostAction(String borrowId) {
+        if (borrowController.lostCopy(borrowId)) {
+            showInformationAlert("Lost Successful", "The book has been marked as lost.");
+            refreshBorrowsTable();
+        } else {
+            showErrorAlert("Lost Error", "An error occurred while marking the book as lost. Please try again.");
+        }
+    }
+
     /**
      * Handles the submit action for extending a borrow.
      */
@@ -394,6 +458,7 @@ public class SubscriberBorrows_Controller implements DataReceiver {
         if (isExtended) {
             showInformationAlert("Extension Successful", "The borrow has been extended successfully.");
             refreshBorrowsTable();
+            
         } else {
             showErrorAlert("Extension Denied", "The extension cannot be processed as there are previous reservations for the book.");
         }
@@ -405,8 +470,14 @@ public class SubscriberBorrows_Controller implements DataReceiver {
      * Refreshes the borrow table with updated data.
      */
     private void refreshBorrowsTable() {
-        // Refresh the messages table by reloading the scene
-        SceneManager.switchScene("/gui/librarian/subscriberBorrows/SubscriberBorrows_UI.fxml", "BLib.4 - Braude Library Management");
+    	// Clear the previous entries before updating the table
+        borrowEntries.clear(); 
+        
+        // Reload the borrows data
+        loadBorrowsData(userId); 
+        
+        // Set the updated list of borrows in the table
+        borrowsTable.setItems(borrowEntries);
     }
 
     /**

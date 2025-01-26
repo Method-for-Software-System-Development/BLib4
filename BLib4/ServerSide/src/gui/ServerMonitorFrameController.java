@@ -3,7 +3,6 @@ package gui;
 import javafx.application.Platform;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -54,7 +53,8 @@ public class ServerMonitorFrameController
      * This method is called to initialize the table of active clients
      */
     @FXML
-    private void initialize() {
+    private void initialize()
+    {
         ps = new PrintStream(new Console(console));
 
         System.setOut(ps);
@@ -69,36 +69,44 @@ public class ServerMonitorFrameController
         column3.setCellValueFactory(cellData -> cellData.getValue().hostProperty());
         column4.setCellValueFactory(cellData -> cellData.getValue().statusProperty());
 
-        try (final DatagramSocket socket = new DatagramSocket()) {
+        try (final DatagramSocket socket = new DatagramSocket())
+        {
             socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
             ipLbl.setText("Server ip: " + socket.getLocalAddress().getHostAddress());
-        } catch (Exception ignored) {
+        }
+        catch (Exception ignored)
+        {
         }
     }
 
+    /**
+     * This class is used to redirect the output to the console
+     */
     public class Console extends OutputStream
     {
         private TextArea console;
 
-        public Console(TextArea console) {
+        public Console(TextArea console)
+        {
             this.console = console;
         }
 
-        public void appendText(String valueOf) {
+        public void appendText(String valueOf)
+        {
             Platform.runLater(() -> console.appendText(valueOf));
         }
 
         public void write(int b) throws IOException
         {
-            appendText(String.valueOf((char)b));
+            appendText(String.valueOf((char) b));
         }
     }
 
     /**
      * This method is called when the user clicks the "Exit" button
      *
-     * @param event
-     * @throws Exception
+     * @param event the event that triggered this method
+     * @throws Exception if an error occurs
      */
     public void getExitBtn(ActionEvent event) throws Exception
     {
@@ -110,10 +118,11 @@ public class ServerMonitorFrameController
      * The method is called when there are new clients connected to the server
      * to add him to the table
      *
-     * @param host
-     * @param ip
+     * @param host the host name of the client
+     * @param ip  the ip address of the client
      */
-    private void addRow(String host, String ip) {
+    private void addRow(String host, String ip)
+    {
         ClientInfo clientInfo = new ClientInfo(String.valueOf(index++), ip, host, "Connected");
         monitorList.add(clientInfo);
         monitorTable.refresh();
@@ -122,10 +131,12 @@ public class ServerMonitorFrameController
     /**
      * The method is called when there are clients connecting from the server to handle the table
      *
-     * @param client
+     * @param client the client that connected
      */
-    public void clientConnected(ConnectionToClient client) {
-        Platform.runLater(() -> {
+    public void clientConnected(ConnectionToClient client)
+    {
+        Platform.runLater(() ->
+        {
             clientMap.put(client, index);
             addRow(Objects.requireNonNull(client.getInetAddress()).getHostName(), client.getInetAddress().getHostAddress());
             monitorTable.refresh();
@@ -134,18 +145,22 @@ public class ServerMonitorFrameController
     }
 
     /**
-     * The method is called when there are clients disconnected from the server to habdle the table
+     * The method is called when there are clients disconnected from the server to handle the table
      *
-     * @param client
+     * @param client the client that disconnected
      */
-    public void clientDisconnected(ConnectionToClient client) {
+    public void clientDisconnected(ConnectionToClient client)
+    {
         System.out.println("Client disconnected: " + client);
-        Platform.runLater(() -> {
+        Platform.runLater(() ->
+        {
             int index = clientMap.get(client);
 
             // remove the client from the table
-            for (ClientInfo clientInfo : monitorList) {
-                if (clientInfo.getIndex().equals(String.valueOf(index))) {
+            for (ClientInfo clientInfo : monitorList)
+            {
+                if (clientInfo.getIndex().equals(String.valueOf(index)))
+                {
                     monitorList.remove(clientInfo);
                     monitorTable.refresh();
                     break;

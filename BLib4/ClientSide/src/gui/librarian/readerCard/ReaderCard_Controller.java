@@ -6,6 +6,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.image.Image;
@@ -168,7 +169,23 @@ public class ReaderCard_Controller implements DataReceiver {
         activityDetailsColumn.setCellValueFactory(data -> data.getValue().activityDetailsProperty());
 
         activitiesTable.setPlaceholder(new Text("No activities to display.")); // Set the placeholder text
-        activitiesTable.setFixedCellSize(35); // Set the row height
+        activityDetailsColumn.setCellFactory(column -> {
+            return new TableCell<ActivityEntry, String>() {
+                private final Text text = new Text();
+
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setGraphic(null);
+                    } else {
+                        text.setText(item);
+                        text.wrappingWidthProperty().bind(activityDetailsColumn.widthProperty().subtract(10)); // Wrap text within column width
+                        setGraphic(text);
+                    }
+                }
+            };
+        });
         activitiesTable.setSelectionModel(null); // Disable row selection
 
         // Ensure the bookTitleColumn fills the remaining space

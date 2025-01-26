@@ -1,6 +1,5 @@
 package logic.communication;
 
-import gui.common.*;
 import javafx.application.Application;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -20,6 +19,11 @@ public class ClientUI extends Application
         launch(args);
     } // end main
 
+    /**
+     * This method is called to start the JavaFX application.
+     *
+     * @param primaryStage - The primary stage of the application.
+     */
     @Override
     public void start(Stage primaryStage) {
         // Loading Montserrat fonts
@@ -78,11 +82,10 @@ public class ClientUI extends Application
     /**
      * This method is called to start the connection with the server.
      *
-     * @param serverIp
-     * @param portStr
-     * @throws Exception
+     * @param serverIp - The IP address of the server.
+     * @param portStr - The port number of the server.
      */
-    public static void runClient(String serverIp, String portStr) throws Exception
+    public static void runClient(String serverIp, String portStr)
     {
         int port = 0; //Port to listen on
         try

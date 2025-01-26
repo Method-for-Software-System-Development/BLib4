@@ -5,68 +5,15 @@ import logic.ServerUI;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
 
 public class ServerPortFrameController
 {
-    String temp = "";
-
     @FXML
     private TextField portTextField;
 
     @FXML
     ObservableList<String> list;
-
-    private String getport()
-    {
-        return portTextField.getText();
-    }
-
-
-    /**
-     * This method is called to start the port window
-     *
-     * @param primaryStage
-     * @throws Exception
-     */
-    public void start(Stage primaryStage) throws Exception
-    {
-        // ToDo: fix open the server port window
-        Parent root = FXMLLoader.load(getClass().getResource("/gui/ServerPort.fxml"));
-
-        Scene scene = new Scene(root);
-
-        primaryStage.setTitle("Server");
-        primaryStage.setScene(scene);
-
-        primaryStage.show();
-
-        // Set the action to be performed when the user tries to close the window
-        primaryStage.setOnCloseRequest(e ->
-        {
-            e.consume();
-            getExitBtn(new ActionEvent());
-        });
-
-    }
-
-    /**
-     * This method is called when the user clicks the "Exit" button
-     *
-     * @param event
-     */
-    public void getExitBtn(ActionEvent event)
-    {
-        System.out.println("exit Server port");
-        System.exit(0);
-    }
 
     /**
      * Sets the port field to the default port value (5555).
@@ -80,7 +27,7 @@ public class ServerPortFrameController
     /**
      * Validates the IP address and port fields.
      * Ensures both fields are not empty before attempting to connect.
-     * If validation passes, tries to initiate the connection.
+     * If validation passes, try to initiate the connection.
      * Displays an error alert in case of failure.
      */
     @FXML
@@ -119,14 +66,14 @@ public class ServerPortFrameController
         }
     }
 
-
     /**
      * Displays an error alert dialog with the provided title and message.
      *
      * @param title   the title of the alert
      * @param message the content message of the alert
      */
-    private void showErrorAlert(String title, String message) {
+    private void showErrorAlert(String title, String message)
+    {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(null);

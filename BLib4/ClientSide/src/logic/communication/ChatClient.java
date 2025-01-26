@@ -1,15 +1,9 @@
-// This file contains material supporting section 3.7 of the textbook:
-// "Object Oriented Software Engineering" and is issued under the open-source
-// license found at www.lloseng.com 
-
 package logic.communication;
 
 import entities.book.Book;
 import gui.librarian.librarianUI.LibrarianUI_Controller;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
-import logic.communication.ChatIF;
-import gui.common.*;
 import entities.logic.*;
 import entities.user.*;
 import ocsf.client.AbstractClient;
@@ -19,15 +13,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- * This class overrides some of the methods defined in the abstract
- * superclass in order to give more functionality to the client.
- *
- * @author Dr Timothy C. Lethbridge
- * @author Dr Robert Lagani&egrave;
- * @author Fran&ccedil;ois B&eacute;langer
- * @version July 2000
- */
 public class ChatClient extends AbstractClient
 {
     //Instance variables **********************************************
@@ -41,16 +26,14 @@ public class ChatClient extends AbstractClient
      * the display method in the client.
      */
     ChatIF clientUI;
-    private ShowAllSubscribersFrameController showAllSubscribersController;
-    private EditSubscriberFrameController editSubscriberFrameController;
     public static List<Subscriber> subscribers = new ArrayList<Subscriber>();
     public static List<Book> books = new ArrayList<>();
     public static List<String> availability = new ArrayList<>();
     public static boolean serverResponse = false;
     public static boolean awaitResponse = false;
-    public static Date todayDate;
     public static Librarian librarian;
     public static ArrayList<Boolean> returnOutcome;
+    public static List<List<String>> listOfOrders;
     public static ArrayList<ArrayList<String>> listOfBorrows;
     public static ArrayList<ArrayList<String>> listOfActivities;
     public static ArrayList<ArrayList<String>> listOfMessages;
@@ -70,7 +53,6 @@ public class ChatClient extends AbstractClient
      * @param port     The port number to connect on.
      * @param clientUI The interface type variable.
      */
-
     public ChatClient(String host, int port, ChatIF clientUI)
             throws IOException
     {
@@ -137,19 +119,24 @@ public class ChatClient extends AbstractClient
                 break;
 
             case "205":
+            	// list of books that matches the search of a book
                 books = (List<Book>) receiveMsg.data;
                 break;
 
             case "206":
+            	//copy of a book availability and orders
                 availability = (List<String>) receiveMsg.getData();
                 break;
 
             case "207":
+            	//response for a new borrow
                 serverResponse = (boolean) receiveMsg.getData();
                 break;
 
             case "208":
+            	//response for book order
             case "209":
+            	//response for book return
                 returnOutcome = (ArrayList<Boolean>) receiveMsg.getData();
                 break;
 
@@ -164,6 +151,7 @@ public class ChatClient extends AbstractClient
                 break;
 
             case "2111":
+            	//notification for librarian about borrow extension
                 Platform.runLater(() ->
                 {
                     messageData = (String) receiveMsg.data;
@@ -177,10 +165,10 @@ public class ChatClient extends AbstractClient
 
                 Object controller = SceneManager.getCurrentController();
 
-                if (controller instanceof LibrarianUI_Controller) {
+                if (controller instanceof LibrarianUI_Controller)
+                {
                     Platform.runLater(() -> ((LibrarianUI_Controller) controller).refreshMessagesTable());
                 }
-
                 break;
 
             case "212":
@@ -211,6 +199,7 @@ public class ChatClient extends AbstractClient
                 break;
 
             case "215":
+            	// all subscribers list
                 subscribers = (List<Subscriber>) receiveMsg.getData();
                 listOfSubscribersForLibrarian = new ArrayList<>();
                 for (Subscriber sub : subscribers)
@@ -232,6 +221,7 @@ public class ChatClient extends AbstractClient
                 break;
 
             case "216":
+            	// status of a subscriber
                 subscriberStatus = (int) receiveMsg.getData();
                 break;
 
@@ -240,12 +230,25 @@ public class ChatClient extends AbstractClient
                 serverResponse = (boolean) receiveMsg.getData();
                 break;
 
+            case "218":
+                // status of update in the db, in format boolean
+                serverResponse = (boolean) receiveMsg.getData();
+                break;
+
+            case "219":
+                // list of active orders of a book
+            	listOfOrders = (List<List<String>>)receiveMsg.data;
+                break;
+
             case "220":
+            	// list of 5 newest books in library
             case "221":
+            	// list of 5 most borrowed books in library
                 books = (List<Book>) receiveMsg.data;
                 break;
 
             case "222":
+            	// SMS message to a subscriber
                 smsData = (List<String>) receiveMsg.data;
                 StringBuilder smsText = new StringBuilder();
                 for (int i = 0; i < smsData.size(); i++)
@@ -275,10 +278,12 @@ public class ChatClient extends AbstractClient
                 break;
 
             case "223":
+            	// book location or availability
                 availability = (List<String>) receiveMsg.data;
                 break;
 
             case "224":
+            	// response about book availability for order
                 serverResponse = (boolean) receiveMsg.getData();
                 break;
 
@@ -291,6 +296,11 @@ public class ChatClient extends AbstractClient
                 //response for blob data of report request
                 blobData = (List<String[]>) receiveMsg.data;
                 break;
+                
+            case "227":
+            	//response for report status
+                serverResponse = (boolean) receiveMsg.getData();
+            	break;
             	
             case "228":
                 // list of unread librarian messages
@@ -301,12 +311,11 @@ public class ChatClient extends AbstractClient
                 //response from server for message confirmation
                 serverResponse = (boolean) receiveMsg.getData();
                 break;
-            	
+
             default:
                 System.out.println("Invalid message received from server");
                 break;
         }
-
     }
 
     /**
@@ -318,7 +327,7 @@ public class ChatClient extends AbstractClient
     {
         try
         {
-            openConnection();//in order to send more than one message
+            openConnection();//to send more than one message
             awaitResponse = true;
             sendToServer(message);
             // wait for response

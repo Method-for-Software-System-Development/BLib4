@@ -44,9 +44,16 @@ public class generateReport_controller {
 	    }
 	    reportsGeneratorController.setMonth(month);
 	    reportsGeneratorController.setYear(year);
-	    if(reportType.equals("subscriberStatus"))
-	    	SceneManager.switchScene("/gui/librarian/LibraryReports_UI/SubscriberStatusReport_UI.fxml","Subscribers Status Report");
-	    else SceneManager.switchScene("/gui/librarian/LibraryReports_UI/BorrowTimeReport_UI.fxml","Borrow Time Report");
-
+	    if(reportsGeneratorController.checkIfReportIsReady(reportType))
+	    {
+	    	if(reportType.equals("subscribersStatus"))
+	    		SceneManager.switchScene("/gui/librarian/LibraryReports_UI/SubscriberStatusReport_UI.fxml","Subscribers Status Report");
+	    	else SceneManager.switchScene("/gui/librarian/LibraryReports_UI/BorrowTimeReport_UI.fxml","Borrow Time Report");
+	    }
+	    else {
+	    	Alert alert = new Alert(Alert.AlertType.WARNING, "The requested report is not ready.");
+	        alert.setHeaderText("Warning");
+	        alert.showAndWait();
+	    }
 	}
 }
