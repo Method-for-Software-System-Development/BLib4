@@ -946,22 +946,30 @@ public class DbController
                     returnValue.add(false);
                 }
 
-                // update the scheduler trigger to be triggered (no need to send reminder email)
-                stmt = connection.prepareStatement("SELECT scheduler_id FROM scheduler_triggers WHERE trigger_operation = 'notifyDayBeforeReturnDate' AND relevant_id = ? AND is_triggered = 0;");
-                stmt.setString(1, borrowId);
-                rs = stmt.executeQuery();
-                rs.next();
-
-                stmt = connection.prepareStatement("UPDATE scheduler_triggers SET is_triggered = 1 WHERE scheduler_id = ?;");
-                stmt.setInt(1, rs.getInt(1));
-                stmt.executeUpdate();
-
             }
             catch (SQLException e)
             {
                 System.out.println("Error! return borrowed book failed - cant update the borrow in the db");
                 returnValue.add(false);
                 returnValue.add(false);
+            }
+
+            // update the scheduler trigger to be triggered (no need to send reminder email)
+            try
+            {
+                // update the scheduler trigger to be triggered (no need to send reminder email)
+                stmt = connection.prepareStatement("SELECT scheduler_id FROM scheduler_triggers WHERE trigger_operation = 'notifyDayBeforeReturnDate' AND relevant_id = ? AND is_triggered = 0;");
+                stmt.setString(1, borrowId);
+                ResultSet rs = stmt.executeQuery();
+                rs.next();
+
+                stmt = connection.prepareStatement("UPDATE scheduler_triggers SET is_triggered = 1 WHERE scheduler_id = ?;");
+                stmt.setInt(1, rs.getInt(1));
+                stmt.executeUpdate();
+            }
+            catch (SQLException e)
+            {
+                System.out.println("Error! return borrowed book failed - cant update the scheduler trigger in the db");
             }
         }
 
