@@ -657,6 +657,11 @@ public class SubscriberBorrows_Controller implements DataReceiver {
     }
 
     @FXML
+    private void goToLibraryReports() {
+        SceneManager.switchScene("/gui/librarian/libraryReports/LibraryReports_UI.fxml", "BLib.4 - Braude Library Management");
+    }
+
+    @FXML
     private void exitApp() {
         ClientUI.chat.getClient().quit();
     }
