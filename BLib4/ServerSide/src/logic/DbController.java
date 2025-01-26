@@ -1030,7 +1030,7 @@ public class DbController
                 rs2.next();
 
                 // send email to the subscriber
-                String message = "Dear " + subscriberFirstName + ",\n\n your order for the book " + rs2.getString("book_title") + " with book id \"" + bookId + "\" has arrived.\n\n Please visit the library to collect it.";
+                String message = "Dear " + subscriberFirstName + ",<br><br> your order for the book " + rs2.getString("book_title") + " with book id \"" + bookId + "\" has arrived.<br><br> Please visit the library to collect it.";
                 Notification_Controller.getInstance().sendEmail(subscriberEmail, "The book you ordered is now available for you to borrow", message);
             }
         }
@@ -2934,7 +2934,7 @@ public class DbController
             	 oneOrderList.add(String.valueOf(rs.getInt("book_id")));
             	 oneOrderList.add(rs.getString("book_title"));
                  Timestamp orderDate = rs.getTimestamp("order_date");
-                 java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                 java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm");
                  oneOrderList.add(sdf.format(orderDate));
             	 ordersList.add(oneOrderList);
              }
