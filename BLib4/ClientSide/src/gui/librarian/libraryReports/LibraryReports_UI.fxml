@@ -215,7 +215,7 @@
 
             <BarChart fx:id="borrowingReportChart" managed="false" title="Borrowing Report" visible="false">
                 <xAxis>
-                    <CategoryAxis label="Book Title"/>
+                    <CategoryAxis/>
                 </xAxis>
                 <yAxis>
                     <NumberAxis label="Time (days)"/>

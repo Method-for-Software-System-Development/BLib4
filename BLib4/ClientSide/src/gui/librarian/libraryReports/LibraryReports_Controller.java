@@ -305,7 +305,6 @@ public class LibraryReports_Controller {
     public BarChart<String, Number> generateBorrowingReportChart() {
         // Axes
         CategoryAxis xAxis = new CategoryAxis();
-        xAxis.setLabel("Book Title");
 
         NumberAxis yAxis = new NumberAxis();
         yAxis.setLabel("Time (days)");
