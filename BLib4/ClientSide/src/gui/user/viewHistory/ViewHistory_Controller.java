@@ -132,7 +132,6 @@ public class ViewHistory_Controller
         // Get the subscriber's activities
         ClientUI.chat.accept(new MessageType("112", subscriberController.getLoggedSubscriber().getId()));
         subscriberActivities = ChatClient.listOfActivities;
-        System.out.println(subscriberActivities);
 
         // Add rounded corners to the TableView
         Rectangle clip = new Rectangle();

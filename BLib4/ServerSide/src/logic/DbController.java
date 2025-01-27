@@ -961,11 +961,11 @@ public class DbController
                 stmt = connection.prepareStatement("SELECT scheduler_id FROM scheduler_triggers WHERE trigger_operation = 'notifyDayBeforeReturnDate' AND relevant_id = ? AND is_triggered = 0;");
                 stmt.setString(1, borrowId);
                 rs = stmt.executeQuery();
-                rs.next();
-
-                stmt = connection.prepareStatement("UPDATE scheduler_triggers SET is_triggered = 1 WHERE scheduler_id = ?;");
-                stmt.setInt(1, rs.getInt(1));
-                stmt.executeUpdate();
+                if(rs.next()) {
+                	stmt = connection.prepareStatement("UPDATE scheduler_triggers SET is_triggered = 1 WHERE scheduler_id = ?;");
+                	stmt.setInt(1, rs.getInt(1));
+                	stmt.executeUpdate();                	
+                }
             }
             catch (SQLException e)
             {

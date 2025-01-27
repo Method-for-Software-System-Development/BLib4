@@ -43,7 +43,6 @@ public class ReportsGenerator_Controller
      */
     public BorrowingReport getBorrowingReport()
     {
-        System.out.println("Fetching borrowing report for: " + month + " " + year);
         // Create a list of data of the requested report to send to the server
         ArrayList<String> dataOfReport = new ArrayList<>();
         dataOfReport.add("BorrowingReport");
@@ -55,7 +54,7 @@ public class ReportsGenerator_Controller
         //if report id not found response is -1
         if (reportNum == -1)
         {
-            System.out.println("No subscriber status report found for: " + month + " " + year);
+            System.out.println("No borrowing report report found for: " + month + " " + year);
             return null;
         }
 
@@ -78,7 +77,6 @@ public class ReportsGenerator_Controller
      */
     public SubscriberStatusReport getSubscriberStatusReport()
     {
-        System.out.println("Fetching subscriber status report for: " + month + " " + year);
         // Create a list of data of the requested report to send to the server
         ArrayList<String> dataOfReport = new ArrayList<>();
         dataOfReport.add("SubscribersStatus");
@@ -134,7 +132,6 @@ public class ReportsGenerator_Controller
      */
     public boolean checkIfReportIsReady(String reportType)
     {
-        System.out.println("Checking if " + reportType + " report for: " + month + " " + year + " is ready..");
         // Create a list of data of the requested report to send to the server
         ArrayList<String> dataOfReport = new ArrayList<>();
         dataOfReport.add(reportType);
