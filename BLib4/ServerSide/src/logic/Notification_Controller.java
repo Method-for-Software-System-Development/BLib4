@@ -12,9 +12,9 @@ public class Notification_Controller
     private static volatile Notification_Controller instance = null;
 
     // Email credentials
-    Dotenv dotenv = Dotenv.load();// Loads environment variables from the .env file
-    private final String EMAIL_ADDRESS = dotenv.get("EMAIL_ADDRESS");// Email address for sending notifications
-    private final String EMAIL_PASSWORD = dotenv.get("EMAIL_PASSWORD");// Password for the email account
+    Dotenv dotenv;
+    private String EMAIL_ADDRESS;
+    private String EMAIL_PASSWORD;
 
     /**
      * Singleton instance getter.
@@ -41,7 +41,16 @@ public class Notification_Controller
      */
     private Notification_Controller()
     {
-
+        try
+        {
+            dotenv = Dotenv.load();// Loads environment variables from the .env file
+            EMAIL_ADDRESS = dotenv.get("EMAIL_ADDRESS");// Email address for sending notifications
+            EMAIL_PASSWORD = dotenv.get("EMAIL_PASSWORD");// Password for the email account
+        }
+        catch (Exception e)
+        {
+            System.out.println("Error loading environment variables: " + e.getMessage());
+        }
     }
 
     /**
@@ -53,6 +62,8 @@ public class Notification_Controller
      */
     public void sendEmail(String recipientEmail, String subject, String content)
     {
+        Session session;
+
         // Email signature
         String signature = "<br><br>BLib 4 - Advanced Library Management System<br>" +
                 "Efficient management of books, subscribers, and library data<br><br>" +
@@ -64,23 +75,31 @@ public class Notification_Controller
         // Combine the content with the signature
         String fullContent = content + signature;
 
-        // Configure email server properties
-        Properties properties = new Properties();
-        properties.put("mail.smtp.auth", "true");// Enable SMTP authentication
-        properties.put("mail.smtp.starttls.enable", "true");// Enable STARTTLS
-        properties.put("mail.smtp.host", "smtp.gmail.com");// SMTP server address
-        properties.put("mail.smtp.port", "587");// SMTP server port
-        properties.put("mail.smtp.ssl.trust", "smtp.gmail.com");
-
-        // Create a session with an authenticator
-        Session session = Session.getInstance(properties, new Authenticator()
+        try
         {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication()
+            // Configure email server properties
+            Properties properties = new Properties();
+            properties.put("mail.smtp.auth", "true");// Enable SMTP authentication
+            properties.put("mail.smtp.starttls.enable", "true");// Enable STARTTLS
+            properties.put("mail.smtp.host", "smtp.gmail.com");// SMTP server address
+            properties.put("mail.smtp.port", "587");// SMTP server port
+            properties.put("mail.smtp.ssl.trust", "smtp.gmail.com");
+
+            // Create a session with an authenticator
+            session = Session.getInstance(properties, new Authenticator()
             {
-                return new PasswordAuthentication(EMAIL_ADDRESS, EMAIL_PASSWORD);
-            }
-        });
+                @Override
+                protected PasswordAuthentication getPasswordAuthentication()
+                {
+                    return new PasswordAuthentication(EMAIL_ADDRESS, EMAIL_PASSWORD);
+                }
+            });
+        }
+        catch (Exception e)
+        {
+            System.out.println("Error configuring email server properties: " + e.getMessage());
+            return;
+        }
 
         try
         {
@@ -99,7 +118,7 @@ public class Notification_Controller
         }
         catch (MessagingException e)
         {
-            e.printStackTrace();
+            System.out.println("Error sending email: " + e.getMessage());
         }
     }
 
