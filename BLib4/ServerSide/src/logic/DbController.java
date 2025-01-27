@@ -2942,9 +2942,18 @@ public class DbController
                 oneOrderList.add(String.valueOf(rs.getInt("order_id")));
                 oneOrderList.add(String.valueOf(rs.getInt("book_id")));
                 oneOrderList.add(rs.getString("book_title"));
-                Timestamp orderDate = rs.getTimestamp("order_date");
-                java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm");
-                oneOrderList.add(sdf.format(orderDate));
+                String dateTime=rs.getString("order_date");
+                // Utility method to format dates
+                try
+                {
+                    LocalDateTime localDateTime = LocalDateTime.parse(dateTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                    dateTime = localDateTime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+                }
+                catch (Exception e)
+                {
+                    // Do nothing
+                }
+                oneOrderList.add(dateTime);
                 ordersList.add(oneOrderList);
             }
         }
