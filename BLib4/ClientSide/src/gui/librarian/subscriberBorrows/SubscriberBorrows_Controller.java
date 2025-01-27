@@ -369,6 +369,7 @@ public class SubscriberBorrows_Controller implements DataReceiver
                     else
                     {
                         text.setText(item);
+                        text.setTextAlignment(TextAlignment.CENTER);
                         text.wrappingWidthProperty().bind(bookTitleColumn.widthProperty().subtract(10)); // Wrap text within column width
                         setGraphic(text);
                     }

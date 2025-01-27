@@ -1380,12 +1380,28 @@ public class DbController
                 stmt = connection.prepareStatement("SELECT scheduler_id FROM scheduler_triggers WHERE trigger_operation = 'notifyDayBeforeReturnDate' AND relevant_id = ? AND is_triggered = 0;");
                 stmt.setString(1, borrowId);
                 rs = stmt.executeQuery();
-                rs.next();
+                if (rs.next())
+                {
+                    stmt = connection.prepareStatement("UPDATE scheduler_triggers SET trigger_date = ? WHERE scheduler_id = ?;");
+                    stmt.setDate(1, Date.valueOf(newDueDate.toLocalDate().minusDays(1)));
+                    stmt.setInt(2, rs.getInt(1));
+                    stmt.executeUpdate();
+                }
+                else
+                {
+                    // create new scheduler trigger
+                    stmt = connection.prepareStatement("SELECT MAX(scheduler_id) FROM scheduler_triggers;");
+                    rs = stmt.executeQuery();
+                    rs.next();
+                    int schedulerId = rs.getInt(1) + 1;
 
-                stmt = connection.prepareStatement("UPDATE scheduler_triggers SET trigger_date = ? WHERE scheduler_id = ?;");
-                stmt.setDate(1, Date.valueOf(newDueDate.toLocalDate().minusDays(1)));
-                stmt.setInt(2, rs.getInt(1));
-                stmt.executeUpdate();
+                    stmt = connection.prepareStatement("INSERT INTO scheduler_triggers (scheduler_id, trigger_date, trigger_operation, relevant_id, is_triggered) VALUES (?, ?, ?, ?, 0);");
+                    stmt.setInt(1, schedulerId);
+                    stmt.setDate(2, Date.valueOf(newDueDate.toLocalDate().minusDays(1)));
+                    stmt.setString(3, "notifyDayBeforeReturnDate");
+                    stmt.setString(4, borrowId);
+                    stmt.executeUpdate();
+                }
             }
             catch (SQLException e)
             {
