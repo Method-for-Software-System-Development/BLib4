@@ -692,16 +692,8 @@ public class SubscriberBorrows_Controller implements DataReceiver
      */
     private void refreshBorrowsTable()
     {
-        // Clear the previous entries before updating the table
-        borrowEntries.clear();
-
-        // Reload the borrow data
-        loadBorrowsData(userId);
-        loadOrderData(userId);
-
-        // Set the updated list of borrows in the table
-        borrowsTable.setItems(borrowEntries);
-        orderTable.setItems(orderEntries);
+        // Refresh the borrows table by reloading the scene
+        SceneManager.switchSceneWithData("/gui/librarian/subscriberBorrows/SubscriberBorrows_UI.fxml", "BLib.4 - Subscriber Borrows", userId);
     }
 
     /**

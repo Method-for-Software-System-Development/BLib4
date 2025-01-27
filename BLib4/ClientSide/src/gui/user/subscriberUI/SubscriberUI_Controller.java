@@ -547,22 +547,8 @@ public class SubscriberUI_Controller
      */
     private void refreshBorrowsTable()
     {
-        // Get the subscriber's borrows
-        ClientUI.chat.accept(new MessageType("110", subscriberController.getLoggedSubscriber().getId()));
-        subscriberBorrows = ChatClient.listOfBorrows;
-        // Clear the previous entries before updating the table
-        borrowEntries.clear();
-        // Reload the borrow data
-        loadBorrowsData();
-        // Set the updated list of borrows in the table
-        borrowsTable.setItems(borrowEntries);
-        borrowsTable.refresh();
-
-        ClientUI.chat.accept(new MessageType("119", subscriberController.getLoggedSubscriber().getId()));
-
-        loadOrderData();
-        orderTable.setItems(orderEntries);
-        orderTable.refresh();
+        // Refresh the borrows table by reloading the scene
+        SceneManager.switchScene("/gui/user/subscriberUI/SubscriberUI_UI.fxml", "BLib.4 - Braude Library Management");
     }
 
     /**
