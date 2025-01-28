@@ -183,7 +183,25 @@ public class ServerController extends AbstractServer
                     dbController.handleUpdateHistoryFileBySubscriberId(subscriberId, newHistoryList);
                 }
 
-                // ToDo: docoment on reader card if the subscriber is frozen
+                // account is frozen
+                if (((List<Boolean>) responseMsg.getData()).get(1))
+                {
+                    // Getting book name by borrow ID
+                    String bookName = (dbController.getBookDetailsByBorrowId((String) receiveMsg.data)).getTitle();
+
+                    // Getting subscriber ID from DB using borrow ID
+                    String subscriberId = dbController.getSubscriberIdFromBorrowId((String) receiveMsg.data);
+
+                    // Getting a history file of subscriber
+                    List<String[]> historyList = dbController.getHistoryFileBySubscriberId(subscriberId);
+
+                    // Document return of a book
+                    List<String[]> newHistoryList = documentationController.documentOnReaderCard("109-1", historyList, bookName, null);
+
+                    // Updating a subscriber history file in DB
+                    dbController.handleUpdateHistoryFileBySubscriberId(subscriberId, newHistoryList);
+                }
+
                 break;
 
             case "110":
@@ -326,7 +344,22 @@ public class ServerController extends AbstractServer
                 // Request to update copy of the book to lost status
                 responseMsg = new MessageType("218", dbController.handleUpdateBookCopyToLost((String) receiveMsg.data));
 
-                // ToDo: Document on reader card
+                if ((boolean) responseMsg.getData())
+                {
+                    // Getting subscriber ID using borrow ID
+                    subscriberId = dbController.getSubscriberIdFromBorrowId((String) receiveMsg.data);
+
+                    // Getting book name by borrow ID
+                    bookName = (dbController.getBookDetailsByBorrowId((String) receiveMsg.data)).getTitle();
+
+                    // Getting a history file of subscriber
+                    historyList = dbController.getHistoryFileBySubscriberId(subscriberId);
+
+                    // Document lost book
+                    List<String[]> newHistoryList = documentationController.documentOnReaderCard("118", historyList, bookName, null);
+                    // Updating a subscriber history file in DB
+                    dbController.handleUpdateHistoryFileBySubscriberId(subscriberId, newHistoryList);
+                }
                 break;
 
             case "120":

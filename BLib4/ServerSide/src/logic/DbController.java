@@ -1713,6 +1713,17 @@ public class DbController
                 {
                     updateSubscriberStmt.setString(1, subscriberId);
                     updateSubscriberStmt.executeUpdate();
+
+                    // document the unfrozen subscriber in subscriber history
+
+                    // Getting a history file of subscriber
+                    List<String[]> historyList = getHistoryFileBySubscriberId(subscriberId);
+
+                    // Document lost book
+                    List<String[]> newHistoryList = DocumentationController.getInstance().documentOnReaderCard("109-2", historyList, null, null);
+                    // Updating a subscriber history file in DB
+                    handleUpdateHistoryFileBySubscriberId(subscriberId, newHistoryList);
+
                 }
             }
 
