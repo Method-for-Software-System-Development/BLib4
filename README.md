@@ -56,6 +56,9 @@ All the files can be found in the [Run](Run/) folder
 ### Sequence Diagram - Subscription Report
 ![Sequence_Diagram-Subscription_Report](Models/Sequence_Diagram-Subscription_Report.png)
 
+### Package Diagram
+![PackageDiagram](Models/Package_final.png)
+
 ## System Screenshots
 
 ### Client Side
