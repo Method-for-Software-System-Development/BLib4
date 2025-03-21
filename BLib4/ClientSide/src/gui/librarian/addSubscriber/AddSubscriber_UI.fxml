@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<GridPane alignment="CENTER" hgap="15.0" prefHeight="1080.0" prefWidth="1920.0" styleClass="gridPane"
+          stylesheets="@../../GlobalBLib_Styles.css, @AddSubscriber_Styles.css" vgap="15.0"
+          xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1"
+          fx:controller="gui.librarian.addSubscriber.AddSubscriber_Controller">
+
+    <!-- Row Constraints -->
+    <rowConstraints>
+        <RowConstraints maxHeight="200.0" minHeight="200.0" prefHeight="200.0"/>
+        <RowConstraints vgrow="ALWAYS"/>
+    </rowConstraints>
+
+    <!-- Column Constraints -->
+    <columnConstraints>
+        <ColumnConstraints maxWidth="500.0" minWidth="500.0" prefWidth="500.0"/>
+        <ColumnConstraints hgrow="ALWAYS"/>
+    </columnConstraints>
+
+    <!-- Padding -->
+    <padding>
+        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0"/>
+    </padding>
+
+    <!-- Menu (Left Panel) -->
+    <VBox alignment="TOP_CENTER" maxWidth="500.0" minWidth="500.0" prefWidth="500.0" styleClass="menu"
+          GridPane.hgrow="NEVER" GridPane.rowSpan="2" GridPane.vgrow="ALWAYS">
+
+        <!-- Logo Image -->
+        <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@../../assets/images/logo.png"/>
+            </image>
+            <VBox.margin>
+                <Insets bottom="25.0" top="15.0"/>
+            </VBox.margin>
+        </ImageView>
+
+        <!-- White Separator -->
+        <Separator prefHeight="5.0" styleClass="menu-separator"/>
+
+        <Text fx:id="userGreeting" styleClass="menu-title">
+            <VBox.margin>
+                <Insets bottom="25.0" top="25.0"/>
+            </VBox.margin>
+        </Text>
+
+        <!-- White Separator -->
+        <Separator prefHeight="5.0" styleClass="menu-separator"/>
+
+        <!-- Menu Buttons -->
+        <Button fx:id="librarianDashButton" maxWidth="Infinity" onAction="#goToLibrarianDash" prefHeight="50.0" styleClass="orange-button" text="Librarian Dashboard">
+            <graphic>
+                <ImageView fx:id="librarianDashImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                    <image>
+                        <Image url="@../../assets/icons/local_library_24dp_FFFFFF.png"/>
+                    </image>
+                </ImageView>
+            </graphic>
+            <VBox.margin>
+                <Insets top="25.0" />
+            </VBox.margin>
+        </Button>
+
+        <Button fx:id="searchBooksButton" maxWidth="Infinity" onAction="#goToSearch" prefHeight="50.0"
+                styleClass="transparent-button" text="Search For Books">
+            <graphic>
+                <ImageView fx:id="searchBooksImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                    <image>
+                        <Image url="@../../assets/icons/search_24dp_FFFFFF.png"/>
+                    </image>
+                </ImageView>
+            </graphic>
+            <VBox.margin>
+                <Insets top="25.0"/>
+            </VBox.margin>
+        </Button>
+
+        <Button fx:id="newBorrowButton" maxWidth="Infinity" onAction="#goToNewBorrow" prefHeight="50.0" styleClass="transparent-button"
+                text="New Borrow">
+            <graphic>
+                <ImageView fx:id="newBorrowImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                    <image>
+                        <Image url="@../../assets/icons/post_add_24dp_FFFFFF.png"/>
+                    </image>
+                </ImageView>
+            </graphic>
+            <VBox.margin>
+                <Insets top="25.0"/>
+            </VBox.margin>
+        </Button>
+
+        <Button fx:id="reportsButton" maxWidth="Infinity" onAction="#goToLibraryReports" prefHeight="50.0" styleClass="transparent-button"
+                text="Library Reports">
+            <graphic>
+                <ImageView fx:id="reportsImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                    <image>
+                        <Image url="@../../assets/icons/bar_chart_24dp_FFFFFF.png"/>
+                    </image>
+                </ImageView>
+            </graphic>
+            <VBox.margin>
+                <Insets top="25.0"/>
+            </VBox.margin>
+        </Button>
+
+        <Button fx:id="logoutButton" maxWidth="Infinity" onAction="#logout" prefHeight="50.0"
+                styleClass="transparent-button" text="Logout">
+            <graphic>
+                <ImageView fx:id="logoutImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                    <image>
+                        <Image url="@../../assets/icons/logout_24dp_FFFFFF.png"/>
+                    </image>
+                </ImageView>
+            </graphic>
+            <VBox.margin>
+                <Insets top="25.0"/>
+            </VBox.margin>
+        </Button>
+
+        <!-- Spacer Region -->
+        <Region VBox.vgrow="ALWAYS"/>
+
+        <Button fx:id="homePageButton" maxWidth="Infinity" onAction="#goToHomePage" prefHeight="50.0"
+                styleClass="transparent-button" text="Home Page">
+            <graphic>
+                <ImageView fx:id="homePageImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                    <image>
+                        <Image url="@../../assets/icons/home_24dp_FFFFFF.png"/>
+                    </image>
+                </ImageView>
+            </graphic>
+            <VBox.margin>
+                <Insets top="25.0"/>
+            </VBox.margin>
+        </Button>
+
+        <Button fx:id="exitButton" maxWidth="Infinity" onAction="#exitApp" prefHeight="50.0"
+                styleClass="transparent-button" text="Exit Application">
+            <graphic>
+                <ImageView fx:id="exitImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                    <image>
+                        <Image url="@../../assets/icons/close_24dp_FFFFFF.png"/>
+                    </image>
+                </ImageView>
+            </graphic>
+            <VBox.margin>
+                <Insets top="25.0"/>
+            </VBox.margin>
+        </Button>
+
+        <!-- TextFlow for Credits -->
+        <TextFlow textAlignment="CENTER">
+            <Text styleClass="verySmall-white-text"
+                  text="Engineering Methods For Software Systems Development Semester Project by Group 4"/>
+            <VBox.margin>
+                <Insets top="25.0"/>
+            </VBox.margin>
+        </TextFlow>
+
+    </VBox>
+
+    <!-- Header (Top Panel) -->
+    <VBox alignment="BOTTOM_LEFT" maxHeight="200.0" minHeight="200.0" prefHeight="200.0" styleClass="header"
+          GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
+        <Text styleClass="header-title" text="Braude College Library Management Application">
+            <VBox.margin>
+                <Insets bottom="10.0" left="15.0"/>
+            </VBox.margin>
+        </Text>
+    </VBox>
+
+    <!-- Main (Main Content Panel) -->
+    <VBox styleClass="main" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1"
+          GridPane.vgrow="ALWAYS">
+
+        <Text styleClass="main-title" text="Add New Subscriber:">
+            <VBox.margin>
+                <Insets bottom="15.0" />
+            </VBox.margin>
+        </Text>
+
+        <TextFlow>
+            <Text text="Below is a form for creating a new library subscriber account. "/>
+            <Text style="-fx-fill: #E74C3C" text="All fields are mandatory.&#10;"/>
+            <Text text="Please ensure the accuracy of the ID number, first name, and last name, as these cannot be changed later.&#10;Other details can be updated by the subscriber."/>
+            <VBox.margin>
+                <Insets bottom="50.0" />
+            </VBox.margin>
+        </TextFlow>
+
+        <!-- Add Subscriber Form -->
+        <GridPane fx:id="addSubscriberForm" alignment="CENTER" hgap="15" vgap="20">
+
+            <!-- User ID -->
+            <Text text="User ID:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+            <TextField fx:id="userIdField" prefHeight="50.0" prefWidth="350.0" promptText="Enter User ID" styleClass="grey-text-field" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+            <Pane GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.columnSpan="2" />
+
+            <!-- First Name and Last Name -->
+            <Text text="First Name:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+            <TextField fx:id="firstNameField" prefHeight="50.0" prefWidth="350.0" promptText="Enter First Name" styleClass="grey-text-field" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <Pane prefWidth="30.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+            <Text text="Last Name:" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+            <TextField fx:id="lastNameField" prefHeight="50.0" prefWidth="350.0" promptText="Enter Last Name" styleClass="grey-text-field" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+
+            <!-- Phone Number and Email -->
+            <Text text="Phone Number:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+            <TextField fx:id="phoneNumberField" prefHeight="50.0" prefWidth="350.0" promptText="Enter Phone Number (05XXXXXXXX)" styleClass="grey-text-field" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <Pane GridPane.columnIndex="2" GridPane.rowIndex="2" />
+            <Text text="Email:" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+            <TextField fx:id="emailField" prefHeight="50.0" prefWidth="350.0" promptText="Enter Email Address" styleClass="grey-text-field" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+
+            <!-- Password and Confirm Password -->
+            <Text text="Password:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+            <PasswordField fx:id="passwordField" prefHeight="50.0" prefWidth="350.0" promptText="Enter Password" styleClass="grey-text-field" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <Pane GridPane.columnIndex="2" GridPane.rowIndex="3" />
+            <Text text="Confirm Password:" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+            <PasswordField fx:id="confirmPasswordField" prefHeight="50.0" prefWidth="350.0" promptText="Re-enter Password" styleClass="grey-text-field" GridPane.columnIndex="4" GridPane.rowIndex="3" />
+
+            <!-- Buttons -->
+            <HBox alignment="CENTER_RIGHT" spacing="20" GridPane.columnIndex="0" GridPane.columnSpan="5" GridPane.rowIndex="4">
+                <Button fx:id="clearButton" prefHeight="50.0" prefWidth="150.0" styleClass="grey-transparent-button" text="Clear" onAction="#clear_form" />
+                <Button fx:id="submitButton" prefHeight="50.0" prefWidth="150.0" styleClass="orange-orange-button" text="Submit" onAction="#validate_addSubscriber_form" />
+            </HBox>
+
+        </GridPane>
+
+    </VBox>
+</GridPane>

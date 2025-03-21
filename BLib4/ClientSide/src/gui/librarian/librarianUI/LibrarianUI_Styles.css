@@ -1,0 +1,57 @@
+/* Base styling for the TableView */
+.messages-table {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-border-width: 0px;
+}
+
+/* styling for the table header background */
+.messages-table .column-header-background {
+    -fx-max-height: 0;
+    -fx-pref-height: 0;
+    -fx-min-height: 0;
+}
+
+/* Styling for odd rows (alternating row colors) */
+.messages-table .table-row-cell:odd {
+    -fx-background-color: transparent;
+}
+/* Row hover effect */
+.messages-table .table-row-cell:hover {
+    -fx-background-color: transparent;
+}
+
+/* Styling for table cells */
+.messages-table .table-cell {
+    -fx-font-family: "Roboto";
+    -fx-font-size: 20px;
+    -fx-text-fill: #454545;
+    -fx-alignment: CENTER;
+    -fx-border-color: #999999;
+    -fx-border-width: 0 0px 1px 0;
+}
+
+/* Scroll pane styling */
+.messages-table .scroll-bar {
+    -fx-background-color: transparent;
+    -fx-border-width: none;
+    -fx-padding: 0 0 15px 0;
+}
+.messages-table .scroll-bar .viewport {
+    -fx-background-color: transparent;
+}
+.messages-table .scroll-bar .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-height: 10px;
+}
+.messages-table .scroll-bar:vertical .increment-button,
+.messages-table .scroll-bar:vertical .decrement-button {
+    -fx-opacity: 0;
+}
+.messages-table .scroll-bar .thumb {
+    -fx-background-color: #454545;
+    -fx-background-radius: 5px;
+}
+.messages-table .scroll-bar .thumb:hover {
+    -fx-background-color: #525FE1;
+}

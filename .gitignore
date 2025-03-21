@@ -199,6 +199,13 @@ modules.xml
 *.zip
 *.tar.gz
 *.rar
+.env
+
+# Eclipse specific files
+*.classpath
+*.project
+*.settings/
+bin/
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
@@ -212,3 +219,8 @@ RemoteSystemsTempFiles/
 
 # include mysql lib files
 !mysql-connector-java-8.0.13.jar
+!javax.mail.jar
+!dotenv-java-2.2.0.jar
+!opencsv-5.9.jar
+!activation-1.1.1.jar
+!Run/*

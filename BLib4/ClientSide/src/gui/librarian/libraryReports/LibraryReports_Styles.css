@@ -1,0 +1,54 @@
+.grey-choice-box {
+    -fx-border-color: #454545;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-border-width: 2px;
+    -fx-text-fill: #454545;
+    -fx-font-family: "Roboto Medium";
+    -fx-font-size: 20px;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+.grey-choice-box:focused {
+    -fx-border-color: #F86F03;
+}
+.grey-choice-box .menu-item:focused {
+    -fx-background-color: #B5BBFF;
+}
+
+.default-color0.chart-bar {
+    -fx-bar-fill: #525FE1;
+}
+.default-color1.chart-bar {
+    -fx-bar-fill: #B5BBFF;
+}
+.default-color2.chart-bar {
+    -fx-bar-fill: #F86F03;
+}
+
+.chart-plot-background {
+    -fx-background-color: transparent;
+}
+.chart-horizontal-grid-lines, .chart-vertical-grid-lines {
+    -fx-stroke: transparent;
+}
+
+.axis-label {
+    -fx-text-fill: #454545;
+    -fx-font-family: "Roboto Medium";
+    -fx-font-size: 20px;
+    -fx-padding: 20px;
+}
+
+.chart-legend {
+    -fx-text-fill: #454545;
+    -fx-font-family: "Roboto Medium";
+    -fx-font-size: 20px;
+}
+.chart-legend-item {
+    -fx-padding: 15px;
+}
+.chart-legend-item-symbol {
+    -fx-border-radius: 3px;
+    -fx-background-radius: 3px;
+}

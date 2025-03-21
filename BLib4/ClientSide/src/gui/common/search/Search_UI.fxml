@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<GridPane alignment="CENTER" hgap="15.0" prefHeight="1080.0" prefWidth="1920.0" styleClass="gridPane"
+          stylesheets="@../../GlobalBLib_Styles.css, @Search_Styles.css" vgap="15.0"
+          xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1"
+          fx:controller="gui.common.search.Search_Controller">
+
+    <!-- Row Constraints -->
+    <rowConstraints>
+        <RowConstraints maxHeight="200.0" minHeight="200.0" prefHeight="200.0"/>
+        <RowConstraints vgrow="ALWAYS"/>
+    </rowConstraints>
+
+    <!-- Column Constraints -->
+    <columnConstraints>
+        <ColumnConstraints maxWidth="500.0" minWidth="500.0" prefWidth="500.0"/>
+        <ColumnConstraints hgrow="ALWAYS"/>
+    </columnConstraints>
+
+    <!-- Padding -->
+    <padding>
+        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0"/>
+    </padding>
+
+    <!-- Menu (Left Panel) -->
+    <VBox alignment="TOP_CENTER" maxWidth="500.0" minWidth="500.0" prefWidth="500.0" styleClass="menu"
+          GridPane.hgrow="NEVER" GridPane.rowSpan="2" GridPane.vgrow="ALWAYS">
+
+        <!-- Logo Image -->
+        <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@../../assets/images/logo.png"/>
+            </image>
+            <VBox.margin>
+                <Insets bottom="25.0" top="15.0"/>
+            </VBox.margin>
+        </ImageView>
+
+        <!-- White Separator -->
+        <Separator prefHeight="5.0" styleClass="menu-separator"/>
+
+        <!-- ***************** This VBox will be shown if the user is not logged in ***************** -->
+        <VBox fx:id="seeIfNotLoggedIn">
+
+            <VBox alignment="TOP_LEFT" spacing="20.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                <VBox.margin>
+                    <Insets bottom="25.0" top="25.0"/>
+                </VBox.margin>
+
+                <!-- Title -->
+                <Text styleClass="menu-title" text="Login:"/>
+
+                <!-- Radio Buttons for Account Selection -->
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                    <Text text="Select Account Type:"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <RadioButton fx:id="subscriberRadioButton" styleClass="custom-radio-button" text="Subscriber">
+                        <toggleGroup>
+                            <ToggleGroup fx:id="accountTypeGroup"/>
+                        </toggleGroup>
+                    </RadioButton>
+                    <RadioButton fx:id="librarianRadioButton" styleClass="custom-radio-button" text="Librarian"
+                                 toggleGroup="$accountTypeGroup"/>
+                </HBox>
+
+                <!-- User's ID Field -->
+                <HBox alignment="CENTER_LEFT">
+                    <Text text="User's ID:"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <TextField fx:id="idTextField" prefHeight="50.0" prefWidth="350.0" promptText="Enter your ID"
+                               styleClass="custom-text-field"/>
+                </HBox>
+
+                <!-- Password Field -->
+                <HBox alignment="CENTER_LEFT">
+                    <Text text="Password:"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <PasswordField fx:id="passwordTextField" prefHeight="50.0" prefWidth="350.0"
+                                   promptText="Enter your Password" styleClass="custom-text-field"/>
+                </HBox>
+
+                <!-- Scan Reader Card and Login Buttons -->
+                <HBox>
+                    <Button fx:id="scanReaderCardButton" prefHeight="50.0" styleClass="transparent-button"
+                            text="Scan Reader Card" onAction="#validate_scanReaderCard_login">
+                        <graphic>
+                            <ImageView fx:id="scanReaderCardImageView" fitHeight="24.0" fitWidth="24.0"
+                                       preserveRatio="true">
+                                <image>
+                                    <Image url="@../../assets/icons/qr_code_scanner_24dp_FFFFFF.png"/>
+                                </image>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+
+                    <!-- Spacer Region -->
+                    <Region HBox.hgrow="ALWAYS"/>
+
+                    <Button fx:id="loginButton" prefHeight="50.0" prefWidth="150.0" styleClass="orange-button"
+                            text="Login" onAction="#validate_login_form">
+                        <graphic>
+                            <ImageView fx:id="loginImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                                <image>
+                                    <Image url="@../../assets/icons/login_24dp_FFFFFF.png"/>
+                                </image>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+
+                </HBox>
+            </VBox>
+
+            <!-- White Separator -->
+            <Separator prefHeight="5.0" styleClass="menu-separator"/>
+
+            <!-- TextFlow for Account Creation -->
+            <TextFlow>
+                <Text styleClass="medium-bold-white-text" text="Don't have an account?&#10;"/> <!-- new line -->
+                <Text styleClass="small-white-text"
+                      text="Please contact the librarian at the library for a quick identification process and account creation."/>
+                <VBox.margin>
+                    <Insets bottom="25.0" top="25.0"/>
+                </VBox.margin>
+            </TextFlow>
+
+            <!-- White Separator -->
+            <Separator prefHeight="5.0" styleClass="menu-separator"/>
+
+        </VBox>
+        <!-- ***************** End of VBox for not logged in ***************** -->
+
+        <!-- ***************** This VBox will be shown if the user is logged in ***************** -->
+        <VBox fx:id="seeIfLoggedIn" alignment="TOP_CENTER">
+
+            <Text fx:id="userGreeting" styleClass="menu-title">
+                <VBox.margin>
+                    <Insets bottom="25.0" top="25.0"/>
+                </VBox.margin>
+            </Text>
+
+            <!-- White Separator -->
+            <Separator prefHeight="5.0" styleClass="menu-separator"/>
+
+            <Button fx:id="dashboardButton" maxWidth="Infinity" onAction="#goToDashboard" prefHeight="50.0"
+                    styleClass="orange-button" text="My Dashboard">
+                <graphic>
+                    <ImageView fx:id="dashboardImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                        <image>
+                            <Image url="@../../assets/icons/person_24dp_FFFFFF.png"/>
+                        </image>
+                    </ImageView>
+                </graphic>
+                <VBox.margin>
+                    <Insets top="25.0"/>
+                </VBox.margin>
+            </Button>
+
+            <Button fx:id="viewHistoryButton" maxWidth="Infinity" onAction="#goToViewHistory" prefHeight="50.0" styleClass="transparent-button"
+                    text="View Activity History">
+                <graphic>
+                    <ImageView fx:id="viewHistoryImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                        <image>
+                            <Image url="@../../assets/icons/history_24dp_FFFFFF.png"/>
+                        </image>
+                    </ImageView>
+                </graphic>
+                <VBox.margin>
+                    <Insets top="25.0"/>
+                </VBox.margin>
+            </Button>
+
+            <Button fx:id="editProfileButton" maxWidth="Infinity" onAction="#goToEditProfile" prefHeight="50.0" styleClass="transparent-button"
+                    text="Edit Profile">
+                <graphic>
+                    <ImageView fx:id="editProfileImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                        <image>
+                            <Image url="@../../assets/icons/edit_24dp_FFFFFF.png"/>
+                        </image>
+                    </ImageView>
+                </graphic>
+                <VBox.margin>
+                    <Insets top="25.0"/>
+                </VBox.margin>
+            </Button>
+
+            <Button fx:id="logoutButton" maxWidth="Infinity" onAction="#logout" prefHeight="50.0" styleClass="transparent-button"
+                    text="Logout">
+                <graphic>
+                    <ImageView fx:id="logoutImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                        <image>
+                            <Image url="@../../assets/icons/logout_24dp_FFFFFF.png"/>
+                        </image>
+                    </ImageView>
+                </graphic>
+                <VBox.margin>
+                    <Insets top="25.0"/>
+                </VBox.margin>
+            </Button>
+
+        </VBox>
+        <!-- ***************** End of VBox for logged in ***************** -->
+
+        <!-- ***************** This VBox will be shown if the librarian is logged in ***************** -->
+        <VBox fx:id="seeIfLibrarianLoggedIn" alignment="TOP_CENTER">
+
+            <Text fx:id="userGreeting2" styleClass="menu-title">
+                <VBox.margin>
+                    <Insets bottom="25.0" top="25.0"/>
+                </VBox.margin>
+            </Text>
+
+            <!-- White Separator -->
+            <Separator prefHeight="5.0" styleClass="menu-separator"/>
+
+            <Button fx:id="librarianDashButton" maxWidth="Infinity" onAction="#goToLibrarianDash" prefHeight="50.0" styleClass="orange-button" text="Librarian Dashboard">
+                <graphic>
+                    <ImageView fx:id="librarianDashImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                        <image>
+                            <Image url="@../../assets/icons/local_library_24dp_FFFFFF.png"/>
+                        </image>
+                    </ImageView>
+                </graphic>
+                <VBox.margin>
+                    <Insets top="25.0" />
+                </VBox.margin>
+            </Button>
+
+            <Button fx:id="newBorrowButton" maxWidth="Infinity" onAction="#goToNewBorrow" prefHeight="50.0" styleClass="transparent-button"
+                    text="New Borrow">
+                <graphic>
+                    <ImageView fx:id="newBorrowImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                        <image>
+                            <Image url="@../../assets/icons/post_add_24dp_FFFFFF.png"/>
+                        </image>
+                    </ImageView>
+                </graphic>
+                <VBox.margin>
+                    <Insets top="25.0"/>
+                </VBox.margin>
+            </Button>
+
+            <Button fx:id="addSubscriberButton" maxWidth="Infinity" onAction="#goToAddSubscriber" prefHeight="50.0" styleClass="transparent-button"
+                    text="Add Subscriber">
+                <graphic>
+                    <ImageView fx:id="addSubscriberImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                        <image>
+                            <Image url="@../../assets/icons/person_add_24dp_FFFFFF.png"/>
+                        </image>
+                    </ImageView>
+                </graphic>
+                <VBox.margin>
+                    <Insets top="25.0"/>
+                </VBox.margin>
+            </Button>
+
+            <Button fx:id="reportsButton" maxWidth="Infinity" onAction="#goToLibraryReports" prefHeight="50.0" styleClass="transparent-button"
+                    text="Library Reports">
+                <graphic>
+                    <ImageView fx:id="reportsImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                        <image>
+                            <Image url="@../../assets/icons/bar_chart_24dp_FFFFFF.png"/>
+                        </image>
+                    </ImageView>
+                </graphic>
+                <VBox.margin>
+                    <Insets top="25.0"/>
+                </VBox.margin>
+            </Button>
+
+            <Button fx:id="logoutButton2" maxWidth="Infinity" onAction="#logout" prefHeight="50.0"
+                    styleClass="transparent-button" text="Logout">
+                <graphic>
+                    <ImageView fx:id="logoutImageView2" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                        <image>
+                            <Image url="@../../assets/icons/logout_24dp_FFFFFF.png"/>
+                        </image>
+                    </ImageView>
+                </graphic>
+                <VBox.margin>
+                    <Insets top="25.0"/>
+                </VBox.margin>
+            </Button>
+
+        </VBox>
+        <!-- ***************** End of VBox for logged in ***************** -->
+
+        <!-- Spacer Region -->
+        <Region fx:id="menuButtonsSpacer" VBox.vgrow="ALWAYS"/>
+
+        <Button fx:id="homePageButton" maxWidth="Infinity" onAction="#goToHomePage" prefHeight="50.0" styleClass="transparent-button" text="Home Page">
+            <graphic>
+                <ImageView fx:id="homePageImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                    <image>
+                        <Image url="@../../assets/icons/home_24dp_FFFFFF.png" />
+                    </image>
+                </ImageView>
+            </graphic>
+            <VBox.margin>
+                <Insets top="25.0" />
+            </VBox.margin>
+        </Button>
+
+        <Button fx:id="exitButton" maxWidth="Infinity" onAction="#exitApp" prefHeight="50.0"
+                styleClass="transparent-button" text="Exit Application">
+            <graphic>
+                <ImageView fx:id="exitImageView" fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                    <image>
+                        <Image url="@../../assets/icons/close_24dp_FFFFFF.png"/>
+                    </image>
+                </ImageView>
+            </graphic>
+            <VBox.margin>
+                <Insets top="25.0"/>
+            </VBox.margin>
+        </Button>
+
+        <!-- TextFlow for Credits -->
+        <TextFlow textAlignment="CENTER">
+            <Text styleClass="verySmall-white-text"
+                  text="Engineering Methods For Software Systems Development Semester Project by Group 4"/>
+            <VBox.margin>
+                <Insets top="25.0"/>
+            </VBox.margin>
+        </TextFlow>
+
+    </VBox> <!-- End of Menu VBox -->
+
+    <!-- Header (Top Panel) -->
+    <VBox alignment="BOTTOM_LEFT" maxHeight="200.0" minHeight="200.0" prefHeight="200.0" styleClass="header"
+          GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS">
+        <Text styleClass="header-title" text="Braude College Library Management Application">
+            <VBox.margin>
+                <Insets bottom="10.0" left="15.0"/>
+            </VBox.margin>
+        </Text>
+    </VBox>
+
+    <!-- Main (Main Content Panel) -->
+    <VBox spacing="20" styleClass="main" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1"
+          GridPane.vgrow="ALWAYS">
+
+        <Text styleClass="main-title" text="Search for Books:">
+            <VBox.margin>
+                <Insets bottom="15.0"/>
+            </VBox.margin>
+        </Text>
+
+        <!-- Search Form -->
+        <HBox alignment="CENTER_LEFT">
+            <Text text="Search by book title:    "/>
+            <TextField fx:id="titleTextField" prefHeight="50.0" prefWidth="460.0" promptText="Enter title"
+                       styleClass="grey-text-field"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Text text="OR by book subject:    "/>
+            <TextField fx:id="subjectTextField" prefHeight="50.0" prefWidth="460.0" promptText="Enter subject"
+                       styleClass="grey-text-field"/>
+        </HBox>
+
+        <Text text="OR by free text:"/>
+        <TextField fx:id="freeTextField" prefHeight="50.0" promptText="Enter free text" styleClass="grey-text-field"/>
+
+        <HBox alignment="CENTER_RIGHT">
+            <Button fx:id="clearButton" onAction="#clear_form" prefHeight="50.0" prefWidth="150.0"
+                    styleClass="grey-transparent-button" text="Clear">
+                <HBox.margin>
+                    <Insets right="20.0"/>
+                </HBox.margin>
+            </Button>
+
+            <Button fx:id="searchButton" onAction="#validate_search_form" prefHeight="50.0" prefWidth="150.0"
+                    styleClass="orange-orange-button" text="Search">
+            </Button>
+        </HBox>
+
+        <VBox fx:id="seeIfFoundBooks" visible="false">
+
+            <Text styleClass="main-title" text="Search Results:">
+                <VBox.margin>
+                    <Insets bottom="15.0"/>
+                </VBox.margin>
+            </Text>
+
+            <!-- ScrollPane for Search Results -->
+            <ScrollPane hbarPolicy="ALWAYS" pannable="true" styleClass="scroll-pane" vbarPolicy="NEVER">
+                <content>
+                    <HBox fx:id="searchResultsHBox" alignment="CENTER" spacing="15.0">
+                        <!-- Books will be dynamically added here -->
+                    </HBox>
+                </content>
+            </ScrollPane>
+
+        </VBox>
+
+    </VBox>
+</GridPane>
